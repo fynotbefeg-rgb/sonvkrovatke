@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сон без укачивания — мягкий метод за 14 дней</title>
+<meta name="description" content="Практическое руководство для мам детей 6–10 месяцев: 7 шагов, 22 страницы, 4 печатных бланка. Без метода «оставить плакать одну».">
+<meta name="p:domain_verify" content="a162304d38de11477ed4f5ccdde8a9cc"/>
+
+<!-- OG-теги для соцсетей: подставьте свой домен и картинку -->
+<meta property="og:title" content="Сон без укачивания — мягкий метод за 14 дней">
+<meta property="og:description" content="7 шагов, 22 страницы, 4 бланка. Первый шаг работает уже сегодня вечером.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --night:#101d29;
+  --night-deep:#0a141d;
+  --night-soft:#1a2c3b;
+  --dusk:#3c4a52;
+  --dawn:#e9e0d2;
+  --morning:#faf6ef;
+  --lamp:#f2dcbb;
+  --amber:#d99a3f;
+  --amber-deep:#a96f21;
+  --ink:#1b2b33;
+  --mute:#6f8494;
+  --mute-light:#6e7a80;
+  --line-night:rgba(242,220,187,.18);
+  --line-day:#d9d0c1;
+  --serif:"Literata",Georgia,"Times New Roman",serif;
+  --sans:"Golos Text",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.65;
+  color:var(--lamp);
+  background:var(--night-deep);
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+
+.wrap{max-width:660px;margin:0 auto;padding:0 24px}
+section{padding:64px 0}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.22;margin:0 0 16px}
+h1{font-size:clamp(30px,7.5vw,46px);letter-spacing:-.01em}
+h2{font-size:clamp(24px,5.4vw,32px)}
+h3{font-size:19px;margin-bottom:8px}
+p{margin:0 0 16px;max-width:60ch}
+a{color:inherit}
+
+/* ---------- НОЧЬ ---------- */
+.night{background:var(--night-deep);color:var(--lamp)}
+.night-2{background:var(--night);color:var(--lamp)}
+
+.hero{padding:56px 0 68px}
+.log{
+  font-family:var(--sans);
+  font-size:15px;
+  border-left:1px solid var(--line-night);
+  padding-left:18px;
+  margin:0 0 34px;
+  list-style:none;
+}
+.log li{
+  display:flex;gap:14px;
+  color:#93a9ba;
+  padding:5px 0;
+  opacity:0;
+  animation:tick .5s ease forwards;
+}
+.log time{
+  font-variant-numeric:tabular-nums;
+  color:var(--lamp);
+  min-width:52px;
+  font-weight:500;
+}
+.log li:nth-child(1){animation-delay:.15s}
+.log li:nth-child(2){animation-delay:.55s}
+.log li:nth-child(3){animation-delay:.95s}
+.log li:nth-child(4){animation-delay:1.35s}
+.log li:nth-child(5){animation-delay:1.75s}
+.log li:last-child{color:#c9a97e}
+@keyframes tick{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.log li{opacity:1}}
+
+.hero h1{color:#fff8ec;margin-bottom:18px}
+.hero .lede{font-size:19px;color:#b9cddb;max-width:52ch}
+.gentle{
+  display:inline-block;
+  margin-top:6px;
+  font-size:14.5px;
+  color:#8ea9bd;
+  border:1px solid var(--line-night);
+  border-radius:2px;
+  padding:7px 13px;
+}
+
+/* кнопка */
+.btn{
+  display:inline-block;
+  background:var(--amber);
+  color:#20160a;
+  font-family:var(--sans);
+  font-weight:600;
+  font-size:17px;
+  text-decoration:none;
+  padding:16px 30px;
+  border-radius:3px;
+  border:none;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.btn:hover{background:#e9ad51}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn-row{margin:30px 0 10px}
+.btn-note{font-size:14px;color:var(--mute);margin:0}
+.night .btn-note{color:#8399a8}
+
+/* карточка «что это» */
+.facts{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1px;
+  background:var(--line-night);
+  border:1px solid var(--line-night);
+  margin:28px 0 0;
+}
+.facts div{background:var(--night);padding:18px 16px}
+.facts b{display:block;font-family:var(--serif);font-size:26px;color:#fff8ec;font-weight:600;line-height:1.1}
+.facts span{font-size:14px;color:#8ea9bd}
+
+/* цитата-боль */
+.pain li{margin-bottom:10px;color:#c6d6e1}
+.pain{padding-left:20px}
+
+/* ---------- РАССВЕТ ---------- */
+.dawn{
+  background:linear-gradient(180deg,var(--night) 0%,#5c5f5c 55%,var(--dawn) 100%);
+  color:#fdf6ea;
+}
+.dawn h2{color:#fff}
+
+/* превью первого шага */
+.moves{list-style:none;padding:0;margin:24px 0 0;counter-reset:m}
+.moves li{
+  counter-increment:m;
+  display:flex;gap:16px;
+  padding:12px 0;
+  border-top:1px solid rgba(255,255,255,.22);
+  font-size:16px;
+}
+.moves li::before{
+  content:counter(m);
+  font-family:var(--serif);
+  font-size:15px;
+  color:#e6c58e;
+  min-width:20px;
+}
+.moves .hidden-move{color:rgba(255,255,255,.55);font-style:italic}
+
+/* ---------- УТРО ---------- */
+.day{background:var(--morning);color:var(--ink)}
+.day h2,.day h3{color:#12242c}
+.day p{color:#3d4d55}
+.day-alt{background:#f2ece1;color:var(--ink)}
+
+/* оглавление */
+.steps{list-style:none;padding:0;margin:26px 0 0;counter-reset:s}
+.steps li{
+  counter-increment:s;
+  border-top:1px solid var(--line-day);
+  padding:16px 0 16px 46px;
+  position:relative;
+}
+.steps li:last-child{border-bottom:1px solid var(--line-day)}
+.steps li::before{
+  content:counter(s);
+  position:absolute;left:0;top:16px;
+  font-family:var(--serif);
+  font-size:15px;
+  color:#a8814a;
+  border:1px solid #ddceb4;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+}
+.steps h3{margin:0 0 4px;font-size:18px}
+.steps p{margin:0;font-size:15px;color:#54636b}
+.steps .when{font-size:13.5px;color:#8b7a5f;margin-top:6px;display:block}
+
+/* лестница */
+.ladder{margin:26px 0 0;border-left:2px solid #e0d4bd;padding-left:0}
+.ladder div{
+  padding:11px 16px;
+  font-size:15.5px;
+  border-bottom:1px solid #ece3d3;
+  background:#fff;
+}
+.ladder div:nth-child(1){margin-left:0}
+.ladder div:nth-child(2){margin-left:10px}
+.ladder div:nth-child(3){margin-left:20px}
+.ladder div:nth-child(4){margin-left:30px}
+.ladder div:nth-child(5){margin-left:40px}
+.ladder div:nth-child(6){margin-left:50px}
+.ladder div:nth-child(7){margin-left:60px}
+.ladder div:nth-child(8){margin-left:70px}
+.ladder b{font-family:var(--serif);color:#a8814a;margin-right:8px}
+.ladder-note{font-size:14.5px;color:#6b7a82;margin-top:14px}
+
+/* списки «что будет / чего нет» */
+.two{margin-top:24px}
+.two h3{font-size:17px;margin-bottom:10px}
+.yes,.no{padding-left:0;list-style:none;margin:0 0 28px}
+.yes li,.no li{padding:7px 0 7px 26px;position:relative;font-size:16px;border-bottom:1px solid #e8e0d1}
+.yes li::before{content:"✓";position:absolute;left:0;color:#5d8a5f;font-weight:600}
+.no li::before{content:"—";position:absolute;left:0;color:#a89880}
+.no li{color:#5b6870}
+
+/* предупреждение */
+.care{
+  border-left:3px solid #b4574a;
+  background:#fbf1ee;
+  padding:18px 20px;
+  margin:26px 0 0;
+}
+.care h3{color:#8f3f33;font-size:16px}
+.care p,.care li{font-size:15px;color:#5a4a46}
+.care ul{margin:0;padding-left:20px}
+
+/* FAQ */
+details{border-bottom:1px solid var(--line-day);padding:2px 0}
+summary{
+  cursor:pointer;
+  padding:15px 30px 15px 0;
+  font-weight:500;
+  font-size:16.5px;
+  list-style:none;
+  position:relative;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{
+  content:"+";
+  position:absolute;right:2px;top:13px;
+  font-size:21px;color:#a8814a;font-weight:400;
+}
+details[open] summary::after{content:"–"}
+summary:focus-visible{outline:2px solid var(--amber-deep);outline-offset:2px}
+details p{font-size:15.5px;color:#4c5a62;padding:0 0 16px}
+
+/* покупка */
+.buy{background:#12242c;color:#f4ecdd}
+.buy h2{color:#fff}
+.buy p{color:#bdcbd3}
+.card{
+  background:#1a3038;
+  border:1px solid rgba(244,236,221,.16);
+  padding:28px 24px;
+  margin-top:26px;
+}
+.price{font-family:var(--serif);font-size:42px;color:#fff;display:block;line-height:1.1}
+.price small{font-size:15px;font-family:var(--sans);color:#9fb2bb;display:block;margin-top:6px}
+.why{font-size:15px;color:#a9bcc5;border-left:2px solid var(--amber);padding-left:14px;margin:20px 0 0}
+.included{list-style:none;padding:0;margin:22px 0 26px}
+.included li{padding:6px 0 6px 24px;position:relative;font-size:15.5px;color:#dae4e9}
+.included li::before{content:"·";position:absolute;left:6px;color:var(--amber);font-size:22px;line-height:1}
+.buy .btn{display:block;text-align:center;width:100%}
+
+footer{background:#0a141d;color:#6f8494;font-size:13.5px;padding:34px 0 44px}
+footer p{max-width:none;margin-bottom:10px}
+footer a{color:#93a9ba}
+footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid rgba(242,220,187,.12)}
+
+@media(max-width:520px){
+  body{font-size:16.5px}
+  section{padding:52px 0}
+  .facts{grid-template-columns:1fr 1fr}
+  .ladder div{font-size:14.5px;padding:10px 12px}
+  .ladder div:nth-child(n){margin-left:0}
+  .ladder div:nth-child(2){margin-left:6px}
+  .ladder div:nth-child(3){margin-left:12px}
+  .ladder div:nth-child(4){margin-left:18px}
+  .ladder div:nth-child(5){margin-left:24px}
+  .ladder div:nth-child(6){margin-left:30px}
+  .ladder div:nth-child(7){margin-left:36px}
+  .ladder div:nth-child(8){margin-left:42px}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= ГЕРОЙ ================= -->
+<section class="night hero">
+  <div class="wrap">
+    <ul class="log">
+      <li><time>20:10</time><span>уснул на руках</span></li>
+      <li><time>20:35</time><span>переложила в кроватку</span></li>
+      <li><time>20:37</time><span>плачет</span></li>
+      <li><time>21:20</time><span>снова на руках, поясница</span></li>
+      <li><time>02:40</time><span>вы читаете это одной рукой</span></li>
+    </ul>
+
+    <h1>Сон без укачивания</h1>
+    <p class="lede">Мягкий метод за 14 дней, после которого малыш засыпает в своей кроватке — а вы укладываете его за пятнадцать минут вместо часа на руках.</p>
+    <span class="gentle">Без метода «оставить плакать одну в комнате». Вы в комнате на каждом шаге.</span>
+
+    <div class="btn-row"><a class="btn" href="https://yookassa.ru/my/i/aqKvWbmFlZ1f/l" target="_blank" rel="noopener">Забрать за 1 199 ₽</a></div>
+    <p class="btn-note">PDF, 22 страницы + 3 бонуса. Приходит на почту сразу после оплаты.<br><a href="#buy" style="color:#8ea9bd">Что входит →</a></p>
+  </div>
+</section>
+
+<!-- ================= УЗНАЁТЕ ================= -->
+<section class="night-2">
+  <div class="wrap">
+    <h2>Он засыпает только на руках</h2>
+    <p>И как только вы наклоняетесь к кроватке — он открывает глаза. Каждый раз.</p>
+    <p>Днём вы почти всё время носите его на руках. Поясница и запястья болят к вечеру, дела копятся. Вы уже пробовали «просто положить» — не сработало, и вам говорят потерпеть, потому что «перерастёт».</p>
+    <p>Он не перерастёт сам по себе. Он засыпает на руках потому, что ни разу не пробовал заснуть иначе — и не потому, что вы что-то делаете не так.</p>
+  </div>
+</section>
+
+<!-- ================= ЧТО ЭТО ================= -->
+<section class="night-2" style="padding-top:0">
+  <div class="wrap">
+    <p>Практическое руководство в PDF: семь шагов, каждый из которых нужно сделать, и бланки, которые нужно заполнить. Без физиологии сна и историй других мам.</p>
+    <div class="facts">
+      <div><b>7</b><span>шагов по порядку</span></div>
+      <div><b>22</b><span>страницы без воды</span></div>
+      <div><b>4</b><span>печатных бланка</span></div>
+      <div><b>14</b><span>дней до результата</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ОГЛАВЛЕНИЕ ================= -->
+<section class="day">
+  <div class="wrap">
+    <h2>Семь шагов</h2>
+    <p>Каждый следующий опирается на предыдущий. Ничего не нужно решать заранее — просто идти по порядку.</p>
+    <ol class="steps">
+      <li>
+        <h3>Переложите его в кроватку сегодня вечером</h3>
+        <p>Техника переноса из семи движений и признаки, по которым видно, что перекладывать уже можно.</p>
+        <span class="when">20 минут чтения · применяется в первый же сон</span>
+      </li>
+      <li>
+        <h3>Найдите окно, когда он ложится без боя</h3>
+        <p>Три дня дневника — и вы знаете свою минуту, в которую он засыпает за пять минут, а не за сорок.</p>
+        <span class="when">15 минут · три дня наблюдения</span>
+      </li>
+      <li>
+        <h3>Сделайте кроватку местом, куда он хочет</h3>
+        <p>Чек-лист по комнате и кроватке плюс пять дневных игр по три минуты.</p>
+        <span class="when">час на переделку · дальше 3 минуты в день</span>
+      </li>
+      <li>
+        <h3>Соберите вечерний ритуал на 15 минут</h3>
+        <p>Пять действий в неизменном порядке. Карточка, по которой уложит и папа, и бабушка.</p>
+        <span class="when">20 минут на сборку</span>
+      </li>
+      <li>
+        <h3>Убирайте укачивание по одной ступеньке</h3>
+        <p>Лестница из семи ступеней, календарь на 14 дней и правило отката. Это ядро метода.</p>
+        <span class="when">30 минут · 14 дней применения</span>
+      </li>
+      <li>
+        <h3>Переведите ночные пробуждения на сон без рук</h3>
+        <p>Пять ночных сценариев и один короткий ответ на каждый — не вынимая ребёнка из кроватки.</p>
+        <span class="when">20 минут · вторая неделя</span>
+      </li>
+      <li>
+        <h3>Удержите результат, когда всё сломается</h3>
+        <p>Зубы, болезнь, поездка, скачок навыков — и протокол возврата за три дня.</p>
+        <span class="when">15 минут · применяется по факту</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= ЛЕСТНИЦА ================= -->
+<section class="day-alt">
+  <div class="wrap">
+    <h2>Лестница семи ступеней</h2>
+    <p>Это и есть весь метод. Мы ничего не отнимаем разом: помощь снимается по одному слою, и на каждом ребёнок успевает приспособиться прежде, чем снимется следующий.</p>
+    <div class="ladder">
+      <div><b>0</b>Укачиваете на руках до полного засыпания</div>
+      <div><b>1</b>Держите на руках неподвижно, без укачивания</div>
+      <div><b>2</b>Кладёте сонным, но ещё не спящим</div>
+      <div><b>3</b>Ладонь на груди, вы сидите рядом</div>
+      <div><b>4</b>Руки убраны, касание только по требованию</div>
+      <div><b>5</b>Сидите рядом молча</div>
+      <div><b>6</b>Сидите у двери, выходите и возвращаетесь</div>
+      <div><b>7</b>Он засыпает сам</div>
+    </div>
+    <p class="ladder-note">Переход на следующую ступень — когда два укладывания подряд прошли спокойно. Стало тяжело — спускаетесь на ступень назад. Откат прописан в методе как обычная часть плана, а не как ваша неудача.</p>
+  </div>
+</section>
+
+
+<!-- ================= БОНУСЫ ================= -->
+<section class="day">
+  <div class="wrap">
+    <h2>Три бонуса к руководству</h2>
+    <p>Приходят вместе с основным файлом.</p>
+
+    <ol class="steps" style="counter-reset:b">
+      <li>
+        <h3>Дневные сны за пять дней</h3>
+        <p>Дневной сон отстаёт от вечернего почти всегда. Отдельный план, как подтянуть его, когда вечер уже работает — и вернуть себе два свободных часа в сутки.</p>
+        <span class="when">4 страницы · применяется со второй недели</span>
+      </li>
+      <li>
+        <h3>Спина и руки после месяцев ношения</h3>
+        <p>Малыш уже спит в кроватке, а поясница и запястья болят по-прежнему. Десять минут в день, пять привычек и честный список — когда упражнений мало и нужен врач.</p>
+        <span class="when">4 страницы · можно начинать сразу</span>
+      </li>
+      <li>
+        <h3>Переход на два сна</h3>
+        <p>В 8–9 месяцев режим, который вы только выстроили, ломается сам. Как отличить это от отката и перейти за две недели, не возвращаясь к рукам.</p>
+        <span class="when">4 страницы · пригодится через месяц-полтора</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= ЧТО БУДЕТ / ЧЕГО НЕТ ================= -->
+<section class="day">
+  <div class="wrap">
+    <h2>Что будет к пятнадцатому дню</h2>
+    <p>Малыш засыпает в своей кроватке без укачивания, а вы укладываете его за пятнадцать минут ритуала вместо часа на руках.</p>
+
+    <div class="two">
+      <h3>Чего в руководстве нет</h3>
+      <ul class="no">
+        <li>Фаз сна, циклов и «как устроен мозг младенца»</li>
+        <li>Обзоров и сравнений известных методик</li>
+        <li>Мотивационных глав «вы справитесь, вы хорошая мама»</li>
+        <li>Споров про совместный сон</li>
+        <li>Таблиц норм сна от нуля до трёх лет</li>
+        <li>Обзоров кроваток и гаджетов</li>
+        <li>Метода «оставить плакать одну в комнате»</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ПОКУПКА ================= -->
+<section class="buy" id="buy">
+  <div class="wrap">
+    <h2>Забрать руководство</h2>
+    <p>Начать можно сегодня вечером — первый шаг не требует подготовки.</p>
+
+    <div class="card">
+      <!-- ЗАМЕНИТЕ цену на свою -->
+      <span class="price">1 199 ₽<small>единоразово, файлы остаются у вас</small></span>
+
+      <p class="why">Почему так недорого: это первый запуск, и мне нужны отзывы реальных мам. Вы получаете руководство и три бонуса, я получаю обратную связь, по которой доработаю следующую версию. Когда отзывы наберутся, цена вырастет — так что честно будет сказать: дешевле, чем сейчас, уже не будет.</p>
+
+      <ul class="included">
+        <li>Руководство: PDF, 22 страницы, 7 шагов</li>
+        <li>Четыре бланка: дневник снов, карточка ритуала, календарь 14 дней, схема на ночь</li>
+        <li>Бонус 1 — Дневные сны за пять дней</li>
+        <li>Бонус 2 — Спина и руки после месяцев ношения</li>
+        <li>Бонус 3 — Переход на два сна</li>
+      </ul>
+
+      <!-- ЗАМЕНИТЕ href на ссылку вашей платёжной системы -->
+      <a class="btn" href="https://yookassa.ru/my/i/aqKvWbmFlZ1f/l" target="_blank" rel="noopener">Купить и получить на почту</a>
+      <p class="btn-note" style="margin-top:14px;text-align:center">Оплата картой · Файл приходит сразу после оплаты<br>Нажимая кнопку, вы соглашаетесь с <a href="/oferta.html" style="color:#9fb2bb">офертой</a> и <a href="/policy.html" style="color:#9fb2bb">политикой конфиденциальности</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= КОМУ НЕ ПОДОЙДЁТ ================= -->
+<section class="day-alt">
+  <div class="wrap">
+    <h2>Когда это не ваш случай</h2>
+    <p>Руководство рассчитано на здорового ребёнка 6–10 месяцев, у которого сон — вопрос привычки. В этих ситуациях сначала нужен врач, а не метод:</p>
+    <div class="care">
+      <h3>Сначала к педиатру</h3>
+      <ul>
+        <li>Ребёнок храпит, дышит ртом во сне, есть паузы в дыхании</li>
+        <li>Плохо набирает вес</li>
+        <li>Сильно выгибается, кричит от боли, обильно срыгивает</li>
+        <li>Сон сломался резко, на фоне температуры или вялости</li>
+        <li>Ребёнок родился раньше срока или наблюдается у невролога</li>
+      </ul>
+    </div>
+    <p style="margin-top:22px">И ещё: если вам самой тяжело настолько, что нет сил и нет радости — это тоже повод обратиться к врачу, и это не про слабость. Метод здесь подождёт.</p>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="day">
+  <div class="wrap">
+    <h2>Частые вопросы</h2>
+
+    <details>
+      <summary>Ребёнок будет плакать?</summary>
+      <p>Скорее всего, будет — вы меняете привычку, а возражать он умеет одним способом. Разница в том, что вы находитесь в комнате на каждой ступени и отвечаете ему. В руководстве отдельно разобрано, как отличить плач-протест, при котором вы продолжаете, от паники, при которой ребёнка нужно взять на руки. Взять на руки — это часть метода, а не срыв.</p>
+    </details>
+
+    <details>
+      <summary>Нам 5 месяцев. Или уже год. Подойдёт?</summary>
+      <p>Метод собран под 6–10 месяцев: расчёты окон бодрствования и календарь ступеней рассчитаны на этот возраст. Сама лестница работает и позже, но цифры режима вам придётся пересчитывать самостоятельно. До шести месяцев брать не советую.</p>
+    </details>
+
+    <details>
+      <summary>Нужно ли отучать от ночных кормлений?</summary>
+      <p>Нет. В семь месяцев одно-два кормления за ночь — нормально, и мы их не трогаем. Убирается только связка «еда равно засыпание»: как это сделать, разобрано в шаге 6.</p>
+    </details>
+
+    <details>
+      <summary>Мы спим вместе. Это помешает?</summary>
+      <p>Не помешает начать. Первые пять шагов работают на дневных снах и вечернем укладывании независимо от того, где проходит остаток ночи. Ночь подключается на второй неделе.</p>
+    </details>
+
+    <details>
+      <summary>Что если за 14 дней не получится?</summary>
+      <p>Календарь на 14 дней — это ожидаемый темп, а не обязательство ребёнка. У части детей уходит 18–20 дней, особенно если попадают зубы или болезнь. В шаге 7 есть три показателя, по которым видно, идёт процесс или вы застряли, и что проверять в каждом случае.</p>
+    </details>
+
+    <details>
+      <summary>В каком виде приходит руководство?</summary>
+      <p>PDF на 22 страницы. Читается с телефона, бланки можно распечатать на обычном принтере. Ссылка приходит на почту сразу после оплаты, файл остаётся у вас навсегда.</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Руководство носит информационный характер и не заменяет консультацию педиатра. При любых сомнениях о здоровье ребёнка обратитесь к врачу.</p>
+    <p class="req">Бекетов Антон Александрович<br>ИНН 370306752995</p>
+    <p><a href="mailto:sonvkrovatke@gmail.com">Написать автору</a> · <a href="/oferta.html">Оферта</a> · <a href="/policy.html">Политика конфиденциальности</a></p>
+  </div>
+</footer>
+
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(112353722, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/112353722" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</body>
+</html>

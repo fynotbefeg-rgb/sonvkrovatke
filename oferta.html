@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Публичная оферта</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#101d29;
+  --night-deep:#0a141d;
+  --night-soft:#1a2c3b;
+  --dusk:#3c4a52;
+  --dawn:#e9e0d2;
+  --morning:#faf6ef;
+  --lamp:#f2dcbb;
+  --amber:#d99a3f;
+  --amber-deep:#a96f21;
+  --ink:#1b2b33;
+  --mute:#6f8494;
+  --mute-light:#6e7a80;
+  --line-night:rgba(242,220,187,.18);
+  --line-day:#d9d0c1;
+  --serif:"Literata",Georgia,"Times New Roman",serif;
+  --sans:"Golos Text",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.65;
+  color:var(--lamp);
+  background:var(--night-deep);
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+
+.wrap{max-width:660px;margin:0 auto;padding:0 24px}
+section{padding:64px 0}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.22;margin:0 0 16px}
+h1{font-size:clamp(30px,7.5vw,46px);letter-spacing:-.01em}
+h2{font-size:clamp(24px,5.4vw,32px)}
+h3{font-size:19px;margin-bottom:8px}
+p{margin:0 0 16px;max-width:60ch}
+a{color:inherit}
+
+/* ---------- НОЧЬ ---------- */
+.night{background:var(--night-deep);color:var(--lamp)}
+.night-2{background:var(--night);color:var(--lamp)}
+
+.hero{padding:56px 0 68px}
+.log{
+  font-family:var(--sans);
+  font-size:15px;
+  border-left:1px solid var(--line-night);
+  padding-left:18px;
+  margin:0 0 34px;
+  list-style:none;
+}
+.log li{
+  display:flex;gap:14px;
+  color:#93a9ba;
+  padding:5px 0;
+  opacity:0;
+  animation:tick .5s ease forwards;
+}
+.log time{
+  font-variant-numeric:tabular-nums;
+  color:var(--lamp);
+  min-width:52px;
+  font-weight:500;
+}
+.log li:nth-child(1){animation-delay:.15s}
+.log li:nth-child(2){animation-delay:.55s}
+.log li:nth-child(3){animation-delay:.95s}
+.log li:nth-child(4){animation-delay:1.35s}
+.log li:nth-child(5){animation-delay:1.75s}
+.log li:last-child{color:#c9a97e}
+@keyframes tick{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.log li{opacity:1}}
+
+.hero h1{color:#fff8ec;margin-bottom:18px}
+.hero .lede{font-size:19px;color:#b9cddb;max-width:52ch}
+.gentle{
+  display:inline-block;
+  margin-top:6px;
+  font-size:14.5px;
+  color:#8ea9bd;
+  border:1px solid var(--line-night);
+  border-radius:2px;
+  padding:7px 13px;
+}
+
+/* кнопка */
+.btn{
+  display:inline-block;
+  background:var(--amber);
+  color:#20160a;
+  font-family:var(--sans);
+  font-weight:600;
+  font-size:17px;
+  text-decoration:none;
+  padding:16px 30px;
+  border-radius:3px;
+  border:none;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.btn:hover{background:#e9ad51}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn-row{margin:30px 0 10px}
+.btn-note{font-size:14px;color:var(--mute);margin:0}
+.night .btn-note{color:#8399a8}
+
+/* карточка «что это» */
+.facts{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1px;
+  background:var(--line-night);
+  border:1px solid var(--line-night);
+  margin:28px 0 0;
+}
+.facts div{background:var(--night);padding:18px 16px}
+.facts b{display:block;font-family:var(--serif);font-size:26px;color:#fff8ec;font-weight:600;line-height:1.1}
+.facts span{font-size:14px;color:#8ea9bd}
+
+/* цитата-боль */
+.pain li{margin-bottom:10px;color:#c6d6e1}
+.pain{padding-left:20px}
+
+/* ---------- РАССВЕТ ---------- */
+.dawn{
+  background:linear-gradient(180deg,var(--night) 0%,#5c5f5c 55%,var(--dawn) 100%);
+  color:#fdf6ea;
+}
+.dawn h2{color:#fff}
+
+/* превью первого шага */
+.moves{list-style:none;padding:0;margin:24px 0 0;counter-reset:m}
+.moves li{
+  counter-increment:m;
+  display:flex;gap:16px;
+  padding:12px 0;
+  border-top:1px solid rgba(255,255,255,.22);
+  font-size:16px;
+}
+.moves li::before{
+  content:counter(m);
+  font-family:var(--serif);
+  font-size:15px;
+  color:#e6c58e;
+  min-width:20px;
+}
+.moves .hidden-move{color:rgba(255,255,255,.55);font-style:italic}
+
+/* ---------- УТРО ---------- */
+.day{background:var(--morning);color:var(--ink)}
+.day h2,.day h3{color:#12242c}
+.day p{color:#3d4d55}
+.day-alt{background:#f2ece1;color:var(--ink)}
+
+/* оглавление */
+.steps{list-style:none;padding:0;margin:26px 0 0;counter-reset:s}
+.steps li{
+  counter-increment:s;
+  border-top:1px solid var(--line-day);
+  padding:16px 0 16px 46px;
+  position:relative;
+}
+.steps li:last-child{border-bottom:1px solid var(--line-day)}
+.steps li::before{
+  content:counter(s);
+  position:absolute;left:0;top:16px;
+  font-family:var(--serif);
+  font-size:15px;
+  color:#a8814a;
+  border:1px solid #ddceb4;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+}
+.steps h3{margin:0 0 4px;font-size:18px}
+.steps p{margin:0;font-size:15px;color:#54636b}
+.steps .when{font-size:13.5px;color:#8b7a5f;margin-top:6px;display:block}
+
+/* лестница */
+.ladder{margin:26px 0 0;border-left:2px solid #e0d4bd;padding-left:0}
+.ladder div{
+  padding:11px 16px;
+  font-size:15.5px;
+  border-bottom:1px solid #ece3d3;
+  background:#fff;
+}
+.ladder div:nth-child(1){margin-left:0}
+.ladder div:nth-child(2){margin-left:10px}
+.ladder div:nth-child(3){margin-left:20px}
+.ladder div:nth-child(4){margin-left:30px}
+.ladder div:nth-child(5){margin-left:40px}
+.ladder div:nth-child(6){margin-left:50px}
+.ladder div:nth-child(7){margin-left:60px}
+.ladder div:nth-child(8){margin-left:70px}
+.ladder b{font-family:var(--serif);color:#a8814a;margin-right:8px}
+.ladder-note{font-size:14.5px;color:#6b7a82;margin-top:14px}
+
+/* списки «что будет / чего нет» */
+.two{margin-top:24px}
+.two h3{font-size:17px;margin-bottom:10px}
+.yes,.no{padding-left:0;list-style:none;margin:0 0 28px}
+.yes li,.no li{padding:7px 0 7px 26px;position:relative;font-size:16px;border-bottom:1px solid #e8e0d1}
+.yes li::before{content:"✓";position:absolute;left:0;color:#5d8a5f;font-weight:600}
+.no li::before{content:"—";position:absolute;left:0;color:#a89880}
+.no li{color:#5b6870}
+
+/* предупреждение */
+.care{
+  border-left:3px solid #b4574a;
+  background:#fbf1ee;
+  padding:18px 20px;
+  margin:26px 0 0;
+}
+.care h3{color:#8f3f33;font-size:16px}
+.care p,.care li{font-size:15px;color:#5a4a46}
+.care ul{margin:0;padding-left:20px}
+
+/* FAQ */
+details{border-bottom:1px solid var(--line-day);padding:2px 0}
+summary{
+  cursor:pointer;
+  padding:15px 30px 15px 0;
+  font-weight:500;
+  font-size:16.5px;
+  list-style:none;
+  position:relative;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{
+  content:"+";
+  position:absolute;right:2px;top:13px;
+  font-size:21px;color:#a8814a;font-weight:400;
+}
+details[open] summary::after{content:"–"}
+summary:focus-visible{outline:2px solid var(--amber-deep);outline-offset:2px}
+details p{font-size:15.5px;color:#4c5a62;padding:0 0 16px}
+
+/* покупка */
+.buy{background:#12242c;color:#f4ecdd}
+.buy h2{color:#fff}
+.buy p{color:#bdcbd3}
+.card{
+  background:#1a3038;
+  border:1px solid rgba(244,236,221,.16);
+  padding:28px 24px;
+  margin-top:26px;
+}
+.price{font-family:var(--serif);font-size:42px;color:#fff;display:block;line-height:1.1}
+.price small{font-size:15px;font-family:var(--sans);color:#9fb2bb;display:block;margin-top:6px}
+.why{font-size:15px;color:#a9bcc5;border-left:2px solid var(--amber);padding-left:14px;margin:20px 0 0}
+.included{list-style:none;padding:0;margin:22px 0 26px}
+.included li{padding:6px 0 6px 24px;position:relative;font-size:15.5px;color:#dae4e9}
+.included li::before{content:"·";position:absolute;left:6px;color:var(--amber);font-size:22px;line-height:1}
+.buy .btn{display:block;text-align:center;width:100%}
+
+footer{background:#0a141d;color:#6f8494;font-size:13.5px;padding:34px 0 44px}
+footer p{max-width:none;margin-bottom:10px}
+footer a{color:#93a9ba}
+footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid rgba(242,220,187,.12)}
+
+@media(max-width:520px){
+  body{font-size:16.5px}
+  section{padding:52px 0}
+  .facts{grid-template-columns:1fr 1fr}
+  .ladder div{font-size:14.5px;padding:10px 12px}
+  .ladder div:nth-child(n){margin-left:0}
+  .ladder div:nth-child(2){margin-left:6px}
+  .ladder div:nth-child(3){margin-left:12px}
+  .ladder div:nth-child(4){margin-left:18px}
+  .ladder div:nth-child(5){margin-left:24px}
+  .ladder div:nth-child(6){margin-left:30px}
+  .ladder div:nth-child(7){margin-left:36px}
+  .ladder div:nth-child(8){margin-left:42px}
+}
+</style>
+<style>
+  body{background:#faf6ef;color:#1b2b33}
+  .doc{max-width:720px;margin:0 auto;padding:56px 24px 80px}
+  .doc h1{font-size:clamp(24px,5.4vw,34px);color:#12242c;margin-bottom:8px}
+  .doc .upd{font-size:14px;color:#7a8890;margin-bottom:34px}
+  .doc h2{font-size:19px;color:#12242c;margin:34px 0 10px}
+  .doc p{font-size:16px;line-height:1.65;color:#3d4d55;margin:0 0 12px}
+  .doc ul{margin:0 0 14px;padding-left:22px}
+  .doc li{font-size:16px;line-height:1.6;color:#3d4d55;margin-bottom:7px}
+  .doc .req{background:#f2ece1;padding:16px 20px;margin:26px 0;font-size:15.5px;line-height:1.6}
+  .doc a{color:#a8752a}
+  .back{display:inline-block;margin-top:40px;font-size:15px;color:#7a8890}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<h1>Публичная оферта</h1>
+<div class="upd">Редакция от 10 сентября 2026 года</div>
+
+<p>Настоящий документ является публичной офертой в соответствии со статьёй 437 Гражданского кодекса Российской Федерации и содержит предложение заключить договор на приобретение цифрового информационного продукта на изложенных ниже условиях.</p>
+
+<div class="req">
+<b>Продавец:</b> Бекетов Антон Александрович<br>
+ИНН 370306752995<br>
+Адрес электронной почты: <a href="mailto:sonvkrovatke@gmail.com">sonvkrovatke@gmail.com</a><br>
+Сайт: sonvkrovatke.ru
+</div>
+
+<h2>1. Термины</h2>
+<p><b>Продавец</b> — Бекетов Антон Александрович, указанный выше.</p>
+<p><b>Покупатель</b> — дееспособное физическое лицо, достигшее 18 лет, акцептовавшее настоящую оферту.</p>
+<p><b>Товар</b> — цифровой информационный продукт: практическое руководство «Сон без укачивания» в формате PDF объёмом 22 страницы и три дополнительных материала в формате PDF.</p>
+<p><b>Сайт</b> — интернет-ресурс, размещённый по адресу sonvkrovatke.ru.</p>
+<p><b>Акцепт</b> — полное и безоговорочное принятие Покупателем условий настоящей оферты путём оплаты Товара.</p>
+
+<h2>2. Предмет договора</h2>
+<p>2.1. Продавец обязуется передать Покупателю Товар в электронном виде, а Покупатель обязуется оплатить его на условиях настоящей оферты.</p>
+<p>2.2. Товар представляет собой информационный материал и не является медицинской услугой, консультацией врача или иной услугой, требующей лицензирования.</p>
+<p>2.3. Товар передаётся в виде файлов, направляемых на адрес электронной почты, указанный Покупателем при оплате, либо в виде ссылки для скачивания.</p>
+
+<h2>3. Порядок заключения договора</h2>
+<p>3.1. Договор считается заключённым с момента оплаты Товара Покупателем.</p>
+<p>3.2. Совершая оплату, Покупатель подтверждает, что ознакомился с условиями настоящей оферты, полностью их принимает, а также подтверждает достижение возраста 18 лет.</p>
+<p>3.3. Продавец вправе в любой момент изменить условия оферты. Изменения вступают в силу с момента публикации новой редакции на Сайте и не распространяются на договоры, заключённые ранее.</p>
+
+<h2>4. Стоимость и порядок оплаты</h2>
+<p>4.1. Стоимость Товара составляет 1 199 (одну тысячу сто девяносто девять) рублей.</p>
+<p>4.2. Оплата производится единовременно, в безналичном порядке, через платёжный сервис ЮKassa.</p>
+<p>4.3. Продавец вправе изменить стоимость Товара. Изменение стоимости не распространяется на уже оплаченные заказы.</p>
+<p>4.4. Обязательства Покупателя по оплате считаются исполненными с момента поступления денежных средств Продавцу.</p>
+
+<h2>5. Передача Товара</h2>
+<p>5.1. Товар направляется Покупателю в течение 24 часов с момента поступления оплаты.</p>
+<p>5.2. Товар считается переданным надлежащим образом с момента направления файлов или ссылки для скачивания на указанный Покупателем адрес электронной почты.</p>
+<p>5.3. Покупатель обязан указать корректный адрес электронной почты. Продавец не несёт ответственности за неполучение Товара вследствие указания Покупателем недостоверных данных, а также вследствие технических ограничений почтового сервиса Покупателя.</p>
+<p>5.4. Если Товар не поступил в указанный срок, Покупателю следует обратиться к Продавцу по адресу sonvkrovatke@gmail.com.</p>
+
+<h2>6. Возврат денежных средств</h2>
+<p>6.1. В соответствии с пунктом 4 статьи 26.1 Закона Российской Федерации «О защите прав потребителей» и Правилами продажи товаров дистанционным способом, возврат цифрового товара надлежащего качества, переданного Покупателю в электронном виде, не производится, поскольку такой товар не может быть возвращён.</p>
+<p>6.2. Возврат денежных средств производится в случае, если Товар не был передан Покупателю по вине Продавца, а также в иных случаях, предусмотренных законодательством Российской Федерации.</p>
+<p>6.3. Для возврата Покупатель направляет обращение на адрес sonvkrovatke@gmail.com с указанием даты и суммы платежа. Обращение рассматривается в течение 10 календарных дней.</p>
+
+<h2>7. Права на результат интеллектуальной деятельности</h2>
+<p>7.1. Исключительные права на Товар принадлежат Продавцу.</p>
+<p>7.2. Покупатель приобретает право использовать Товар исключительно в личных некоммерческих целях.</p>
+<p>7.3. Запрещается копирование, распространение, публикация, передача третьим лицам, перепродажа и любое иное использование Товара, выходящее за пределы личного использования.</p>
+
+<h2>8. Ответственность и ограничения</h2>
+<p>8.1. Товар носит информационный характер. Продавец не является медицинским работником и не оказывает медицинских услуг.</p>
+<p>8.2. Материалы Товара не заменяют консультацию педиатра. Покупателю рекомендуется проконсультироваться с врачом перед применением содержащихся в Товаре рекомендаций.</p>
+<p>8.3. Продавец не гарантирует достижения Покупателем конкретного результата, поскольку результат зависит от индивидуальных особенностей ребёнка, условий применения и иных обстоятельств, находящихся вне контроля Продавца.</p>
+<p>8.4. Покупатель применяет рекомендации Товара самостоятельно и под свою ответственность.</p>
+<p>8.5. Продавец не несёт ответственности за последствия применения материалов Товара, за исключением случаев, прямо предусмотренных законодательством Российской Федерации.</p>
+
+<h2>9. Персональные данные</h2>
+<p>9.1. Совершая оплату, Покупатель даёт согласие на обработку своих персональных данных в объёме и на условиях, указанных в <a href="/policy.html">Политике конфиденциальности</a>.</p>
+
+<h2>10. Заключительные положения</h2>
+<p>10.1. Настоящая оферта регулируется законодательством Российской Федерации.</p>
+<p>10.2. Споры разрешаются путём переговоров, а при недостижении согласия — в порядке, установленном законодательством Российской Федерации.</p>
+<p>10.3. Признание отдельных положений оферты недействительными не влечёт недействительности оферты в целом.</p>
+
+<a class="back" href="/">← На главную</a>
+</div>
+</body>
+</html>
