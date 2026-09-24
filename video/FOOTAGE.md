@@ -9,9 +9,10 @@
 |---|---|---|
 | `stock-mom-shoulder.mp4` | Хук | [Pexels 8909879](https://www.pexels.com/video/8909879/) |
 | `stock-mom-rocking-crib.mp4` | Вечер по часам | [Pexels 7509023](https://www.pexels.com/video/7509023/) |
+| `ai-bedroom-night.mp4` | «Он не перерастёт сам» | [Pixabay 371839](https://pixabay.com/videos/id-371839/), ИИ-кадр без людей |
 | `stock-crib-lights.mp4` | Призыв | [Pexels 7884188](https://www.pexels.com/video/7884188/) |
 
-Сцена «Он не перерастёт сам» идёт на ночном фоне. Клипы обрезаны до 6 секунд и уменьшены до 1080 px по ширине. Имена файлов для каждой сцены задаются в `src/Root.tsx`.
+Клипы обрезаны до 6 секунд и уменьшены до 1080 px по ширине. Имена файлов для каждой сцены задаются в `src/Root.tsx`.
 
 ## Как искать замену
 
