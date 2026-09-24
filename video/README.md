@@ -11,6 +11,17 @@
 
 Новый рилс — это новый ключ `DayNN` в `src/reels.ts`, код писать не нужно.
 
+Кроме рилсов:
+
+- `src/carousels.ts` + `src/Carousel.tsx` — карусели 1080×1350, один кадр композиции равен одному слайду. Готовые слайды для закрепа лежат в `renders/pinned/`.
+- `src/Brand.tsx` — аватар профиля (`renders/brand/avatar.png`) и обложки хайлайтов (`renders/brand/highlights/`).
+
+Отрендерить карусель в PNG:
+
+```bash
+npx remotion render Pin2Ladder renders/pinned/2-ladder --sequence --image-format=png
+```
+
 ## Запуск
 
 ```bash
