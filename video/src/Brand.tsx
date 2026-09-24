@@ -134,3 +134,43 @@ export const HighlightCover: React.FC = () => {
     </Night>
   );
 };
+
+// Превью ссылки для соцсетей и мессенджеров (og:image), 1200×630
+const ogCards = [
+  { kicker: "Для малышей 6–12 месяцев", title: "Малыш засыпает в своей кроватке — без укачивания, за 14 дней", note: "sonvkrovatke.ru" },
+  { kicker: "Бесплатная памятка", title: "7 движений, чтобы переложить малыша и не разбудить", note: "sonvkrovatke.ru/pamyatka" },
+];
+
+export const OgImage: React.FC = () => {
+  const frame = useCurrentFrame();
+  const card = ogCards[Math.min(frame, ogCards.length - 1)];
+  return (
+    <AbsoluteFill
+      style={{
+        background: `radial-gradient(ellipse 700px 500px at 88% 10%, rgba(217,154,63,.24), transparent 70%),
+          linear-gradient(180deg, ${C.nightDeep}, ${C.night})`,
+        padding: "72px 80px",
+        justifyContent: "space-between",
+      }}
+    >
+      <div style={{ fontFamily: sans, fontWeight: 500, fontSize: 28, letterSpacing: 4, textTransform: "uppercase", color: C.amber }}>
+        {card.kicker}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 56 }}>
+        <div style={{ fontFamily: "Literata", fontWeight: 600, fontSize: 64, lineHeight: 1.15, color: C.morning, flex: 1 }}>
+          {card.title}
+        </div>
+        <svg width="190" height="190" viewBox="0 0 200 200" style={{ flex: "0 0 auto" }}>
+          <path d="M128 30a34 34 0 1 0 30 50a28 28 0 1 1 -30 -50z" fill={C.amber} />
+          <g stroke={C.lamp} strokeWidth="7" strokeLinecap="round" fill="none">
+            <path d="M34 108v66M166 108v66M34 124h132M34 164h132" />
+            <path d="M60 124v40M86 124v40M114 124v40M140 124v40" strokeWidth="5" />
+          </g>
+        </svg>
+      </div>
+      <div style={{ fontFamily: sans, fontSize: 28, color: C.mute }}>{card.note}</div>
+    </AbsoluteFill>
+  );
+};
+
+export const ogCount = ogCards.length;

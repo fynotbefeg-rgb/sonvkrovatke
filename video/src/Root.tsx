@@ -3,7 +3,7 @@ import { Reel, reelDuration } from "./Reel";
 import { reels } from "./reels";
 import { Carousel } from "./Carousel";
 import { carousels } from "./carousels";
-import { Avatar, HighlightCover, highlights } from "./Brand";
+import { Avatar, HighlightCover, OgImage, highlights, ogCount } from "./Brand";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -33,6 +33,7 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
       <Composition id="Avatar" component={Avatar} durationInFrames={1} fps={1} width={1080} height={1080} />
+      <Composition id="OgImage" component={OgImage} durationInFrames={ogCount} fps={1} width={1200} height={630} />
       <Composition
         id="Highlights"
         component={HighlightCover}
