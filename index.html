@@ -292,6 +292,9 @@ details p{font-size:15.5px;color:#4c5a62;padding:0 0 16px}
 }
 .price{font-family:var(--serif);font-size:42px;color:#fff;display:block;line-height:1.1}
 .price small{font-size:15px;font-family:var(--sans);color:#9fb2bb;display:block;margin-top:6px}
+.limit{display:inline-block;margin-top:14px;padding:6px 12px;border:1px solid rgba(217,154,63,.5);border-radius:999px;font-size:14px;color:var(--lamp)}
+.guarantee{margin:0 0 24px;padding:14px 16px;border:1px solid rgba(242,220,187,.16);border-radius:10px;font-size:15px;color:#c6d6e1;line-height:1.5}
+.guarantee b{display:block;color:#fff;font-family:var(--serif);font-size:17px;margin-bottom:4px}
 .why{font-size:15px;color:#a9bcc5;border-left:2px solid var(--amber);padding-left:14px;margin:20px 0 0}
 .included{list-style:none;padding:0;margin:22px 0 26px}
 .included li{padding:6px 0 6px 24px;position:relative;font-size:15.5px;color:#dae4e9}
@@ -337,8 +340,8 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
     <p class="lede">Мягкий метод из семи шагов: вы укладываете его за пятнадцать минут вместо часа на руках.</p>
     <span class="gentle">Без метода «оставить плакать одну в комнате». Вы в комнате на каждом шаге.</span>
 
-    <div class="btn-row"><a class="btn" href="https://yookassa.ru/my/i/aqKvWbmFlZ1f/l" target="_blank" rel="noopener" data-goal="buy_click">Забрать за 1 199 ₽</a></div>
-    <p class="btn-note">PDF, 22 страницы + 3 бонуса. Отправлю на почту, обычно в течение часа после оплаты.<br><a href="#buy" style="color:#8ea9bd">Что входит →</a></p>
+    <div class="btn-row"><a class="btn" href="https://yookassa.ru/my/i/aqKvWbmFlZ1f/l" target="_blank" rel="noopener" data-goal="buy_click">Забрать за 1&nbsp;199&nbsp;₽</a></div>
+    <p class="btn-note">PDF, 22 страницы + 3 бонуса. Цена для первых 15 покупателей, дальше 2&nbsp;499&nbsp;₽.<br>Отправлю на почту, обычно в течение часа после оплаты.<br><a href="#buy" style="color:#8ea9bd">Что входит →</a></p>
     <a class="soft" href="/pamyatka.html" data-goal="to_memo">Не готовы покупать? Начните с бесплатного шага 1 →</a>
   </div>
 </section>
@@ -427,7 +430,7 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
       <div><b>7</b>Он засыпает сам</div>
     </div>
     <p class="ladder-note">Переход на следующую ступень — когда два укладывания подряд прошли спокойно. Стало тяжело — спускаетесь на ступень назад. Откат прописан в методе как обычная часть плана, а не как ваша неудача.</p>
-    <div class="mid-cta"><a class="btn" href="#buy">Забрать метод за 1 199 ₽</a></div>
+    <div class="mid-cta"><a class="btn" href="#buy">Забрать метод за 1&nbsp;199&nbsp;₽</a></div>
   </div>
 </section>
 
@@ -486,10 +489,12 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
     <p>Начать можно сегодня вечером — первый шаг не требует подготовки.</p>
 
     <div class="card">
-      <!-- ЗАМЕНИТЕ цену на свою -->
-      <span class="price">1 199 ₽<small>единоразово, файлы остаются у вас</small></span>
+      <!-- Цена для первых 15 покупателей. После 15-й продажи: поставить 2&nbsp;499&nbsp;₽ здесь, в первом экране,
+           в липкой кнопке, на spasibo.html, в ссылке ЮKassa и в п. 4.1 оферты -->
+      <span class="price">1&nbsp;199&nbsp;₽<small>единоразово, файлы остаются у вас</small></span>
+      <span class="limit">Для первых 15 покупателей · дальше 2&nbsp;499&nbsp;₽</span>
 
-      <p class="why">Почему так недорого: это первый запуск, и мне нужны отзывы реальных мам. Вы получаете руководство и три бонуса, я получаю обратную связь, по которой доработаю следующую версию. Когда отзывы наберутся, цена вырастет — так что честно будет сказать: дешевле, чем сейчас, уже не будет.</p>
+      <p class="why">Почему так недорого: это первый запуск, и мне нужны отзывы реальных мам. Вы получаете руководство и три бонуса, я получаю обратную связь, по которой доработаю следующую версию. Поэтому 1&nbsp;199&nbsp;₽ — только для первых 15 покупателей. Дальше руководство будет стоить 2&nbsp;499&nbsp;₽, и дешевле, чем сейчас, уже не будет.</p>
 
       <ul class="included">
         <li>Руководство: PDF, 22 страницы, 7 шагов</li>
@@ -498,6 +503,8 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
         <li>Бонус 2 — Спина и руки после месяцев ношения</li>
         <li>Бонус 3 — Переход на два сна</li>
       </ul>
+
+      <div class="guarantee"><b>Гарантия поддержки</b>Застряли на какой-то ступени или всё пошло не по плану — напишите на <a href="mailto:sonvkrovatke@gmail.com" style="color:#f2dcbb">sonvkrovatke@gmail.com</a>. Разберём ваш случай письмом, пока вы идёте по методу.</div>
 
       <!-- ЗАМЕНИТЕ href на ссылку вашей платёжной системы -->
       <a class="btn" href="https://yookassa.ru/my/i/aqKvWbmFlZ1f/l" target="_blank" rel="noopener" data-goal="buy_click">Купить и получить на почту</a>
@@ -553,7 +560,7 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
 
     <details>
       <summary>Что если за 14 дней не получится?</summary>
-      <p>Календарь на 14 дней — это ожидаемый темп, а не обязательство ребёнка. У части детей уходит 18–20 дней, особенно если попадают зубы или болезнь. В шаге 7 есть три показателя, по которым видно, идёт процесс или вы застряли, и что проверять в каждом случае.</p>
+      <p>Календарь на 14 дней — это ожидаемый темп, а не обязательство ребёнка. У части детей уходит 18–20 дней, особенно если попадают зубы или болезнь. В шаге 7 есть три показателя, по которым видно, идёт процесс или вы застряли, и что проверять в каждом случае. А если застряли — напишите, разберём ваш случай письмом.</p>
     </details>
 
     <details>
@@ -564,7 +571,7 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
 </section>
 
 <div class="sticky" id="sticky" aria-hidden="true">
-  <span>Сон без укачивания<br>1 199 ₽ · 22 страницы + 3 бонуса</span>
+  <span>1&nbsp;199&nbsp;₽ для первых 15<br>дальше 2&nbsp;499&nbsp;₽</span>
   <a class="btn" href="#buy" tabindex="-1">Забрать</a>
 </div>
 
