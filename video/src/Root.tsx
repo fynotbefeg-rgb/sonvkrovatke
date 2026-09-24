@@ -1,13 +1,13 @@
 import { Composition } from "remotion";
 import { SleepReel, noFootage, type SleepReelProps } from "./Composition";
 
-// Видеофоны: стоковые кадры с людьми для первых сцен, ИИ-фон без лиц для последних
+// Видеофоны: стоковые кадры Pexels (id в FOOTAGE.md); сцена «Он не перерастёт сам» на ночном фоне
 const withFootage: SleepReelProps = {
   footage: {
-    hook: "stock-mom-rocking.mp4",
-    timeline: "stock-mom-night-phone.mp4",
-    insight: "ai-nursery-night.mp4",
-    cta: "ai-crib-lamp.mp4",
+    hook: "stock-mom-shoulder.mp4",
+    timeline: "stock-mom-rocking-crib.mp4",
+    insight: null,
+    cta: "stock-crib-lights.mp4",
   },
 };
 
