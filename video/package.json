@@ -26,6 +26,6 @@
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc",
-    "render": "remotion render SleepReel out/son-bez-ukachivaniya-reel.mp4 --codec=h264 --crf=18"
+    "render": "node scripts/render-all.mjs"
   }
 }
