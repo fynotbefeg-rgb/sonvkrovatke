@@ -9,6 +9,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { loadFont } from "@remotion/fonts";
+import { Video } from "@remotion/media";
 import { staticFile } from "remotion";
 
 // Шрифты лендинга лежат локально в public/fonts (вариативные woff2 с Google Fonts)
@@ -263,20 +264,63 @@ const Cta: React.FC = () => {
   );
 };
 
-export const SleepReel: React.FC = () => (
+// Видеофон сцены: файл из public/footage, медленный наезд и затемнение под текст
+const Footage: React.FC<{ src: string; duration: number }> = ({ src, duration }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 10, duration - 10, duration], [0, 1, 1, 0], clamp);
+  const scale = interpolate(frame, [0, duration], [1.06, 1.14]);
+  return (
+    <AbsoluteFill style={{ opacity }}>
+      <AbsoluteFill style={{ transform: `scale(${scale})` }}>
+        <Video
+          src={staticFile(`footage/${src}`)}
+          muted
+          loop
+          objectFit="cover"
+          style={{ width: "100%", height: "100%" }}
+        />
+      </AbsoluteFill>
+      <AbsoluteFill
+        style={{
+          background: `linear-gradient(180deg, rgba(10,20,29,.55) 0%, rgba(10,20,29,.78) 45%, rgba(10,20,29,.9) 100%)`,
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
+export type SleepReelProps = {
+  // Имена файлов в public/footage; null — сцена на однотонном ночном фоне
+  footage: {
+    hook: string | null;
+    timeline: string | null;
+    insight: string | null;
+    cta: string | null;
+  };
+};
+
+export const noFootage: SleepReelProps = {
+  footage: { hook: null, timeline: null, insight: null, cta: null },
+};
+
+const scenes = [
+  { key: "hook", from: 0, duration: 75, Content: Hook },
+  { key: "timeline", from: 75, duration: 150, Content: Timeline },
+  { key: "insight", from: 225, duration: 105, Content: Insight },
+  { key: "cta", from: 330, duration: 120, Content: Cta },
+] as const;
+
+export const SleepReel: React.FC<SleepReelProps> = ({ footage }) => (
   <AbsoluteFill>
     <Background />
-    <Sequence durationInFrames={75}>
-      <Hook />
-    </Sequence>
-    <Sequence from={75} durationInFrames={150}>
-      <Timeline />
-    </Sequence>
-    <Sequence from={225} durationInFrames={105}>
-      <Insight />
-    </Sequence>
-    <Sequence from={330} durationInFrames={120}>
-      <Cta />
-    </Sequence>
+    {scenes.map(({ key, from, duration, Content }) => {
+      const src = footage[key];
+      return (
+        <Sequence key={key} from={from} durationInFrames={duration}>
+          {src ? <Footage src={src} duration={duration} /> : null}
+          <Content />
+        </Sequence>
+      );
+    })}
   </AbsoluteFill>
 );
