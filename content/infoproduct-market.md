@@ -1,6 +1,6 @@
 # Рынок инфопродуктов в России: что это значит для автора «Сна без укачивания»
 
-Данные на сентябрь 2026 года. Выводы построены на том, что известно об авторе из проекта:
+Данные на сентябрь 2026 года. Напрямую открыты и прочитаны материалы White EdTech, Profi.ru, vsemson.com, Moscow Digital School и страница курса Дианы Сигал. Остальные цифры взяты из поисковых сводок по указанным ссылкам: перед тем как ссылаться на них публично, откройте первоисточник. Выводы построены на том, что известно об авторе из проекта:
 
 - работает один и без лица;
 - быстро собирает PDF-продукты, в том числе с помощью ИИ;
@@ -37,10 +37,9 @@
 
 ### 4. Новые каналы продаж без своей аудитории
 
-- **Wildberries** в 2026 году переносит цифровые товары из WB Digital в общий каталог ([Точка](https://tochka.com/knowledge/marketpleisy/wildberries-cifrovoy/), [Контур](https://e-kontur.ru/enquiry/2683/prodavat-cifrovye-tovary-na-wildberries)). Цифровые товары показали самую высокую динамику продаж на маркетплейсах в 2025 году ([Контур](https://e-kontur.ru/enquiry/2683/prodavat-cifrovye-tovary-na-wildberries)). С 1 октября 2026 года маркетплейсы обязаны проверять данные и статус продавца ([1С](https://1c-prime.ru/articles/rekomendatsii-novye-stati-2025/novye-pravila-raboty-marketpleysov-s-2026-goda-chto-izmenitsya-dlya-biznesa/)).
+- **Wildberries** в 2026 году переносит цифровые товары из WB Digital в общий каталог ([Точка](https://tochka.com/knowledge/marketpleisy/wildberries-cifrovoy/), [Контур](https://e-kontur.ru/enquiry/2683/prodavat-cifrovye-tovary-na-wildberries)). С 1 октября 2026 года маркетплейсы обязаны проверять данные и статус продавца ([1С](https://1c-prime.ru/articles/rekomendatsii-novye-stati-2025/novye-pravila-raboty-marketpleysov-s-2026-goda-chto-izmenitsya-dlya-biznesa/)).
 - **Telegram**: платные посты и закрытые каналы за Stars без комиссии Telegram, но вывод через Fragment занимает 21 день и может съесть до 30% ([Хабр](https://habr.com/ru/companies/ggsel_marketplace/articles/1068814/), [vc.ru](https://vc.ru/services/2946546-kak-vyvesti-zvezdy-telegram)).
 - **Литрес** продаёт электронные книги о детском сне ([Литрес](https://litres.com/book/olga-dobrovolskaya/kak-naladit-son-rebenka-vazhnye-znaniya-prakticheskie-s-48607693/)).
-- Онлайн-торговля в целом — 13,4 трлн ₽ в 2025 году, +19% ([Robokassa](https://robokassa.com/blog/articles/chto-prodavat-v-2026-godu/)).
 
 **Вывод для вас.** Маркетплейсы — лучший канал для автора без лица: мамы ищут там сами, лицо и блог не нужны, продаёт карточка. Это закрывает проблему «нет аудитории» и не зависит от Instagram.
 
