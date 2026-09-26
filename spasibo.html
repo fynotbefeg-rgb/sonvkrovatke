@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Памятка готова к скачиванию</title>
 <meta name="robots" content="noindex">
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
@@ -320,7 +321,7 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
   <h1>Памятка ваша</h1>
   <p class="lede">Скачайте файл — он останется у вас. Попробуйте сегодня вечером, на любом сне.</p>
 
-  <a class="btn" href="/pamyatka.pdf" download style="display:block;text-align:center;width:100%">Скачать памятку, PDF</a>
+  <a class="btn" href="/pamyatka.pdf" download data-goal="pdf_download" style="display:block;text-align:center;width:100%">Скачать памятку, PDF</a>
 
   <div class="whatin" style="margin-top:34px">
     <div class="t">С чего начать сегодня</div>
@@ -334,13 +335,16 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
 
   <h2 style="margin-top:44px;color:#fff">Это шаг 1 из семи</h2>
   <p style="color:#bdcbd3">Дальше: как найти минуту, в которую он засыпает за пять минут вместо сорока, как убрать укачивание по одной ступеньке за 14 дней и что отвечать в два часа ночи.</p>
-  <p style="color:#bdcbd3">Полное руководство — 22 страницы, четыре бланка для печати и три бонуса.</p>
+  <p style="color:#bdcbd3">Полное руководство — 22 страницы, четыре бланка для печати и три бонуса. 1&nbsp;199&nbsp;₽ — для первых 15 покупателей, дальше 2&nbsp;499&nbsp;₽.</p>
 
-  <a class="btn" href="/#buy" style="display:block;text-align:center;width:100%;margin-top:20px">Посмотреть руководство</a>
+  <a class="btn" href="/" data-goal="to_guide" style="display:block;text-align:center;width:100%;margin-top:20px">Посмотреть весь метод</a>
 
   <p class="fine"><a href="/">На главную</a></p>
 </div>
 <!-- Yandex.Metrika counter -->
+<script>
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-goal]');if(a&&window.ym)ym(112462368,'reachGoal',a.getAttribute('data-goal'))});
+</script>
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
