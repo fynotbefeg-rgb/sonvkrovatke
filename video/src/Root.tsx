@@ -4,6 +4,7 @@ import { reels } from "./reels";
 import { Carousel } from "./Carousel";
 import { carousels } from "./carousels";
 import { Avatar, HighlightCover, OgImage, highlights, ogCount } from "./Brand";
+import { StoryFrame, memoStories } from "./Stories";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -34,6 +35,15 @@ export const RemotionRoot: React.FC = () => {
       ))}
       <Composition id="Avatar" component={Avatar} durationInFrames={1} fps={1} width={1080} height={1080} />
       <Composition id="OgImage" component={OgImage} durationInFrames={ogCount} fps={1} width={1200} height={630} />
+      <Composition
+        id="StoriesMemo"
+        component={StoryFrame}
+        durationInFrames={memoStories.length}
+        fps={1}
+        width={1080}
+        height={1920}
+        defaultProps={{ stories: memoStories }}
+      />
       <Composition
         id="Highlights"
         component={HighlightCover}
