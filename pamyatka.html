@@ -331,7 +331,7 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
   <h1>Семь движений,<br>чтобы переложить малыша<br>и не разбудить</h1>
   <p class="lede">Первые 15 минут после засыпания он в поверхностном сне — его будит даже смена температуры простыни. Большинство мам кладут на пятой минуте, и «ничего не работает».</p>
 
-  <form name="pamyatka" onsubmit="window.ym&&ym(112462368,'reachGoal','lead_form')" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/spasibo.html">
+  <form name="pamyatka" id="memo-form" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/spasibo.html">
     <input type="hidden" name="form-name" value="pamyatka">
     <p style="display:none"><label>Не заполняйте: <input name="bot-field"></label></p>
 
@@ -358,6 +358,23 @@ footer .req{color:#8ea3b2;line-height:1.5;padding-top:14px;border-top:1px solid 
   <p class="fine">Памятка откроется сразу после кнопки. Без рассылок и спама. Памятка носит информационный характер и не заменяет консультацию педиатра.<br><a href="/">На главную</a></p>
 </div>
 <!-- Yandex.Metrika counter -->
+<script>
+// Отправка формы в фоне: почта уходит в Netlify Forms, а памятка открывается в любом случае,
+// даже если сервер формы не принял. Без JavaScript работает обычная отправка через action.
+(function(){
+  var form=document.getElementById('memo-form');
+  if(!form||!window.fetch||!window.URLSearchParams)return;
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(window.ym)ym(112462368,'reachGoal','lead_form');
+    var btn=form.querySelector('button,[type=submit]');if(btn){btn.disabled=true;btn.textContent='Открываю памятку…'}
+    var done=false;function go(){if(done)return;done=true;location.href='/spasibo.html'}
+    setTimeout(go,3000);
+    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form)).toString()})
+      .catch(function(){}).then(go);
+  });
+})();
+</script>
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};

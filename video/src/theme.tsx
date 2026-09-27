@@ -53,17 +53,24 @@ export const Rise: React.FC<{
 };
 
 // Затухание сцены на входе и выходе
-export const Scene: React.FC<{ duration: number; children: React.ReactNode }> = ({
+// Затухание сцены на выходе. fadeIn={false} — для первой сцены: первый кадр рилса
+// становится обложкой в ленте и не должен быть пустым
+export const Scene: React.FC<{ duration: number; fadeIn?: boolean; children: React.ReactNode }> = ({
   duration,
+  fadeIn = true,
   children,
 }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 8, duration - 10, duration], [0, 1, 1, 0], clamp);
+  const opacity = fadeIn
+    ? interpolate(frame, [0, 8, duration - 10, duration], [0, 1, 1, 0], clamp)
+    : interpolate(frame, [duration - 10, duration], [1, 0], clamp);
   return (
     <AbsoluteFill
       style={{
         opacity,
         justifyContent: "center",
+        // Тень под текстом держит читаемость на светлых участках видео
+        textShadow: "0 2px 18px rgba(5,10,15,.65), 0 1px 3px rgba(5,10,15,.5)",
         padding: "0 110px",
         paddingBottom: 120,
       }}

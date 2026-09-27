@@ -16,7 +16,7 @@ type Base = { duration: number; footage?: string };
 
 export type SceneSpec = Base &
   (
-    | { kind: "hook"; kicker?: string; lines: string[]; size?: number }
+    | { kind: "hook"; kicker?: string; lines: string[]; sub?: string; size?: number }
     | { kind: "timeline"; kicker?: string; rows: [string, string][]; accentLast?: boolean }
     | { kind: "statement"; kicker?: string; title: string; body?: string; highlight?: string; size?: number }
     | { kind: "steps"; kicker?: string; items: string[] }
@@ -29,20 +29,41 @@ export type ReelProps = { scenes: SceneSpec[] };
 export const reelDuration = (scenes: SceneSpec[]) =>
   scenes.reduce((sum, s) => sum + s.duration, 0);
 
-const Hook: React.FC<Extract<SceneSpec, { kind: "hook" }>> = ({ duration, kicker, lines, size = 132 }) => (
-  <Scene duration={duration}>
+// Хук. В первой сцене текст виден целиком с первого кадра, анимируется только подпись
+const Hook: React.FC<Extract<SceneSpec, { kind: "hook" }> & { first?: boolean }> = ({
+  duration,
+  kicker,
+  lines,
+  sub,
+  size = 132,
+  first = false,
+}) => (
+  <Scene duration={duration} fadeIn={!first}>
     {kicker ? (
-      <Rise>
+      first ? (
         <Kicker>{kicker}</Kicker>
-      </Rise>
+      ) : (
+        <Rise>
+          <Kicker>{kicker}</Kicker>
+        </Rise>
+      )
     ) : null}
     <Title size={size}>
-      {lines.map((line, i) => (
-        <Rise key={line} delay={6 + i * 7} style={{ display: "block" }}>
-          {line}
-        </Rise>
-      ))}
+      {lines.map((line, i) =>
+        first ? (
+          <div key={line}>{line}</div>
+        ) : (
+          <Rise key={line} delay={6 + i * 7} style={{ display: "block" }}>
+            {line}
+          </Rise>
+        ),
+      )}
     </Title>
+    {sub ? (
+      <Rise delay={first ? 8 : 30} style={{ marginTop: 44 }}>
+        <div style={{ fontFamily: sans, fontWeight: 500, fontSize: 58, lineHeight: 1.3, color: C.lamp }}>{sub}</div>
+      </Rise>
+    ) : null}
   </Scene>
 );
 
@@ -281,9 +302,11 @@ const Cta: React.FC<Extract<SceneSpec, { kind: "cta" }>> = ({ duration, kicker, 
 };
 
 // Видеофон сцены: медленный наезд и затемнение под текст
-const Footage: React.FC<{ src: string; duration: number }> = ({ src, duration }) => {
+const Footage: React.FC<{ src: string; duration: number; fadeIn: boolean }> = ({ src, duration, fadeIn }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 10, duration - 10, duration], [0, 1, 1, 0], clamp);
+  const opacity = fadeIn
+    ? interpolate(frame, [0, 10, duration - 10, duration], [0, 1, 1, 0], clamp)
+    : interpolate(frame, [duration - 10, duration], [1, 0], clamp);
   const scale = interpolate(frame, [0, duration], [1.06, 1.14]);
   return (
     <AbsoluteFill style={{ opacity }}>
@@ -298,17 +321,17 @@ const Footage: React.FC<{ src: string; duration: number }> = ({ src, duration })
       </AbsoluteFill>
       <AbsoluteFill
         style={{
-          background: `linear-gradient(180deg, rgba(10,20,29,.55) 0%, rgba(10,20,29,.78) 45%, rgba(10,20,29,.9) 100%)`,
+          background: `linear-gradient(180deg, rgba(10,20,29,.3) 0%, rgba(10,20,29,.5) 45%, rgba(10,20,29,.62) 100%)`,
         }}
       />
     </AbsoluteFill>
   );
 };
 
-const SceneBody: React.FC<{ spec: SceneSpec }> = ({ spec }) => {
+const SceneBody: React.FC<{ spec: SceneSpec; first: boolean }> = ({ spec, first }) => {
   switch (spec.kind) {
     case "hook":
-      return <Hook {...spec} />;
+      return <Hook {...spec} first={first} />;
     case "timeline":
       return <Timeline {...spec} />;
     case "statement":
@@ -332,8 +355,8 @@ export const Reel: React.FC<ReelProps> = ({ scenes }) => {
         from += spec.duration;
         return (
           <Sequence key={i} from={start} durationInFrames={spec.duration}>
-            {spec.footage ? <Footage src={spec.footage} duration={spec.duration} /> : null}
-            <SceneBody spec={spec} />
+            {spec.footage ? <Footage src={spec.footage} duration={spec.duration} fadeIn={i > 0} /> : null}
+            <SceneBody spec={spec} first={i === 0} />
           </Sequence>
         );
       })}
