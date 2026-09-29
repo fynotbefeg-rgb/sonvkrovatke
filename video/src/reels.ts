@@ -9,6 +9,18 @@ const F = {
   rocking: "stock-mom-rocking-crib.mp4",
   putting: "stock-putting-in-crib.mp4",
   bedroom: "ai-bedroom-night.mp4",
+  handOnChest: "stock-hand-on-chest.mp4",
+  asleepTop: "stock-asleep-top-view.mp4",
+  asleepFace: "stock-asleep-face.mp4",
+  lampBook: "stock-lamp-book.mp4",
+  holdingHand: "stock-holding-baby-hand.mp4",
+  hands: "stock-hands-closeup.mp4",
+  childAsleep: "stock-child-asleep-bed.mp4",
+  phoneDark: "stock-phone-dark.mp4",
+  eyesOpen: "stock-baby-eyes-open.mp4",
+  momReading: "stock-mom-reading.mp4",
+  fairyLights: "stock-reading-fairy-lights.mp4",
+  momPhone: "stock-mom-phone-bed.mp4",
 };
 
 // Правила сценария: хук с обещанием виден с первого кадра, сцена 1,5–3 с,
@@ -48,20 +60,20 @@ export const reels: Record<string, SceneSpec[]> = {
   ],
 
   Day02: [
-    { kind: "hook", duration: 70, footage: F.byCrib, lines: ["Почему он", "просыпается,", "как только вы", "кладёте его", "в кроватку?"], size: 104 },
-    { kind: "statement", duration: 70, footage: F.bedroom, kicker: "Всё дело во времени", title: "Первые 15 минут после засыпания сон поверхностный" },
-    { kind: "statement", duration: 70, footage: F.holding, title: "Большинство кладут на 5-й минуте.", body: "Подождите", highlight: "15." },
-    { ...memoCta, footage: F.putting, title: "Тест обмякшей руки и 7 движений" },
+    { kind: "hook", duration: 70, footage: F.handOnChest, lines: ["Почему он", "просыпается,", "как только вы", "кладёте его", "в кроватку?"], size: 104 },
+    { kind: "number", duration: 75, value: "15", label: "минут после засыпания сон поверхностный", sub: "Его будит даже прохладная простыня" },
+    { kind: "statement", duration: 70, footage: F.asleepFace, title: "Большинство кладут на 5-й минуте.", body: "Подождите", highlight: "15." },
+    { ...memoCta, footage: F.lampBook, title: "Тест обмякшей руки и 7 движений" },
   ],
 
   Day03: [
-    { kind: "hook", duration: 65, footage: F.bedroom, kicker: "Самый частый совет", lines: ["«Перерастёт", "сам»"], sub: "Нет. И вот почему ↓" },
-    { kind: "statement", duration: 70, footage: F.rocking, title: "Он засыпает на руках не потому, что маленький." },
-    { kind: "statement", duration: 75, footage: F.holding, title: "А потому, что ни разу не пробовал", highlight: "иначе." },
+    { kind: "notes", duration: 80, text: "«Потерпи, он перерастёт»", answer: "Самый частый совет. И самый бесполезный." },
+    { kind: "statement", duration: 70, footage: F.asleepTop, title: "Он засыпает на руках не потому, что маленький." },
+    { kind: "statement", duration: 70, footage: F.holdingHand, title: "А потому, что ни разу не пробовал", highlight: "иначе." },
     {
       kind: "cta",
       duration: 90,
-      footage: F.byCrib,
+      footage: F.hands,
       kicker: "Лестница из 7 ступеней",
       title: "Привычку меняют по одной ступеньке",
       button: "Закреп в профиле",
@@ -69,11 +81,11 @@ export const reels: Record<string, SceneSpec[]> = {
   ],
 
   Day04: [
-    { kind: "hook", duration: 60, footage: F.putting, lines: ["Час на руках", "каждый вечер?"], sub: "Вот как выглядит вечер по методу ↓" },
+    { kind: "hook", duration: 60, footage: F.momPhone, lines: ["Час на руках", "каждый вечер?"], sub: "Вот как выглядит вечер по методу ↓" },
     {
       kind: "timeline",
       duration: 90,
-      footage: F.bedroom,
+      footage: F.fairyLights,
       kicker: "Вечер по методу",
       rows: [
         ["20:00", "ритуал, 5 действий"],
@@ -81,42 +93,35 @@ export const reels: Record<string, SceneSpec[]> = {
         ["20:16", "вы свободны"],
       ],
     },
-    { kind: "statement", duration: 60, footage: F.byCrib, title: "15 минут вместо часа.", body: "Мягко, за", highlight: "14 дней." },
-    { ...memoCta, footage: F.holding },
+    { kind: "number", duration: 60, value: "15", label: "минут вместо часа на руках", sub: "Мягко, за 14 дней" },
+    { ...memoCta, footage: F.asleepTop },
   ],
 
   Day05: [
-    { kind: "hook", duration: 60, footage: F.holding, kicker: "Чит-код", lines: ["Тест", "обмякшей руки"], sub: "3 секунды решают, проснётся ли он" },
+    { kind: "hook", duration: 60, footage: F.holdingHand, kicker: "Чит-код", lines: ["Тест", "обмякшей руки"], sub: "3 секунды решают, проснётся ли он" },
     {
       kind: "steps",
       duration: 135,
-      footage: F.byCrib,
+      footage: F.hands,
       items: [
         "Поднимите его кисть на 2–3 см и отпустите",
         "Упала как плеть — можно класть",
         "Напряглась, пальцы сжались — ждите ещё 5 минут",
       ],
     },
-    { ...memoCta, footage: F.putting, kicker: "Дальше — 7 движений", title: "Они в бесплатной памятке" },
+    { ...memoCta, footage: F.asleepFace, kicker: "Дальше — 7 движений", title: "Они в бесплатной памятке" },
   ],
 
   Day06: [
-    { kind: "hook", duration: 55, footage: F.rocking, kicker: "POV", lines: ["40 минут", "укачивания"], sub: "и вот он наконец уснул…" },
+    { kind: "hook", duration: 55, footage: F.phoneDark, kicker: "POV", lines: ["40 минут", "укачивания"], sub: "и вот он наконец уснул…" },
     { kind: "statement", duration: 45, footage: F.putting, title: "Вы наклоняетесь к кроватке…" },
-    { kind: "statement", duration: 45, footage: F.bedroom, title: "Он открывает глаза.", size: 110 },
-    {
-      kind: "cta",
-      duration: 90,
-      footage: F.byCrib,
-      kicker: "Знакомо?",
-      title: "Дело в 3 мелочах, о которых никто не говорит",
-      button: "Памятка — в профиле",
-    },
+    { kind: "statement", duration: 45, footage: F.eyesOpen, title: "Он открывает глаза.", size: 110 },
+    { kind: "notes", duration: 100, text: "Дело в 3 мелочах, о которых никто не говорит", answer: "Разбор — в памятке, ссылка в профиле" },
   ],
 
   Day07: [
-    { kind: "hook", duration: 60, footage: F.byCrib, lines: ["Почему резко", "отучать от рук", "не работает"], size: 112 },
-    { kind: "statement", duration: 70, footage: F.rocking, title: "Убираете всё сразу — он теряет всё сразу.", body: "И", highlight: "протестует." },
+    { kind: "hook", duration: 60, footage: F.momReading, lines: ["Почему резко", "отучать от рук", "не работает"], size: 112 },
+    { kind: "statement", duration: 70, footage: F.childAsleep, title: "Убираете всё сразу — он теряет всё сразу.", body: "И", highlight: "протестует." },
     {
       kind: "ladder",
       duration: 135,
@@ -136,7 +141,7 @@ export const reels: Record<string, SceneSpec[]> = {
     {
       kind: "cta",
       duration: 90,
-      footage: F.putting,
+      footage: F.handOnChest,
       kicker: "Руководство «Сон без укачивания»",
       title: "7 шагов, лестница ступеней, 14 дней",
       button: "Подробности — в профиле",

@@ -22,6 +22,9 @@ export type SceneSpec = Base &
     | { kind: "steps"; kicker?: string; items: string[] }
     | { kind: "ladder"; kicker?: string; steps: string[] }
     | { kind: "cta"; kicker: string; title: string; button: string; note?: string }
+    // Светлые сцены: «заметки на телефоне» с печатающимся текстом и крупная цифра
+    | { kind: "notes"; header?: string; text: string; answer?: string }
+    | { kind: "number"; value: string; label: string; sub?: string }
   );
 
 export type ReelProps = { scenes: SceneSpec[] };
@@ -301,6 +304,81 @@ const Cta: React.FC<Extract<SceneSpec, { kind: "cta" }>> = ({ duration, kicker, 
   );
 };
 
+// Светлый экран: цвета утра с сайта, без тени под текстом
+const LIGHT = { bg: "#faf6ef", card: "#ffffff", ink: "#1b2b33", mute: "#6e7a80", amberDeep: "#a96f21", line: "#e6ddcf" };
+
+const LightScene: React.FC<{ duration: number; first: boolean; children: React.ReactNode }> = ({
+  duration,
+  first,
+  children,
+}) => {
+  const frame = useCurrentFrame();
+  const opacity = first
+    ? interpolate(frame, [duration - 10, duration], [1, 0], clamp)
+    : interpolate(frame, [0, 8, duration - 10, duration], [0, 1, 1, 0], clamp);
+  return (
+    <AbsoluteFill style={{ opacity, background: LIGHT.bg, padding: "0 90px", paddingBottom: 120, justifyContent: "center" }}>
+      {children}
+    </AbsoluteFill>
+  );
+};
+
+// «Заметки»: текст печатается, как в заметках на телефоне, затем появляется ответ
+const Notes: React.FC<Extract<SceneSpec, { kind: "notes" }> & { first: boolean }> = ({
+  duration,
+  header = "Заметки",
+  text,
+  answer,
+  first,
+}) => {
+  const frame = useCurrentFrame();
+  const typeFrames = Math.min(Math.round(duration * 0.5), Math.max(18, text.length * 1.1));
+  const start = first ? 0 : 6;
+  // В первой сцене текст виден целиком сразу: первый кадр — обложка в ленте
+  const shown = first ? text.length : Math.round(interpolate(frame, [start, start + typeFrames], [0, text.length], clamp));
+  const done = shown >= text.length;
+  const caret = !done || Math.floor(frame / 15) % 2 === 0;
+  return (
+    <LightScene duration={duration} first={first}>
+      <div style={{ background: LIGHT.card, borderRadius: 44, padding: "56px 60px 64px", boxShadow: "0 30px 80px rgba(27,43,51,.12)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: sans, fontSize: 34, color: LIGHT.amberDeep, fontWeight: 500, marginBottom: 36 }}>
+          <span>‹ {header}</span>
+          <span style={{ color: LIGHT.mute }}>02:40</span>
+        </div>
+        <div style={{ fontFamily: sans, fontSize: 66, lineHeight: 1.3, color: LIGHT.ink, fontWeight: 500, minHeight: 250 }}>
+          {text.slice(0, shown)}
+          <span style={{ display: "inline-block", width: 5, height: 70, marginLeft: 4, verticalAlign: "-10px", background: caret ? C.amber : "transparent" }} />
+        </div>
+      </div>
+      {answer ? (
+        <Rise delay={first ? 10 : start + typeFrames + 8} style={{ marginTop: 56 }}>
+          <div style={{ fontFamily: serif, fontWeight: 600, fontSize: 84, lineHeight: 1.15, color: LIGHT.ink }}>{answer}</div>
+        </Rise>
+      ) : null}
+    </LightScene>
+  );
+};
+
+// Крупная цифра на светлом фоне
+const BigNumber: React.FC<Extract<SceneSpec, { kind: "number" }> & { first: boolean }> = ({ duration, value, label, sub, first }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const pop = first ? 1 : spring({ frame, fps, config: { damping: 16, stiffness: 110 } });
+  return (
+    <LightScene duration={duration} first={first}>
+      <div style={{ fontFamily: serif, fontWeight: 600, fontSize: 360, lineHeight: 1, color: LIGHT.amberDeep, transform: `scale(${0.85 + 0.15 * pop})`, transformOrigin: "left bottom" }}>
+        {value}
+      </div>
+      <div style={{ marginTop: 30, fontFamily: serif, fontWeight: 600, fontSize: 86, lineHeight: 1.15, color: LIGHT.ink }}>{label}</div>
+      {sub ? (
+        <Rise delay={first ? 6 : 16} style={{ marginTop: 40 }}>
+          <div style={{ fontFamily: sans, fontSize: 54, lineHeight: 1.35, color: LIGHT.mute }}>{sub}</div>
+        </Rise>
+      ) : null}
+    </LightScene>
+  );
+};
+
 // Видеофон сцены: медленный наезд и затемнение под текст
 const Footage: React.FC<{ src: string; duration: number; fadeIn: boolean }> = ({ src, duration, fadeIn }) => {
   const frame = useCurrentFrame();
@@ -342,6 +420,10 @@ const SceneBody: React.FC<{ spec: SceneSpec; first: boolean }> = ({ spec, first 
       return <Ladder {...spec} />;
     case "cta":
       return <Cta {...spec} />;
+    case "notes":
+      return <Notes {...spec} first={first} />;
+    case "number":
+      return <BigNumber {...spec} first={first} />;
   }
 };
 

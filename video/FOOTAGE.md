@@ -12,8 +12,20 @@
 | `stock-mom-rocking-crib.mp4` | Мама укачивает у пустой кроватки | [Pexels 7509023](https://www.pexels.com/video/7509023/) |
 | `stock-putting-in-crib.mp4` | Мама кладёт малыша в кроватку без одеяла | [Pexels 7508453](https://www.pexels.com/video/7508453/) |
 | `ai-bedroom-night.mp4` | Спальня ночью, людей нет (ИИ-кадр) | [Pixabay 371839](https://pixabay.com/videos/id-371839/) |
+| `stock-hand-on-chest.mp4` | Ладонь мамы на груди спящего малыша | [Pexels 6391711](https://www.pexels.com/video/6391711/) |
+| `stock-asleep-top-view.mp4` | Малыш спит на белой простыне, вид сверху | [Pexels 6392203](https://www.pexels.com/video/6392203/) |
+| `stock-asleep-face.mp4` | Лицо спящего малыша крупно | [Pexels 6391720](https://www.pexels.com/video/6391720/) |
+| `stock-lamp-book.mp4` | Ночник и книга, людей нет | [Pexels 7505914](https://www.pexels.com/video/7505914/) |
+| `stock-holding-baby-hand.mp4` | Мама держит ручку спящего малыша | [Pexels 6391730](https://www.pexels.com/video/6391730/) |
+| `stock-hands-closeup.mp4` | Руки мамы и малыша крупно | [Pexels 6392156](https://www.pexels.com/video/6392156/) |
+| `stock-child-asleep-bed.mp4` | Ребёнок спит в кровати | [Pexels 7506000](https://www.pexels.com/video/7506000/) |
+| `stock-phone-dark.mp4` | Свет телефона в тёмной спальне | [Pexels 7986754](https://www.pexels.com/video/7986754/) |
+| `stock-baby-eyes-open.mp4` | Малыш открывает глаза | [Pexels 18130610](https://www.pexels.com/video/18130610/) |
+| `stock-mom-reading.mp4` | Мама читает ребёнку | [Pexels 12761062](https://www.pexels.com/video/12761062/) |
+| `stock-reading-fairy-lights.mp4` | Чтение на ночь, гирлянда | [Pexels 7394146](https://www.pexels.com/video/7394146/) |
+| `stock-mom-phone-bed.mp4` | Мама в кровати с телефоном, ночь | [Pexels 7986737](https://www.pexels.com/video/7986737/) |
 
-Все стоковые кадры из одной серии: одна мама, малыш на вид 8–10 месяцев, кроватка без подушки и одеяла, как требует безопасный сон. Клипы обрезаны до 6 секунд и уменьшены до 1080 px по ширине.
+Первые четыре кадра — из одной серии: одна мама, малыш на вид 8–10 месяцев, кроватка без подушки и одеяла. Остальные подобраны так, чтобы у каждого рилса был свой фон. Кадры с кроваткой берём только без подушки, одеяла и игрушек. Клипы обрезаны до 6 секунд и уменьшены до 1080 px по ширине.
 
 ## Как искать замену
 
