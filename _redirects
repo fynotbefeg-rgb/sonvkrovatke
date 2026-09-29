@@ -2,5 +2,6 @@
 /content/*        /404  404!
 /video/*          /404  404!
 /.claude/*        /404  404!
+/.agents/*        /404  404!
 /skills-lock.json /404  404!
 /_redirects       /404  404!
