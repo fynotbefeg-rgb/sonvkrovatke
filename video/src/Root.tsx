@@ -5,6 +5,8 @@ import { Carousel } from "./Carousel";
 import { carousels } from "./carousels";
 import { Avatar, HighlightCover, OgImage, highlights, ogCount } from "./Brand";
 import { StoryFrame, memoStories } from "./Stories";
+import { FinReel, finDuration } from "./FinReel";
+import { finReels } from "./finReels";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -15,6 +17,18 @@ export const RemotionRoot: React.FC = () => {
           id={id}
           component={Reel}
           durationInFrames={reelDuration(scenes)}
+          fps={30}
+          width={1080}
+          height={1920}
+          defaultProps={{ scenes }}
+        />
+      ))}
+      {Object.entries(finReels).map(([id, scenes]) => (
+        <Composition
+          key={id}
+          id={id}
+          component={FinReel}
+          durationInFrames={finDuration(scenes)}
           fps={30}
           width={1080}
           height={1920}
