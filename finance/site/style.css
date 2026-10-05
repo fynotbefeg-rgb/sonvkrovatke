@@ -1,0 +1,132 @@
+/* Общие стили сайта «Деньги самозанятого». Палитра та же, что в рилсах и на аватаре */
+:root{
+  --bg:#0d1a16;
+  --bg-soft:#14261f;
+  --card:#1b3129;
+  --paper:#f4f1ea;
+  --paper-2:#e9efe9;
+  --ink:#10201a;
+  --ink-soft:#3d4f47;
+  --mint:#5fd3a0;
+  --mint-deep:#1f7a52;
+  --coral:#e2603f;
+  --mute:#8fa39a;
+  --line:#d4dbd4;
+  --line-dark:rgba(244,241,234,.14);
+  --sans:"Golos Text",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);font-size:17px;line-height:1.6;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+.wrap{max-width:680px;margin:0 auto;padding:0 20px}
+section{padding:56px 0}
+h1,h2,h3{font-weight:700;line-height:1.15;letter-spacing:-.015em;margin:0 0 16px}
+h1{font-size:clamp(30px,7.6vw,46px)}
+h2{font-size:clamp(25px,5.6vw,34px)}
+h3{font-size:19px;margin-bottom:6px}
+p{margin:0 0 14px}
+a{color:inherit}
+.dark{background:var(--bg);color:var(--paper)}
+.dark-2{background:var(--bg-soft);color:var(--paper)}
+.soft{background:var(--paper-2)}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mint-deep);margin-bottom:14px}
+.dark .kicker,.dark-2 .kicker{color:var(--mint)}
+.lead{font-size:19px}
+.muted{color:var(--mute)}
+.nb{white-space:nowrap}
+
+/* Шапка */
+.top{display:flex;align-items:center;gap:10px;padding:18px 0;font-weight:600;font-size:15px}
+.top img{width:34px;height:34px;border-radius:50%}
+
+/* Первый экран */
+.hero{padding:8px 0 56px}
+.hero .descr{display:inline-block;background:var(--card);color:var(--mint);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:500;margin-bottom:22px}
+.hero .sub{font-size:18px;color:#c9d4ce;margin-bottom:28px}
+.hero-card{background:var(--paper);color:var(--ink);border-radius:20px;overflow:hidden;margin:28px 0 30px;font-size:15px}
+.hero-card .row{display:flex;padding:13px 18px;gap:10px}
+.hero-card .row:nth-child(even){background:var(--paper-2)}
+.hero-card .row b{margin-left:auto;font-variant-numeric:tabular-nums}
+.hero-card .row .ok{color:var(--mint-deep)}
+.hero-card .row .warn{color:var(--coral)}
+
+/* Кнопки */
+.btn{display:inline-block;text-align:center;background:var(--mint);color:var(--ink);font:inherit;font-weight:700;font-size:18px;padding:17px 30px;border:0;border-radius:999px;text-decoration:none;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.btn:hover{background:#7be0b3}
+.btn:active{transform:scale(.98)}
+.btn.wide{display:block;width:100%}
+.btn.ghost{background:transparent;color:inherit;border:2px solid currentColor;font-weight:600}
+.link{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.under{font-size:14px;color:var(--mute);margin-top:12px}
+
+/* Блок боли */
+.pains{list-style:none;padding:0;margin:20px 0 0}
+.pains li{position:relative;padding:14px 0 14px 34px;border-bottom:1px solid var(--line)}
+.pains li:before{content:"";position:absolute;left:4px;top:23px;width:12px;height:12px;border-radius:50%;background:var(--coral)}
+
+/* Три шага */
+.steps{counter-reset:s;list-style:none;padding:0;margin:24px 0 0;display:grid;gap:14px}
+.steps li{counter-increment:s;background:var(--card);border-radius:18px;padding:20px 20px 20px 74px;position:relative}
+.steps li:before{content:counter(s);position:absolute;left:20px;top:18px;width:38px;height:38px;border-radius:50%;background:var(--mint);color:var(--ink);font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps .day{font-weight:700;color:var(--mint)}
+
+/* Что внутри */
+.inside{list-style:none;padding:0;margin:20px 0 0}
+.inside li{padding:14px 0 14px 34px;position:relative;border-bottom:1px solid var(--line)}
+.inside li:before{content:"→";position:absolute;left:2px;top:13px;color:var(--mint-deep);font-weight:700}
+.inside em{font-style:normal;color:var(--ink-soft)}
+
+/* Бонусы */
+.bonus{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:14px}
+.bonus .tag{font-size:13px;font-weight:600;color:var(--mint-deep);text-transform:uppercase;letter-spacing:.08em}
+.bonus h3{margin-top:6px}
+.bonus .price{font-size:15px;color:var(--ink-soft)}
+
+/* Стек и цена */
+.stack{list-style:none;padding:0;margin:20px 0}
+.stack li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-dark)}
+.stack li span:last-child{margin-left:auto;white-space:nowrap;color:var(--mute)}
+.total{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:18px 0 6px}
+.total s{color:var(--mute);font-size:22px}
+.total .now{font-size:44px;font-weight:700;color:var(--mint)}
+.limit{display:inline-block;background:rgba(95,211,160,.14);color:var(--mint);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.box{background:var(--card);border-radius:18px;padding:20px;margin-top:22px}
+.box p:last-child{margin:0}
+
+/* Доверие */
+.proof{display:grid;gap:12px;margin-top:20px}
+.proof div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.proof b{display:block;margin-bottom:2px}
+
+/* Форма */
+.field{margin:18px 0 10px}
+.field label{display:block;font-size:15px;font-weight:500;margin-bottom:6px}
+.field input{width:100%;font:inherit;padding:15px 16px;border-radius:14px;border:1px solid var(--line-dark);background:var(--bg);color:var(--paper)}
+.field input:focus{outline:2px solid var(--mint);outline-offset:1px}
+.fine{font-size:13px;color:var(--mute);line-height:1.5}
+.fine a{color:var(--mute)}
+
+/* Вопросы */
+details{border-bottom:1px solid var(--line);padding:16px 0}
+summary{cursor:pointer;font-weight:600;list-style:none;position:relative;padding-right:28px}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";position:absolute;right:4px;top:-2px;font-size:22px;color:var(--mint-deep)}
+details[open] summary:after{content:"−"}
+details p{margin:10px 0 0;color:var(--ink-soft)}
+
+/* Подвал */
+footer{background:var(--bg);color:var(--mute);font-size:14px;padding:36px 0 110px}
+footer p{margin:0 0 10px}
+
+/* Липкая кнопка на телефоне */
+.sticky{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(13,26,22,.94);backdrop-filter:blur(8px);transform:translateY(110%);transition:transform .25s ease;z-index:10}
+.sticky.show{transform:none}
+@media (min-width:900px){.sticky{display:none}footer{padding-bottom:36px}}
+
+/* Документы */
+.doc{padding:40px 0 64px}
+.doc h1{font-size:clamp(26px,6vw,36px)}
+.doc h2{font-size:20px;margin-top:30px}
+.doc p,.doc li{color:var(--ink-soft)}

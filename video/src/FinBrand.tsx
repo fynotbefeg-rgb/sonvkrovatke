@@ -79,3 +79,26 @@ export const FinAvatar: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+// Картинка для превью ссылки (og:image) 1200×630
+export const FinOg: React.FC = () => (
+  <AbsoluteFill
+    style={{
+      background: `radial-gradient(ellipse 700px 500px at 85% 10%, rgba(95,211,160,.18), transparent 70%), linear-gradient(180deg, ${F.bg}, ${F.bgSoft})`,
+      padding: "70px 80px",
+      fontFamily: sans,
+      color: F.paper,
+      justifyContent: "center",
+    }}
+  >
+    <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: 4, textTransform: "uppercase", color: F.mint }}>Деньги самозанятого</div>
+    <div style={{ fontSize: 68, fontWeight: 700, lineHeight: 1.08, marginTop: 22, maxWidth: 820 }}>Правило трёх дат: чеки, налог и лимит без ошибок</div>
+    <div style={{ display: "flex", gap: 18, marginTop: 40 }}>
+      {["9-е · чеки", "12-е · квитанция", "28-е · налог"].map((t) => (
+        <div key={t} style={{ background: F.card, borderRadius: 999, padding: "14px 26px", fontSize: 30, fontWeight: 600, color: F.mint }}>
+          {t}
+        </div>
+      ))}
+    </div>
+  </AbsoluteFill>
+);

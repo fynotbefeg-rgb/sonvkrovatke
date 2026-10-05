@@ -7,7 +7,7 @@ import { Avatar, HighlightCover, OgImage, highlights, ogCount } from "./Brand";
 import { StoryFrame, memoStories } from "./Stories";
 import { FinReel, finDuration } from "./FinReel";
 import { finReels } from "./finReels";
-import { FinAvatar, finAvatarCount } from "./FinBrand";
+import { FinAvatar, FinOg, finAvatarCount } from "./FinBrand";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -49,6 +49,7 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
       <Composition id="FinAvatar" component={FinAvatar} durationInFrames={finAvatarCount} fps={1} width={1080} height={1080} />
+      <Composition id="FinOg" component={FinOg} durationInFrames={1} fps={1} width={1200} height={630} />
       <Composition id="Avatar" component={Avatar} durationInFrames={1} fps={1} width={1080} height={1080} />
       <Composition id="OgImage" component={OgImage} durationInFrames={ogCount} fps={1} width={1200} height={630} />
       <Composition
