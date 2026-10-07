@@ -10,6 +10,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 FF = "/usr/local/lib/python3.11/dist-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
 topic = sys.argv[1]
 fake = "--fake" in sys.argv
+only = next((a.split("=",1)[1].split(",") for a in sys.argv if a.startswith("--keys=")), None)
 texts = json.load(open(os.path.join(ROOT, "roman/gen/texts.json")))[topic]
 out_p = os.path.join(ROOT, "pv/src/romanWords.json")
 data = json.load(open(out_p)) if os.path.exists(out_p) else {}
@@ -34,6 +35,7 @@ def merge_short(ws):
 
 model = None
 for key, fn in [("h1", "h1"), ("h2", "h2"), ("h3", "h3"), ("body", "osnova")]:
+    if only and key not in only: continue
     script = [w for w in texts[key].replace("\n", " ").split(" ") if w.strip() and w != "—"]
     path = os.path.join(ROOT, f"pv/public/rr/{topic}/{fn}.mp4")
     if fake:
