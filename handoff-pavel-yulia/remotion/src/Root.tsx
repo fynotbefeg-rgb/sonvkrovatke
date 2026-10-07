@@ -10,6 +10,7 @@ import { CatStory, CATS_FRAMES } from "./CatStory";
 import { MemeCats, MEME_FRAMES } from "./MemeCats";
 import { KitStory, KIT_FRAMES } from "./KitStory";
 import { RM_V1, RM_V2, RM_DUR } from "./IntroRM";
+import { RM2_A, RM2_B, RM2_DUR } from "./IntroRM2";
 import { FormulaReel, FORMULA_FRAMES } from "./FormulaReel";
 import { FormulaReel3 } from "./FormulaReel3";
 import { LudiVideo, LUDI_FRAMES } from "./LudiVideo";
@@ -59,6 +60,8 @@ export const RemotionRoot: React.FC = () => (
 <Composition id="LudiVideo" component={LudiVideo} durationInFrames={LUDI_FRAMES} fps={30} width={1080} height={1350} />
 <Composition id="FormulaReel3" component={FormulaReel3} durationInFrames={FORMULA_FRAMES} fps={30} width={1080} height={1920} />
     <Composition id="RMv1" component={RM_V1} durationInFrames={RM_DUR*4} fps={30} width={1920} height={1080} />
+    <Composition id="RM2A" component={RM2_A} durationInFrames={RM2_DUR} fps={25} width={1920} height={1080} />
+    <Composition id="RM2B" component={RM2_B} durationInFrames={RM2_DUR} fps={25} width={1920} height={1080} />
     <Composition id="RMv2" component={RM_V2} durationInFrames={RM_DUR*4} fps={30} width={1920} height={1080} />
     <Composition id="IntroSeries" component={IntroSeries} durationInFrames={INTRO * LESSONS.length} fps={30} width={1920} height={1080} />
     {Object.entries(VERSIONS).map(([k, v]) => (
