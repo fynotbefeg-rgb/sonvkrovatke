@@ -233,7 +233,7 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
       whatsapp: { name: "WhatsApp", bar: "#075e54", bg: "#ece5dd", me: "#dcf8c6", them: "#ffffff", ink: "#111" },
       instagram: { name: "Instagram · Директ", bar: "linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045)", bg: "#ffffff", me: "#3797f0", them: "#efefef", ink: "#111" },
       avito: { name: "Авито · Сообщения", bar: "#00aaff", bg: "#f5f5f5", me: "#d6f0ff", them: "#ffffff", ink: "#111" },
-      wb: { name: "Wildberries · Отзывы", bar: "linear-gradient(90deg,#cb11ab,#481173)", bg: "#f6f0fa", me: "#ffffff", them: "#ffffff", ink: "#111" },
+      wb: { name: "Wildberries · API отзывов", bar: "linear-gradient(90deg,#cb11ab,#481173)", bg: "#f6f0fa", me: "#ffffff", them: "#ffffff", ink: "#111" },
       telegram: { name: "Telegram Business", bar: "#2aabee", bg: "#cfe3c3", me: "#effdde", them: "#ffffff", ink: "#111" },
     };
     const c = A[ins.app];
