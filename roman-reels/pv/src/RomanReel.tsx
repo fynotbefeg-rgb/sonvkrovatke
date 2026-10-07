@@ -41,7 +41,7 @@ export const TOPICS: Record<string, Topic> = {
       { kind: "chat", app: "whatsapp", from: { p: ["первое"], d: 1.3 }, to: { p: ["второе"], d: -0.1 }, q: "Здравствуйте! Есть запись на субботу?", a: "Здравствуйте! В субботу свободно 12:00 и 15:30. Записать вас?" },
       { kind: "chat", app: "instagram", from: { p: ["второе"], d: 1.1 }, to: { p: ["третье"], d: -0.1 }, pre: "комментарий: ЦЕНА", q: "ЦЕНА", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши, отвечу." },
       { kind: "chat", app: "avito", from: { p: ["третье"], d: 1.1 }, to: { p: ["четвертое"], d: -0.1 }, q: "Ещё продаётся? Доставка в Казань есть?", a: "Да, в наличии! В Казань — 2–3 дня через Авито Доставку. Оформить?" },
-      { kind: "chat", app: "wb", from: { p: ["четвертое"], d: 1.2 }, to: { p: ["и пятое", "пятое"], d: -0.1 }, stars: 5, q: "Отличный крем, но коробка пришла помятой.", a: "Спасибо за отзыв! Жаль, что упаковка пострадала в дороге — уже передали это в доставку. Рады, что крем понравился!" },
+      { kind: "chat", app: "wb", from: { p: ["четвертое"], d: 1.2 }, to: { p: ["и пятое", "пятое"], d: -0.1 }, q: "Подскажите, на рост 170 какой размер брать?", a: "Здравствуйте! На рост 170 подойдёт M — модель идёт в размер. Если любите посвободнее, берите L." },
       { kind: "chat", app: "telegram", from: { p: ["и пятое", "пятое"], d: 1.2 }, to: { p: ["главное правило"], d: -0.1 }, q: "Сколько стоит консультация?", a: "Консультация 60 минут — 5 000 ₽. Удобно во вторник или в четверг?" },
       { kind: "big", from: { p: ["главное правило"] }, to: { p: ["напиши в комментариях"], d: -0.1 }, top: "типовое — нейросеть,", big: "сложное — тебе", bottom: "жалобы и крупные заказы" },
       { kind: "cta", from: { p: ["напиши в комментариях"] }, to: 999, l1: "Где автоматизировать переписку?", chip: "WhatsApp · Instagram<br/>Авито · WB · Telegram", l2: "следующее видео — про это" },
@@ -233,7 +233,7 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
       whatsapp: { name: "WhatsApp", bar: "#075e54", bg: "#ece5dd", me: "#dcf8c6", them: "#ffffff", ink: "#111" },
       instagram: { name: "Instagram · Директ", bar: "linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045)", bg: "#ffffff", me: "#3797f0", them: "#efefef", ink: "#111" },
       avito: { name: "Авито · Сообщения", bar: "#00aaff", bg: "#f5f5f5", me: "#d6f0ff", them: "#ffffff", ink: "#111" },
-      wb: { name: "Wildberries · API отзывов", bar: "linear-gradient(90deg,#cb11ab,#481173)", bg: "#f6f0fa", me: "#ffffff", them: "#ffffff", ink: "#111" },
+      wb: { name: "Wildberries · Чат с покупателем", bar: "linear-gradient(90deg,#cb11ab,#481173)", bg: "#f6f0fa", me: "#ffffff", them: "#ffffff", ink: "#111" },
       telegram: { name: "Telegram Business", bar: "#2aabee", bg: "#cfe3c3", me: "#effdde", them: "#ffffff", ink: "#111" },
     };
     const c = A[ins.app];
@@ -248,14 +248,14 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
     return (
       <AbsoluteFill style={{ background: c.bg, opacity: p }}>
         <div style={{ height: 230, background: c.bar, display: "flex", alignItems: "flex-end", padding: "0 44px 34px", gap: 24 }}>
-          <div style={{ width: 96, height: 96, borderRadius: 48, background: "rgba(255,255,255,.25)", display: "grid", placeItems: "center", fontSize: 54 }}>{ins.app === "wb" ? "⭐" : "👤"}</div>
+          <div style={{ width: 96, height: 96, borderRadius: 48, background: "rgba(255,255,255,.25)", display: "grid", placeItems: "center", fontSize: 54 }}>{"👤"}</div>
           <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 50, color: "#fff" }}>{c.name}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 34, padding: "70px 48px" }}>
           {ins.pre && <div style={{ alignSelf: "center", fontFamily: FONT, fontSize: 34, color: "#777", opacity: qIn }}>{ins.pre}</div>}
           {bubble(ins.q, false, qIn, ins.stars ? <div style={{ color: "#f5a623", fontSize: 50, marginBottom: 8, fontFamily: "DejaVu Sans" }}>{"★".repeat(ins.stars)}</div> : null)}
           {typingOn && <div style={{ alignSelf: "flex-end", fontFamily: FONT, fontSize: 38, color: "#666", background: c.me, borderRadius: 30, padding: "18px 30px" }}>печатает{".".repeat(1 + (Math.floor(f / 6) % 3))}</div>}
-          {f >= aStart && bubble(ins.a.slice(0, chars), true, aIn, ins.app === "wb" ? <div style={{ fontWeight: 800, fontSize: 36, color: "#cb11ab", marginBottom: 8 }}>Ответ продавца</div> : null)}
+          {f >= aStart && bubble(ins.a.slice(0, chars), true, aIn)}
           {f >= aStart + 10 && <div style={{ alignSelf: "flex-end", display: "flex", alignItems: "center", gap: 12, fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#555", opacity: aIn }}><Logo who="cl" size={44} /> ответ нейросети</div>}
         </div>
       </AbsoluteFill>
