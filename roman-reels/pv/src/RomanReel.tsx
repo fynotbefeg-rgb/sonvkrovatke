@@ -89,13 +89,13 @@ export const TOPICS: Record<string, Topic> = {
       { kind: "web", from: 0.2, to: { p: ["что дают"], d: -0.1 }, img: "ai2/web_hero.jpg", h: 2350, pan: [[0, 900, 1.0], [3, 1000, 1.05]] },
       { kind: "web", from: { p: ["что дают"] }, to: { p: ["кто может подать"], d: -0.1 }, img: "ai2/web_benefits.jpg", h: 1700, pan: [[0, 800, 1.15], [6, 800, 1.25]] },
       { kind: "web", from: { p: ["кто может подать"] }, to: { p: ["и инвестиции", "инвестиции не обязательны"], d: -0.1 }, img: "ai2/faq_who.jpg", h: 1850, pan: [[0, 500, 1.1], [5, 520, 1.15]],
-        marks: [{ t0: 0.4, t1: 30, x: 40, y: 260, w: 1000, h: 140 }] },
+        marks: [{ t0: 0.4, t1: 30, x: 40, y: 394, w: 1000, h: 146 }] },
       { kind: "web", from: { p: ["и инвестиции", "инвестиции не обязательны"] }, to: { p: ["что нужно"], d: -0.1 }, img: "ai2/faq_vc.jpg", h: 1850, pan: [[0, 450, 1.1], [5, 470, 1.15]],
         marks: [{ t0: 0.4, t1: 30, x: 40, y: 250, w: 1000, h: 300 }] },
       { kind: "web", from: { p: ["что нужно"] }, to: { p: ["решение часто", "решение"], d: -0.1 }, img: "ai2/faq_who.jpg", h: 1850, pan: [[0, 520, 1.15], [5, 540, 1.2]],
-        marks: [{ t0: 0.3, t1: 30, x: 40, y: 340, w: 1000, h: 200 }] },
+        marks: [{ t0: 0.3, t1: 30, x: 40, y: 528, w: 1000, h: 212 }] },
       { kind: "web", from: { p: ["решение часто", "решение"] }, to: { p: ["а теперь то", "о чём часто молчат"], d: -0.1 }, img: "ai2/faq_review.jpg", h: 1850, pan: [[0, 450, 1.1], [4, 470, 1.15]],
-        marks: [{ t0: 0.3, t1: 30, x: 40, y: 290, w: 1000, h: 230 }] },
+        marks: [{ t0: 0.3, t1: 30, x: 40, y: 423, w: 1000, h: 292 }] },
       { kind: "big", from: { p: ["а теперь то", "о чём часто молчат"] }, to: { p: ["программа работает только", "работает только"], d: -0.1 }, top: "а теперь то,", big: "о чём молчат", bottom: "🤫" },
       { kind: "web", from: { p: ["программа работает только", "работает только"] }, to: { p: ["например"], d: -0.1 }, img: "ai2/web_countries.jpg", h: 3400, pan: [[0, 1100, 1.15], [4, 2600, 1.15]] },
       { kind: "compare", from: { p: ["например"] }, to: { p: ["полный список"], d: -0.1 }, yes: ["Казахстан", "Грузия"], no: ["Россия", "Беларусь"] },
@@ -146,8 +146,8 @@ const Marks: React.FC<{ marks?: Mark[]; t: number }> = ({ marks, t }) => (
 // контент на весь экран: точка фокуса держится на высоте 760 px кадра
 const FullLayer: React.FC<{ p: number; fy: number; sc: number; h: number; children: React.ReactNode; bg?: string }> = ({ p, fy, sc, h, children, bg = "#1f1e1d" }) => (
   <AbsoluteFill style={{ background: bg, opacity: p, overflow: "hidden" }}>
-    <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: h, transformOrigin: `540px ${fy}px`, transform: `translate(0px, ${760 - fy}px) scale(${sc})` }}>{children}</div>
-    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 700, background: "linear-gradient(180deg, rgba(20,20,20,0) 0%, rgba(20,20,20,.85) 55%)" }} />
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: h, transformOrigin: `540px ${fy}px`, transform: `translate(0px, ${760 - fy}px)` }}>{children}</div>{/* без зума: экран всегда целиком по ширине */}
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 480, background: "linear-gradient(180deg, rgba(20,20,20,0) 0%, rgba(20,20,20,.7) 60%)" }} />
   </AbsoluteFill>
 );
 const keyf = (k: [number, number, number][], t: number) => {
@@ -415,7 +415,8 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook, cap }) => {
   for (const x of T.hookIns?.[hook] ?? []) { const a = resolve(x.from, hw, hookDur), b = resolve(x.to, hw, hookDur); if (a >= 0 && b > a) list.push({ x, a, b }); }
   for (const x of T.body) { const a = resolve(x.from, bw, bodyDur), b = resolve(x.to, bw, bodyDur); if (a >= 0 && b > a) list.push({ x, a: a + hookDur, b: b + hookDur }); }
   list.sort((m, n) => m.a - n.a);
-  for (let i = 0; i + 1 < list.length; i++) if (list[i + 1].a - list[i].b < 0.8) list[i].b = list[i + 1].a + 0.25;
+  // короткие промежутки между вставками не показываем — иначе лицо мелькает
+  for (let i = 0; i + 1 < list.length; i++) if (list[i + 1].a - list[i].b < 2.5) list[i].b = list[i + 1].a + 0.25;
   let fullP = 0;
   let fullOn = false;
   for (const { x, a, b } of list) if (x.kind === "phone" || x.kind === "web" || x.kind === "chat" || x.kind === "mcflow") {
