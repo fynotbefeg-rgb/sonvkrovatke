@@ -25,7 +25,7 @@ export type Ins = Base & (
   | { kind: "cta"; l1: string; chip: string; l2: string }
   | { kind: "chat"; app: "whatsapp" | "instagram" | "avito" | "wb" | "telegram"; q: string; a: string; stars?: number; pre?: string; badge?: string }
 );
-export type Topic = { dir: string; hookIns?: Record<string, Ins[]>; body: Ins[]; plates: Record<string, string> };
+export type Topic = { dir: string; hookIns?: Record<string, Ins[]>; body: Ins[]; plates: Record<string, string>; hookFull?: boolean };
 export type RVersion = { topic: string; hook: "h1" | "h2" | "h3" };
 
 // ---------- темы ----------
@@ -49,6 +49,7 @@ export const TOPICS: Record<string, Topic> = {
   },
   manychat: {
     dir: "rr/manychat",
+    hookFull: true,
     plates: { h1: "Напиши «БОТ» — и смотри в директ 🪄", h2: "Как блогеры отвечают всем в директ 🤖", h3: "Автоответ в директ за 4 шага ⚡" },
     body: [
       { kind: "chat", app: "instagram", from: 0.2, to: { p: ["как настроить"], d: -0.1 }, pre: "комментарий: ПРАЙС", q: "ПРАЙС", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши.", badge: "автоответ ManyChat" },
@@ -80,6 +81,7 @@ export const TOPICS: Record<string, Topic> = {
   },
   startups: {
     dir: "rr/startups",
+    hookFull: true,
     plates: { h1: "Claude бесплатно на год 🎁", h2: "Год Claude Team — бесплатно 🔥", h3: "Claude на год: кто пройдёт? 🤔" },
     body: [
       { kind: "web", from: 0.2, to: { p: ["что дают"], d: -0.1 }, img: "ai2/web_hero.jpg", h: 2350, pan: [[0, 900, 1.0], [3, 1000, 1.05]] },
@@ -349,10 +351,12 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
   for (const c of cuts) { if (c > t) break; if (c - last >= 2) { zoomOn = !zoomOn; last = c; } }
   const zoom = zoomOn ? 1.08 : 1;
   const hookFrames = Math.round(hookDur * FPS);
+  // хук крупным планом — лицо на весь экран
+  const full = !!T.hookFull && !inBody;
   return (
     <AbsoluteFill style={{ background: "linear-gradient(180deg,#141922 0%,#1d2531 100%)" }}>
-      <div style={{ position: "absolute", left: 0, top: 860, width: 1080, height: 1060, overflow: "hidden" }}>
-        <div style={{ position: "absolute", left: 0, top: -250, width: 1080, height: 1920, transform: `scale(${zoom})`, transformOrigin: "50% 30%" }}>
+      <div style={{ position: "absolute", left: 0, top: full ? 0 : 860, width: 1080, height: full ? 1920 : 1060, overflow: "hidden" }}>
+        <div style={{ position: "absolute", left: 0, top: full ? 0 : -250, width: 1080, height: 1920, transform: `scale(${zoom})`, transformOrigin: full ? "50% 45%" : "50% 30%" }}>
           <Sequence durationInFrames={hookFrames}>
             <OffthreadVideo src={staticFile(`${T.dir}/${hook}.mp4`)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </Sequence>
@@ -361,7 +365,7 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
           </Sequence>
         </div>
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 850, height: 30, background: "linear-gradient(180deg,#1d2531,#1d253100)" }} />
+      {!full && <div style={{ position: "absolute", left: 0, right: 0, top: 850, height: 30, background: "linear-gradient(180deg,#1d2531,#1d253100)" }} />}
       {list.map(({ x, a, b }, i) => (
         <Sequence key={i} from={Math.round(a * FPS)} durationInFrames={Math.max(1, Math.round((b - a) * FPS))}>
           <Insert ins={x} p={interpolate(t, [a, a + 0.25, b - 0.25, b], [0, 1, 1, 0], clamp)} />
@@ -370,7 +374,7 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
       <div style={{ position: "absolute", left: 70, right: 150, top: 230, background: "#fff", borderRadius: 34, padding: "22px 30px", textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 52, lineHeight: 1.12, color: "#111", boxShadow: "0 14px 40px rgba(0,0,0,.18)", opacity: 1 - fullP }}>
         {T.plates[hook]}
       </div>
-      <Captions words={inBody ? bw : hw} t={lt} y={fullOn ? 1480 : 868} />
+      <Captions words={inBody ? bw : hw} t={lt} y={fullOn || full ? 1480 : 868} />
     </AbsoluteFill>
   );
 };
