@@ -21,12 +21,13 @@ export type Ins = Base & (
   | { kind: "big"; top: string; big: string; bottom?: string }
   | { kind: "compare"; yes: string[]; no: string[] }
   | { kind: "flow" }
+  | { kind: "mcflow"; word: string; reply: string; btn: string }
   | { kind: "approve" }
   | { kind: "cta"; l1: string; chip: string; l2: string }
   | { kind: "chat"; app: "whatsapp" | "instagram" | "avito" | "wb" | "telegram"; q: string; a: string; stars?: number; pre?: string; badge?: string }
 );
 export type Topic = { dir: string; hookIns?: Record<string, Ins[]>; body: Ins[]; plates: Record<string, string>; hookFull?: boolean; jumps?: Record<string, number[]> };
-export type RVersion = { topic: string; hook: "h1" | "h2" | "h3" };
+export type RVersion = { topic: string; hook: "h1" | "h2" | "h3"; cap?: "word" | "phrase" };
 
 // ---------- темы ----------
 const S3_FULL: [number, number, number][] = [[0, 980, 1.0], [2.6, 980, 1.05], [3.3, 700, 1.1], [6, 700, 1.1], [8, 1150, 1.1]];
@@ -52,7 +53,8 @@ export const TOPICS: Record<string, Topic> = {
     hookFull: true,
     plates: { h1: "Напиши «БОТ» — и смотри в директ 🪄", h2: "Как блогеры отвечают всем в директ 🤖", h3: "Автоответ в директ за 4 шага ⚡" },
     body: [
-      { kind: "chat", app: "instagram", from: 0.2, to: { p: ["как настроить"], d: -0.1 }, pre: "комментарий: ПРАЙС", q: "ПРАЙС", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши.", badge: "автоответ ManyChat" },
+      { kind: "mcflow", from: { p: ["схема простая"] }, to: { p: ["как настроить"], d: -0.1 }, word: "ПРАЙС", reply: "Привет! Держи прайс 👇", btn: "Открыть прайс" },
+      { kind: "chat", app: "instagram", from: 0.2, to: { p: ["схема простая"], d: -0.1 }, pre: "комментарий: ПРАЙС", q: "ПРАЙС", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши.", badge: "автоответ ManyChat" },
       { kind: "big", from: { p: ["первое"] }, to: { p: ["второе"], d: -0.1 }, top: "шаг 1", big: "проф. аккаунт", bottom: "бизнес или автор" },
       { kind: "big", from: { p: ["второе"] }, to: { p: ["третье"], d: -0.1 }, top: "шаг 2", big: "вход через Meta", bottom: "пароль никому не передаёшь" },
       { kind: "big", from: { p: ["третье"] }, to: { p: ["четвертое"], d: -0.1 }, top: "шаг 3", big: "кодовое слово", bottom: "шаблон «ответ на комментарий»" },
@@ -153,6 +155,59 @@ const keyf = (k: [number, number, number][], t: number) => {
   return [interpolate(t, k.map((x) => x[0]), k.map((x) => x[1]), e), interpolate(t, k.map((x) => x[0]), k.map((x) => x[2]), e)];
 };
 
+// анимированная схема: комментарий → ManyChat → директ (моушн-вставка на весь экран)
+const McFlow: React.FC<{ word: string; reply: string; btn: string; p: number }> = ({ word, reply, btn, p }) => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = f / fps;
+  const sp = (d: number) => spring({ frame: Math.round((t - d) * fps), fps, config: { damping: 13, stiffness: 160 } });
+  const typed = word.slice(0, Math.max(0, Math.min(word.length, Math.floor((t - 0.55) * 9))));
+  const bez = (u: number, a: number[], c: number[], b: number[]) => [
+    (1 - u) ** 2 * a[0] + 2 * (1 - u) * u * c[0] + u * u * b[0], (1 - u) ** 2 * a[1] + 2 * (1 - u) * u * c[1] + u * u * b[1]];
+  const u1 = interpolate(t, [1.3, 2.0], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const u2 = interpolate(t, [2.7, 3.3], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const d1 = bez(u1, [540, 600], [880, 700], [540, 800]);
+  const d2 = bez(u2, [540, 900], [200, 1000], [540, 1110]);
+  const dot = (xy: number[], on: boolean) => on ? <div style={{ position: "absolute", left: xy[0] - 22, top: xy[1] - 22, width: 44, height: 44, borderRadius: 22, background: "#ffd400", boxShadow: "0 0 40px 14px rgba(255,212,0,.55)" }} /> : null;
+  const ring = (d: number) => { const k = interpolate(t, [d, d + 0.9], [0, 1], clamp); return <div style={{ position: "absolute", left: 540 - 110 - k * 90, top: 850 - 110 - k * 90, width: 220 + k * 180, height: 220 + k * 180, borderRadius: "50%", border: "6px solid #5b8cff", opacity: (1 - k) * (t > d ? 1 : 0) }} />; };
+  const step = (n: string, y: number, d: number) => <div style={{ position: "absolute", left: 60, top: y, width: 70, height: 70, borderRadius: 35, background: "#fff", color: "#111", fontFamily: FONT, fontWeight: 900, fontSize: 40, display: "grid", placeItems: "center", transform: `scale(${sp(d)})` }}>{n}</div>;
+  const a = sp(0.1), b = sp(1.9), c = sp(3.2), badge = sp(3.8);
+  return (
+    <AbsoluteFill style={{ opacity: p, background: "radial-gradient(120% 80% at 50% 45%, #1c2433 0%, #0b0e14 70%)" }}>
+     <AbsoluteFill style={{ transform: "translateY(90px)" }}>
+      <svg width={1080} height={1920} style={{ position: "absolute" }}>
+        <path opacity={interpolate(t, [1.0, 1.3], [0, 1], clamp)} d="M540 600 Q880 700 540 800" stroke="#ffffff33" strokeWidth={6} fill="none" strokeDasharray="14 14" />
+        <path opacity={interpolate(t, [2.4, 2.7], [0, 1], clamp)} d="M540 900 Q200 1000 540 1110" stroke="#ffffff33" strokeWidth={6} fill="none" strokeDasharray="14 14" />
+      </svg>
+      {step("1", 420, 0.1)}{step("2", 815, 1.9)}{step("3", 1200, 3.2)}
+      {/* комментарий под рилсом */}
+      <div style={{ position: "absolute", left: 170, right: 90, top: 330, height: 270, borderRadius: 34, background: "#fff", padding: "30px 36px", transform: `translateY(${(1 - a) * 60}px)`, opacity: a, boxShadow: "0 20px 60px rgba(0,0,0,.4)" }}>
+        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#8a8f98" }}>Комментарии · рилс</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 22, marginTop: 34 }}>
+          <div style={{ width: 84, height: 84, borderRadius: 42, background: "linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)" }} />
+          <div style={{ fontFamily: FONT, fontSize: 44, color: "#111" }}><b>anna_k</b>{"  "}<span style={{ fontWeight: 900 }}>{typed}</span><span style={{ opacity: t < 1.4 && Math.floor(t * 4) % 2 ? 1 : 0 }}>|</span></div>
+        </div>
+      </div>
+      {dot(d1, t > 1.3 && t < 2.05)}
+      {/* бот */}
+      {ring(2.0)}{ring(2.35)}
+      <div style={{ position: "absolute", left: 540 - 120, top: 850 - 120, width: 240, height: 240, borderRadius: "50%", background: "#2f6bff", display: "grid", placeItems: "center", transform: `scale(${b})`, boxShadow: "0 0 80px rgba(47,107,255,.6)" }}>
+        <div style={{ fontSize: 110 }}>🤖</div>
+      </div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 1000, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 48, color: "#fff", opacity: b }}>ManyChat</div>
+      {dot(d2, t > 2.7 && t < 3.35)}
+      {/* директ */}
+      <div style={{ position: "absolute", left: 170, right: 90, top: 1110, borderRadius: 34, background: "#fff", padding: "26px 32px", transform: `scale(${0.85 + c * 0.15})`, opacity: c, boxShadow: "0 20px 60px rgba(0,0,0,.4)" }}>
+        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#8a8f98", marginBottom: 18 }}>Директ</div>
+        <div style={{ background: "#3797f0", color: "#fff", fontFamily: FONT, fontWeight: 700, fontSize: 40, borderRadius: 30, padding: "18px 26px", display: "inline-block" }}>{reply}</div>
+        <div style={{ marginTop: 18, border: "3px solid #3797f0", color: "#3797f0", fontFamily: FONT, fontWeight: 800, fontSize: 36, borderRadius: 22, padding: "14px 0", textAlign: "center" }}>{btn}</div>
+      </div>
+      <div style={{ position: "absolute", right: 70, top: 1075, background: "#ffd400", color: "#111", fontFamily: FONT, fontWeight: 900, fontSize: 38, borderRadius: 40, padding: "10px 26px", transform: `scale(${badge}) rotate(-6deg)` }}>за 1 секунду</div>
+     </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
 const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -208,6 +263,7 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
       </Card>
     );
   }
+  if (ins.kind === "mcflow") return <McFlow word={ins.word} reply={ins.reply} btn={ins.btn} p={p} />;
   if (ins.kind === "flow") {
     const a = spring({ frame: f - 2, fps, config: { damping: 12 } });
     const b = spring({ frame: f - 10, fps, config: { damping: 12 } });
@@ -317,6 +373,26 @@ const Captions: React.FC<{ words: W[]; t: number; y: number }> = ({ words, t, y 
   );
 };
 
+// субтитры фразами в белой плашке (стиль референса)
+const PhraseCaptions: React.FC<{ words: W[]; t: number; y: number }> = ({ words, t, y }) => {
+  const chunks: { s: number; e: number; text: string }[] = [];
+  let cur: W[] = [];
+  const flush = () => { if (cur.length) chunks.push({ s: cur[0][1], e: cur[cur.length - 1][2], text: cur.map((w) => w[0]).join(" ").replace(/[«»"]/g, "").replace(/[.,:;]+$/, "") }); cur = []; };
+  for (const w of words) { cur.push(w); const n = cur.map((x) => x[0]).join(" ").length; if (/[.!?]$/.test(w[0]) || (/[:;,]$/.test(w[0]) && n > 12) || n > 38) flush(); }
+  flush();
+  let i = -1;
+  for (let k = 0; k < chunks.length; k++) if (chunks[k].s <= t + 0.05) i = k;
+  if (i < 0) return null;
+  const c = chunks[i];
+  const next = i + 1 < chunks.length ? chunks[i + 1].s : c.e + 0.8;
+  if (t > Math.max(next, c.e) + 0.4) return null;
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, top: y, display: "flex", justifyContent: "center" }}>
+      <div style={{ maxWidth: 900, background: "#fff", color: "#111", fontFamily: FONT, fontWeight: 700, fontSize: 46, lineHeight: 1.18, padding: "14px 26px", borderRadius: 14, textAlign: "center", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>{c.text}</div>
+    </div>
+  );
+};
+
 const wordsOf = (key: string) => ((WORDS as unknown as Record<string, W[]>)[key] ?? []);
 const lastEnd = (w: W[]) => (w.length ? w[w.length - 1][2] : 5);
 export const durOf = (topic: string, k: string) => {
@@ -325,7 +401,7 @@ export const durOf = (topic: string, k: string) => {
 };
 export const rFrames = (v: RVersion) => Math.round((durOf(v.topic, v.hook) + durOf(v.topic, "body")) * FPS);
 
-export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
+export const RomanReel: React.FC<RVersion> = ({ topic, hook, cap }) => {
   const T = TOPICS[topic];
   const f = useCurrentFrame();
   const t = f / FPS;
@@ -342,7 +418,7 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
   for (let i = 0; i + 1 < list.length; i++) if (list[i + 1].a - list[i].b < 0.8) list[i].b = list[i + 1].a + 0.25;
   let fullP = 0;
   let fullOn = false;
-  for (const { x, a, b } of list) if (x.kind === "phone" || x.kind === "web" || x.kind === "chat") {
+  for (const { x, a, b } of list) if (x.kind === "phone" || x.kind === "web" || x.kind === "chat" || x.kind === "mcflow") {
     fullP = Math.max(fullP, interpolate(t, [a - 0.1, a + 0.2, b - 0.2, b + 0.1], [0, 1, 1, 0], clamp));
     if (t >= a && t < b) fullOn = true;
   }
@@ -380,11 +456,23 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
       <div style={{ position: "absolute", left: 70, right: 150, top: 230, background: "#fff", borderRadius: 34, padding: "22px 30px", textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 52, lineHeight: 1.12, color: "#111", boxShadow: "0 14px 40px rgba(0,0,0,.18)", opacity: 1 - fullP }}>
         {T.plates[hook]}
       </div>
-      <Captions words={inBody ? bw : hw} t={lt} y={fullOn || full ? 1480 : 868} />
+      {cap === "phrase"
+        ? <PhraseCaptions words={inBody ? bw : hw} t={lt} y={fullOn || full ? 1500 : 880} />
+        : <Captions words={inBody ? bw : hw} t={lt} y={fullOn || full ? 1480 : 868} />}
     </AbsoluteFill>
   );
 };
 
 export const R_VERSIONS: Record<string, RVersion> = Object.fromEntries(
-  Object.keys(TOPICS).flatMap((tp) => (["h1", "h2", "h3"] as const).map((h) => [`${tp}-${h}`, { topic: tp, hook: h }]))
+  Object.keys(TOPICS).flatMap((tp) => (["h1", "h2", "h3"] as const).flatMap((h) => [
+    [`${tp}-${h}`, { topic: tp, hook: h }],
+    [`${tp}-${h}-ph`, { topic: tp, hook: h, cap: "phrase" }],
+  ]))
+);
+
+// превью моушн-вставки отдельно
+export const McFlowDemo: React.FC = () => (
+  <AbsoluteFill style={{ background: "#0b0e14" }}>
+    <McFlow word="ПРАЙС" reply="Привет! Держи прайс 👇" btn="Открыть прайс" p={1} />
+  </AbsoluteFill>
 );
