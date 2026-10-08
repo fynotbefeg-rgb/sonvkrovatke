@@ -4,7 +4,7 @@ import "./Portfolio"; // шрифты Golos Text
 import WORDS from "./romanWords.json";
 
 // Рилсы Романа (шаблон v2): вставки привязаны к фразам расшифровки, контент — на весь экран без кружка
-const FPS = 30;
+const FPS = 25; // как у роликов HeyGen — без дублей кадров
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const CL = "#d97757";
 const GPT = "#10a37f";
@@ -347,16 +347,18 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
   // лёгкий наезд на лицо на каждой новой фразе (по точкам в расшифровке)
   const cuts: number[] = [];
   for (const [w, s] of [...hw.map((x) => x), ...bw.map((x) => [x[0], x[1] + hookDur, x[2]] as W)]) if (/[.!?]$/.test(w)) cuts.push(s + 0.3);
+  // плавный наезд (0.6 с) вместо скачка; в полноэкранном хуке наездов нет
   let zoomOn = false, last = -9;
   for (const c of cuts) { if (c > t) break; if (c - last >= 2) { zoomOn = !zoomOn; last = c; } }
-  const zoom = zoomOn ? 1.08 : 1;
+  const zp = interpolate(t, [last, last + 0.6], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const zoom = 1 + 0.06 * (zoomOn ? zp : 1 - zp);
   const hookFrames = Math.round(hookDur * FPS);
   // хук крупным планом — лицо на весь экран
   const full = !!T.hookFull && !inBody;
   return (
     <AbsoluteFill style={{ background: "linear-gradient(180deg,#141922 0%,#1d2531 100%)" }}>
       <div style={{ position: "absolute", left: 0, top: full ? 0 : 860, width: 1080, height: full ? 1920 : 1060, overflow: "hidden" }}>
-        <div style={{ position: "absolute", left: 0, top: full ? 0 : -250, width: 1080, height: 1920, transform: `scale(${zoom})`, transformOrigin: full ? "50% 45%" : "50% 30%" }}>
+        <div style={{ position: "absolute", left: 0, top: full ? 0 : -250, width: 1080, height: 1920, transform: `scale(${full ? 1 : zoom})`, transformOrigin: "50% 30%" }}>
           <Sequence durationInFrames={hookFrames}>
             <OffthreadVideo src={staticFile(`${T.dir}/${hook}.mp4`)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </Sequence>
