@@ -53,9 +53,9 @@ topic(2, "startups", "Claude бесплатно на год для старта�
   "Последний абзац «совет от тех, кто подавал» заменили на проверяемые факты (сгорание кредитов и +$100K от фонда)."])
 
 d.add_heading("Тексты для HeyGen (с произношением)", 1)
-p("Вставлять как есть: английские слова записаны так, как их правильно прочитает озвучка.", i=True, gray=True)
+p("Вставлять как есть: английские слова записаны так, как их правильно прочитает озвучка. Без тире: HeyGen их не читает как паузу, поэтому паузы сделаны точками и запятыми.", i=True, gray=True)
 for key, title in (("manychat", "ManyChat"), ("startups", "Claude на год")):
     d.add_heading(title, 2)
     for k, name in (("h1", "h1"), ("h2", "h2"), ("h3", "h3"), ("body", "osnova")):
-        p(f"{name}:", b=True); p(heygen(T[key][k]).replace("\n", " "))
+        p(f"{name}:", b=True); p(T[key].get("heygen", {}).get(k, heygen(T[key][k])).replace("\n", " "))
 d.save(sys.argv[1])
