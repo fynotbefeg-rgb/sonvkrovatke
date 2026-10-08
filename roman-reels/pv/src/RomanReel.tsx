@@ -16,7 +16,7 @@ type A = number | { p: string | string[]; d?: number; end?: boolean };
 type Mark = { t0: number; t1: number; x: number; y: number; w: number; h: number };
 type Base = { from: A; to: A };
 export type Ins = Base & (
-  | { kind: "phone"; src: string; trim: number; rate?: number; full: [number, number, number][]; marks?: Mark[] }
+  | { kind: "phone"; src: string; trim: number; rate?: number; full: [number, number, number][]; marks?: Mark[]; h?: number; bg?: string }
   | { kind: "web"; img: string; h: number; pan: [number, number, number][]; marks?: Mark[] }
   | { kind: "big"; top: string; big: string; bottom?: string }
   | { kind: "compare"; yes: string[]; no: string[] }
@@ -53,15 +53,17 @@ export const TOPICS: Record<string, Topic> = {
     hookFull: true,
     plates: { h1: "Напиши «БОТ» — и смотри в директ 🪄", h2: "Как блогеры отвечают всем в директ 🤖", h3: "Автоответ в директ за 4 шага ⚡" },
     body: [
+      { kind: "phone", src: "mc_open.mp4", trim: 0, full: [[0, 900, 1]], from: 0.1, to: { p: ["схема простая"], d: -0.1 } },
       { kind: "mcflow", from: { p: ["схема простая"] }, to: { p: ["как настроить"], d: -0.1 }, word: "ПРАЙС", reply: "Привет! Держи прайс 👇", btn: "Открыть прайс" },
-      { kind: "chat", app: "instagram", from: 0.2, to: { p: ["схема простая"], d: -0.1 }, pre: "комментарий: ПРАЙС", q: "ПРАЙС", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши.", badge: "автоответ ManyChat" },
       { kind: "big", from: { p: ["первое"] }, to: { p: ["второе"], d: -0.1 }, top: "шаг 1", big: "проф. аккаунт", bottom: "бизнес или автор" },
       { kind: "big", from: { p: ["второе"] }, to: { p: ["третье"], d: -0.1 }, top: "шаг 2", big: "вход через Meta", bottom: "пароль никому не передаёшь" },
-      { kind: "big", from: { p: ["третье"] }, to: { p: ["четвертое"], d: -0.1 }, top: "шаг 3", big: "кодовое слово", bottom: "шаблон «ответ на комментарий»" },
-      { kind: "big", from: { p: ["четвертое"] }, to: { p: ["включи"], d: -0.1 }, top: "шаг 4", big: "сообщение в директ", bottom: "со ссылкой или кнопкой" },
-      { kind: "big", from: { p: ["включи"] }, to: { p: ["и важно"], d: -0.1 }, top: "включи и проверь", big: "со 2-го аккаунта" },
-      { kind: "big", from: { p: ["и важно"] }, to: { p: ["совет"], d: -0.1 }, top: "ответ приходит", big: "сразу", bottom: "а не через 3 часа" },
-      { kind: "big", from: { p: ["совет"] }, to: { p: ["а дальше"], d: -0.1 }, top: "кодовое слово —", big: "«ПРАЙС»", bottom: "одно и короткое" },
+      { kind: "phone", src: "mc_tpl.mp4", trim: 0, h: 1316, bg: "#ffffff", full: [[0, 458, 1]], from: { p: ["третье"] }, to: { p: ["выбери рилс"], d: -0.1 } },
+      { kind: "phone", src: "mc_kw.mp4", trim: 0, h: 2100, bg: "#ffffff", full: [[0, 900, 1]], from: { p: ["выбери рилс"] }, to: { p: ["четвертое"], d: -0.1 } },
+      { kind: "phone", src: "mc_dmtext.mp4", trim: 0, h: 2100, bg: "#ffffff", full: [[0, 900, 1]], from: { p: ["четвертое"] }, to: { p: ["включи"], d: -0.1 } },
+      { kind: "phone", src: "mc_type.mp4", trim: 0, full: [[0, 1000, 1]], from: { p: ["включи"] }, to: { p: ["и важно"], d: -0.1 } },
+      { kind: "phone", src: "mc_result.mp4", trim: 0, full: [[0, 900, 1]], from: { p: ["и важно"] }, to: { p: ["совет"], d: -0.1 } },
+      { kind: "big", from: { p: ["совет"] }, to: { p: ["а в директ"], d: -0.1 }, top: "кодовое слово —", big: "«ПРАЙС»", bottom: "одно и короткое" },
+      { kind: "big", from: { p: ["а в директ"] }, to: { p: ["а дальше"], d: -0.1 }, top: "в директ —", big: "сразу польза", bottom: "без «скоро свяжемся»" },
       { kind: "big", from: { p: ["а дальше"] }, to: { p: ["напиши в комментариях"], d: -0.1 }, top: "дальше —", big: "нейросеть", bottom: "в следующем видео" },
       { kind: "cta", from: { p: ["напиши в комментариях"] }, to: 999, l1: "Напиши в комментах", chip: "БОТ", l2: "пришлю инструкцию в директ" },
     ],
@@ -217,8 +219,8 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
     const vt = ins.trim + lt * rate;
     const [fy, sc] = keyf(ins.full, vt);
     return (
-      <FullLayer p={p} fy={fy} sc={sc} h={2340}>
-        <OffthreadVideo src={staticFile(`ai/${ins.src}`)} muted trimBefore={Math.round(ins.trim * FPS)} playbackRate={rate} style={{ width: 1080, height: 2340 }} />
+      <FullLayer p={p} fy={fy} sc={sc} h={ins.h ?? 2340} bg={ins.bg}>
+        <OffthreadVideo src={staticFile(`ai/${ins.src}`)} muted trimBefore={Math.round(ins.trim * FPS)} playbackRate={rate} style={{ width: 1080, height: ins.h ?? 2340 }} />
         <Marks marks={ins.marks} t={vt} />
       </FullLayer>
     );
