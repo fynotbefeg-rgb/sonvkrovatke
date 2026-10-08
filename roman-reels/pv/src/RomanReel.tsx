@@ -25,7 +25,7 @@ export type Ins = Base & (
   | { kind: "cta"; l1: string; chip: string; l2: string }
   | { kind: "chat"; app: "whatsapp" | "instagram" | "avito" | "wb" | "telegram"; q: string; a: string; stars?: number; pre?: string; badge?: string }
 );
-export type Topic = { dir: string; hookIns?: Record<string, Ins[]>; body: Ins[]; plates: Record<string, string>; hookFull?: boolean };
+export type Topic = { dir: string; hookIns?: Record<string, Ins[]>; body: Ins[]; plates: Record<string, string>; hookFull?: boolean; jumps?: Record<string, number[]> };
 export type RVersion = { topic: string; hook: "h1" | "h2" | "h3" };
 
 // ---------- темы ----------
@@ -50,6 +50,7 @@ export const TOPICS: Record<string, Topic> = {
   manychat: {
     dir: "rr/manychat",
     hookFull: true,
+    jumps: { h2: [1.84, 4.44], h3: [3.4, 4.52] }, // скачки HeyGen — прячем резким наездом
     plates: { h1: "Напиши «БОТ» — и смотри в директ 🪄", h2: "Как блогеры отвечают всем в директ 🤖", h3: "Автоответ в директ за 4 шага ⚡" },
     body: [
       { kind: "chat", app: "instagram", from: 0.2, to: { p: ["как настроить"], d: -0.1 }, pre: "комментарий: ПРАЙС", q: "ПРАЙС", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши.", badge: "автоответ ManyChat" },
@@ -355,10 +356,12 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook }) => {
   const hookFrames = Math.round(hookDur * FPS);
   // хук крупным планом — лицо на весь экран
   const full = !!T.hookFull && !inBody;
+  // в местах скачков HeyGen — резкий наезд/отъезд, чтобы скачок читался как монтажная склейка
+  const jumpZoom = (T.jumps?.[hook] ?? []).filter((j) => j <= t).length % 2 ? 1.12 : 1;
   return (
     <AbsoluteFill style={{ background: "linear-gradient(180deg,#141922 0%,#1d2531 100%)" }}>
       <div style={{ position: "absolute", left: 0, top: full ? 0 : 860, width: 1080, height: full ? 1920 : 1060, overflow: "hidden" }}>
-        <div style={{ position: "absolute", left: 0, top: full ? 0 : -250, width: 1080, height: 1920, transform: `scale(${full ? 1 : zoom})`, transformOrigin: "50% 30%" }}>
+        <div style={{ position: "absolute", left: 0, top: full ? 0 : -250, width: 1080, height: 1920, transform: `scale(${full ? jumpZoom : zoom})`, transformOrigin: "50% 30%" }}>
           <Sequence durationInFrames={hookFrames}>
             <OffthreadVideo src={staticFile(`${T.dir}/${hook}.mp4`)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </Sequence>
