@@ -23,7 +23,7 @@ export type Ins = Base & (
   | { kind: "flow" }
   | { kind: "approve" }
   | { kind: "cta"; l1: string; chip: string; l2: string }
-  | { kind: "chat"; app: "whatsapp" | "instagram" | "avito" | "wb" | "telegram"; q: string; a: string; stars?: number; pre?: string }
+  | { kind: "chat"; app: "whatsapp" | "instagram" | "avito" | "wb" | "telegram"; q: string; a: string; stars?: number; pre?: string; badge?: string }
 );
 export type Topic = { dir: string; hookIns?: Record<string, Ins[]>; body: Ins[]; plates: Record<string, string> };
 export type RVersion = { topic: string; hook: "h1" | "h2" | "h3" };
@@ -45,6 +45,22 @@ export const TOPICS: Record<string, Topic> = {
       { kind: "chat", app: "telegram", from: { p: ["и пятое", "пятое"], d: 1.2 }, to: { p: ["главное правило"], d: -0.1 }, q: "Сколько стоит консультация?", a: "Консультация 60 минут — 5 000 ₽. Удобно во вторник или в четверг?" },
       { kind: "big", from: { p: ["главное правило"] }, to: { p: ["напиши в комментариях"], d: -0.1 }, top: "типовое — нейросеть,", big: "сложное — тебе", bottom: "жалобы и крупные заказы" },
       { kind: "cta", from: { p: ["напиши в комментариях"] }, to: 999, l1: "Где автоматизировать переписку?", chip: "WhatsApp · Instagram<br/>Авито · WB · Telegram", l2: "следующее видео — про это" },
+    ],
+  },
+  manychat: {
+    dir: "rr/manychat",
+    plates: { h1: "Напиши «БОТ» — и смотри в директ 🪄", h2: "Как блогеры отвечают всем в директ 🤖", h3: "Автоответ в директ за 4 шага ⚡" },
+    body: [
+      { kind: "chat", app: "instagram", from: 0.2, to: { p: ["как настроить"], d: -0.1 }, pre: "комментарий: ПРАЙС", q: "ПРАЙС", a: "Привет! Держи прайс и ссылку на запись 👇 Если остались вопросы — пиши.", badge: "автоответ ManyChat" },
+      { kind: "big", from: { p: ["первое"] }, to: { p: ["второе"], d: -0.1 }, top: "шаг 1", big: "проф. аккаунт", bottom: "бизнес или автор" },
+      { kind: "big", from: { p: ["второе"] }, to: { p: ["третье"], d: -0.1 }, top: "шаг 2", big: "вход через Meta", bottom: "пароль никому не передаёшь" },
+      { kind: "big", from: { p: ["третье"] }, to: { p: ["четвертое"], d: -0.1 }, top: "шаг 3", big: "кодовое слово", bottom: "шаблон «ответ на комментарий»" },
+      { kind: "big", from: { p: ["четвертое"] }, to: { p: ["включи"], d: -0.1 }, top: "шаг 4", big: "сообщение в директ", bottom: "со ссылкой или кнопкой" },
+      { kind: "big", from: { p: ["включи"] }, to: { p: ["и важно"], d: -0.1 }, top: "включи и проверь", big: "со 2-го аккаунта" },
+      { kind: "big", from: { p: ["и важно"] }, to: { p: ["совет"], d: -0.1 }, top: "ответ приходит", big: "сразу", bottom: "а не через 3 часа" },
+      { kind: "big", from: { p: ["совет"] }, to: { p: ["а дальше"], d: -0.1 }, top: "кодовое слово —", big: "«ПРАЙС»", bottom: "одно и короткое" },
+      { kind: "big", from: { p: ["а дальше"] }, to: { p: ["напиши в комментариях"], d: -0.1 }, top: "дальше —", big: "нейросеть", bottom: "в следующем видео" },
+      { kind: "cta", from: { p: ["напиши в комментариях"] }, to: 999, l1: "Напиши в комментах", chip: "БОТ", l2: "пришлю инструкцию в директ" },
     ],
   },
   otvety: {
@@ -80,8 +96,8 @@ export const TOPICS: Record<string, Topic> = {
       { kind: "compare", from: { p: ["например"] }, to: { p: ["полный список"], d: -0.1 }, yes: ["Казахстан", "Грузия"], no: ["Россия", "Беларусь"] },
       { kind: "web", from: { p: ["полный список"] }, to: { p: ["обходить"], d: -0.1 }, img: "ai2/web_countries.jpg", h: 3400, pan: [[0, 2500, 1.1], [3, 2700, 1.1]],
         marks: [{ t0: 0.3, t1: 30, x: 20, y: 2618, w: 560, h: 82 }] },
-      { kind: "approve", from: { p: ["одобряют"] }, to: { p: ["и опиши", "опиши в заявке"], d: -0.1 } },
-      { kind: "big", from: { p: ["и опиши", "опиши в заявке"] }, to: { p: ["напиши в комментариях"], d: -0.1 }, top: "в заявке опиши,", big: "как Claude", bottom: "ускорит твой продукт" },
+      { kind: "big", from: { p: ["кредиты на api", "кредиты"] }, to: { p: ["а если в тебя", "если в тебя"], d: -0.1 }, top: "кредиты API действуют", big: "6 месяцев", bottom: "только через Claude Console" },
+      { kind: "big", from: { p: ["а если в тебя", "если в тебя"] }, to: { p: ["напиши в комментариях"], d: -0.1 }, top: "если вложился фонд-партнёр", big: "+$100K", bottom: "дополнительно на API" },
       { kind: "cta", from: { p: ["напиши в комментариях"] }, to: 999, l1: "Напиши в комментах", chip: "какой у тебя<br/>продукт", l2: "разберу, как описать в заявке" },
     ],
   },
@@ -256,7 +272,7 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
           {bubble(ins.q, false, qIn, ins.stars ? <div style={{ color: "#f5a623", fontSize: 50, marginBottom: 8, fontFamily: "DejaVu Sans" }}>{"★".repeat(ins.stars)}</div> : null)}
           {typingOn && <div style={{ alignSelf: "flex-end", fontFamily: FONT, fontSize: 38, color: "#666", background: c.me, borderRadius: 30, padding: "18px 30px" }}>печатает{".".repeat(1 + (Math.floor(f / 6) % 3))}</div>}
           {f >= aStart && bubble(ins.a.slice(0, chars), true, aIn)}
-          {f >= aStart + 10 && <div style={{ alignSelf: "flex-end", display: "flex", alignItems: "center", gap: 12, fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#555", opacity: aIn }}><Logo who="cl" size={44} /> ответ нейросети</div>}
+          {f >= aStart + 10 && <div style={{ alignSelf: "flex-end", display: "flex", alignItems: "center", gap: 12, fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#555", opacity: aIn }}>{ins.badge ? <>⚡ {ins.badge}</> : <><Logo who="cl" size={44} /> ответ нейросети</>}</div>}
         </div>
       </AbsoluteFill>
     );
