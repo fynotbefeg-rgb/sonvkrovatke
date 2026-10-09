@@ -1,0 +1,17 @@
+{
+  "mode": "plan",
+  "actor": "apify~instagram-reel-scraper",
+  "shortcode": "Dd-BrltxRS1",
+  "reel_url": "https://www.instagram.com/reel/Dd-BrltxRS1/",
+  "max_total_charge_usd": 0.05,
+  "timeout_seconds": 120,
+  "input": {
+    "username": [
+      "https://www.instagram.com/reel/Dd-BrltxRS1/"
+    ],
+    "resultsLimit": 1,
+    "includeSharesCount": false,
+    "includeTranscript": false,
+    "includeDownloadedVideo": false
+  }
+}

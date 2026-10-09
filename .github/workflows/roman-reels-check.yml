@@ -6,6 +6,15 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      collect_one_apify_reel:
+        description: "Платный пробный сбор одного Reel, API-лимит $0.05 (только после согласования)"
+        required: false
+        type: boolean
+        default: false
+      apify_reel_url:
+        description: "Единственный Reel для пробного сбора"
+        required: false
+        default: "https://www.instagram.com/reel/Dd-BrltxRS1/"
       check_apify_access:
         description: "Проверить только токен Apify, без Remotion и запуска Actors"
         required: false
@@ -21,11 +30,38 @@ permissions:
 
 concurrency:
   group: roman-reels-check-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
+  one-reel:
+    if: inputs.collect_one_apify_reel && !inputs.check_apify_access && github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Budget and scope tests (offline)
+        run: node --test roman-reels/scripts/apify-one-reel.test.mjs
+      - name: Collect exactly one Reel with API cost cap
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          APIFY_ONE_REEL_APPROVED: 'true'
+          REEL_URL: ${{ inputs.apify_reel_url }}
+        run: node roman-reels/scripts/apify-one-reel.mjs "$REEL_URL" "$RUNNER_TEMP/one-reel.json" run
+      - name: Preserve metadata and remote run ID for diagnosis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-apify-one-reel
+          path: |
+            ${{ runner.temp }}/one-reel.json
+            ${{ runner.temp }}/one-reel.json.run.json
+          if-no-files-found: ignore
+          retention-days: 3
   apify:
-    if: inputs.check_apify_access && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -40,7 +76,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.check_apify_access }}
+    if: ${{ !inputs.check_apify_access && !inputs.collect_one_apify_reel }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
