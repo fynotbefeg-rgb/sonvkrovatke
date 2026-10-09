@@ -28,7 +28,7 @@ for (const [i,item] of data.items.entries()) {
  if (status==='approved') {
    approved++;
    if (typeof approved_by!=='string'||!approved_by.trim()) problems.push(label+': approved_by required');
-   if (typeof approved_at!=='string'||!/^\\d{4}-\\d{2}-\\d{2}T/.test(approved_at)||Number.isNaN(Date.parse(approved_at))) problems.push(label+': approved_at must be ISO timestamp');
+   if (typeof approved_at!=='string'||!/^\d{4}-\d{2}-\d{2}T/.test(approved_at)||Number.isNaN(Date.parse(approved_at))) problems.push(label+': approved_at must be ISO timestamp');
    if (script_hash!==digest) problems.push(label+': script_hash does not match approved text/revision');
  } else {pending++;if (approved_by||approved_at) problems.push(label+': unapproved item cannot contain approval metadata');}
 }
