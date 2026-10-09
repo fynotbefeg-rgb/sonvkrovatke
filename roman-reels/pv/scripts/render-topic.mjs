@@ -1,7 +1,8 @@
 // Render three hook variants sequentially using the quality renderer.
 // Usage (from roman-reels/pv): npm run render:topic -- manychat
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const topic = process.argv[2];
 if (!topic || !/^[a-z0-9_-]+$/.test(topic)) {
@@ -18,11 +19,11 @@ if (!available.includes(topic)) {
   process.exit(2);
 }
 const executable = process.execPath;
-const renderer = new URL("./render-quality.mjs", import.meta.url);
+const renderer = fileURLToPath(new URL("./render-quality.mjs", import.meta.url));
 for (const hook of ["h1", "h2", "h3"]) {
   const composition = `R-${topic}-${hook}`;
   console.log(`\n=== ${composition} ===\n`);
-  const result = spawnSync(executable, [renderer.pathname, composition], { stdio: "inherit" });
+  const result = spawnSync(executable, [renderer, composition], { stdio: "inherit" });
   if (result.error || result.status !== 0) {
     console.error(`Render failed for ${composition}; stopping batch.`);
     process.exit(result.status || 1);
