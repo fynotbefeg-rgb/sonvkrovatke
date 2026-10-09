@@ -6,6 +6,11 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      check_apify_access:
+        description: "Проверить только токен Apify, без Remotion и запуска Actors"
+        required: false
+        type: boolean
+        default: false
       topics:
         description: "Темы через пробел, для которых должны существовать композиции R-<тема>-h1..h3"
         required: false
@@ -19,7 +24,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  apify:
+    if: inputs.check_apify_access && github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apify safety tests (offline)
+        run: node --test roman-reels/scripts/apify-access.test.mjs
+      - name: Apify account access (read only, no Actor runs)
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: node roman-reels/scripts/check-apify-access.mjs
   check:
+    if: ${{ !inputs.check_apify_access }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
