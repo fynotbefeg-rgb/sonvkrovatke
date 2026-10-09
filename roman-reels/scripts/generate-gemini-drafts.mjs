@@ -16,22 +16,31 @@ if(!listResponse.ok)throw Error(`Cannot list Gemini models: HTTP ${listResponse.
 const modelList=await listResponse.json();
 const supported=(modelList.models||[]).filter(m=>m.supportedGenerationMethods?.includes('generateContent')).map(m=>m.name.replace(/^models\//,''));
 const preferred=process.env.GEMINI_MODEL;
-const candidates=preferred?[preferred]:['gemini-2.5-flash','gemini-2.0-flash','gemini-2.5-flash-lite','gemini-2.0-flash-lite'];
-const model=candidates.find(m=>supported.includes(m));
-if(!model)throw Error('No supported preferred Gemini model. Available generateContent models: '+supported.join(', '));
-console.log('Using available Gemini model:',model);
+const candidates=(preferred?[preferred]:['gemini-2.5-flash-lite','gemini-2.5-flash','gemini-2.0-flash-lite','gemini-2.0-flash']).filter(m=>supported.includes(m));
+if(!candidates.length)throw Error('No preferred generateContent model listed. Available: '+supported.join(', '));
+console.log('Candidate models:',candidates.join(', '));
 const items=[];
 for(const t of topics){
  const prompt=`Ты сценарист коротких вертикальных видео для Романа. Тема: ${t.topic}. Контекст бренда: ${t.context||'Не задан; не придумывай факты о Романе, продукте или результатах клиентов.'}. Подготовь ровно 3 разных хука и 3 полных сценария на русском языке, каждый 100–160 слов. Не выдумывай статистику, отзывы, медицинские обещания и личный опыт Романа. Ответ только JSON: {"versions":[{"hook_id":1,"hook_text":"...","script_text":"..."},{"hook_id":2,...},{"hook_id":3,...}]}. Каждый сценарий должен соответствовать своему хуку.`;
- const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
  let response,body;
- for(let attempt=0;attempt<3;attempt++){
-  response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.7}})});
-  if(response.ok)break;
-  const message=await response.text();
-  if(![429,500,502,503,504].includes(response.status)||attempt===2)throw Error(`Gemini HTTP ${response.status}: ${message.slice(0,400)}`);
-  await new Promise(r=>setTimeout(r,1500*(attempt+1)));
+ const errors=[];
+ for(const model of candidates){
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  for(let attempt=0;attempt<3;attempt++){
+   response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.7}})});
+   if(response.ok)break;
+   const message=await response.text();
+   if(response.status===404){
+    errors.push(`${model}: HTTP 404 (${message.slice(0,180)})`);
+    console.log(`Model ${model} returned 404; trying next listed model`);
+    break;
+   }
+   if(![429,500,502,503,504].includes(response.status)||attempt===2)throw Error(`Gemini HTTP ${response.status} on ${model}: ${message.slice(0,400)}`);
+   await new Promise(r=>setTimeout(r,1500*(attempt+1)));
+  }
+  if(response.ok){console.log('Gemini model used:',model);break;}
  }
+ if(!response?.ok)throw Error('All listed Gemini models failed: '+errors.join('; '));
  body=await response.json();
  const raw=body.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('');
  if(!raw)throw Error(`Empty Gemini response for ${t.topic_id}`);
