@@ -1,0 +1,94 @@
+# Roman Reels — ручная проверка проекта в облаке (этап 1).
+# Только установка зависимостей и проверка композиций Remotion:
+# без рендера видео, без загрузки на Google Drive и без секретов.
+name: Roman Reels — проверка (ручной запуск)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topics:
+        description: "Темы через пробел, для которых должны существовать композиции R-<тема>-h1..h3"
+        required: false
+        default: "manychat startups"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: roman-reels-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+        working-directory: roman-reels/pv
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: roman-reels/pv/package-lock.json
+
+      - name: Установка зависимостей (npm ci)
+        run: npm ci
+
+      - name: Синтаксис скриптов
+        run: |
+          for f in scripts/*.mjs; do
+            node --check "$f"
+            echo "ok: $f"
+          done
+
+      - name: Проверки аргументов скриптов (без рендера и загрузки)
+        run: |
+          set +e
+          node scripts/render-topic.mjs __unknown_topic__ ; rc=$?
+          [ "$rc" -eq 2 ] || { echo "render-topic: ожидался код 2, получен $rc"; exit 1; }
+          node scripts/render-quality.mjs not-a-composition ; rc=$?
+          [ "$rc" -eq 2 ] || { echo "render-quality: ожидался код 2, получен $rc"; exit 1; }
+          env -u ROMAN_DRIVE_REMOTE node scripts/upload-topic.mjs manychat ; rc=$?
+          [ "$rc" -eq 2 ] || { echo "upload-topic: ожидался код 2, получен $rc"; exit 1; }
+          echo "Проверки аргументов пройдены"
+
+      - name: Браузер для Remotion (Chrome Headless Shell)
+        run: npx remotion browser ensure
+
+      - name: Список композиций Remotion
+        run: npx remotion compositions src/index.ts | tee compositions.txt
+
+      - name: Проверка обязательных композиций
+        env:
+          TOPICS: ${{ inputs.topics }}
+        run: |
+          missing=0
+          for t in $TOPICS; do
+            case "$t" in *[!a-z0-9_-]*) echo "Недопустимое имя темы: $t"; exit 1;; esac
+            for h in h1 h2 h3; do
+              id="R-$t-$h"
+              if grep -Eq "(^|[[:space:]])$id[[:space:]]" compositions.txt; then
+                echo "ok: $id"
+              else
+                echo "НЕТ композиции: $id"; missing=1
+              fi
+            done
+          done
+          exit $missing
+
+      - name: Сохранить список композиций
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-reels-compositions
+          path: roman-reels/pv/compositions.txt
+          if-no-files-found: ignore
+          retention-days: 7
