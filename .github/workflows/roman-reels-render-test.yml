@@ -1,0 +1,131 @@
+# Roman Reels — тестовый рендер одной композиции в облаке (этап 2).
+# Только ручной запуск. Исходники качаются из Google Drive через rclone
+# (сервисный аккаунт, только чтение), результат — artifact GitHub Actions.
+# Доступ к Drive задаётся секретом GDRIVE_SA_JSON и переменной ROMAN_ASSETS_FOLDER_ID;
+# пока они не заданы, workflow останавливается на первом шаге и ничего не рендерит.
+name: Roman Reels — тестовый рендер (ручной запуск)
+
+on:
+  workflow_dispatch:
+    inputs:
+      composition:
+        description: "Композиция, например R-manychat-h1"
+        required: true
+        default: "R-manychat-h1"
+      mode:
+        description: "check-sources — только скачать и проверить исходники; render — плюс рендер и artifact"
+        required: true
+        type: choice
+        options:
+          - check-sources
+          - render
+        default: check-sources
+
+permissions:
+  contents: read
+
+concurrency:
+  group: roman-reels-render-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+        working-directory: roman-reels/pv
+    env:
+      COMPOSITION: ${{ inputs.composition }}
+      MODE: ${{ inputs.mode }}
+    steps:
+      - name: Доступ к Google Drive настроен?
+        working-directory: .
+        env:
+          HAS_SA: ${{ secrets.GDRIVE_SA_JSON != '' }}
+          FOLDER_ID: ${{ vars.ROMAN_ASSETS_FOLDER_ID }}
+        run: |
+          if [[ ! "$COMPOSITION" =~ ^R-[a-z0-9_]+-h[123](-ph)?$ ]]; then
+            echo "::error::Недопустимое имя композиции: $COMPOSITION (ожидается R-<тема>-h1|h2|h3)"; exit 1
+          fi
+          if [ "$HAS_SA" != "true" ] || [ -z "$FOLDER_ID" ]; then
+            echo "::error::Доступ к Google Drive ещё не настроен: нужен секрет GDRIVE_SA_JSON и переменная ROMAN_ASSETS_FOLDER_ID (см. roman-reels/CLOUD_RENDER.md). Рендер не запускался."
+            exit 1
+          fi
+          echo "Композиция: $COMPOSITION, режим: $MODE"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: roman-reels/pv/package-lock.json
+
+      - name: Установка зависимостей (npm ci)
+        run: npm ci
+
+      - name: Установка rclone
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq rclone
+          rclone version | head -1
+
+      - name: Список исходников для скачивания
+        run: |
+          node scripts/check-assets.mjs "$COMPOSITION" --list > "$RUNNER_TEMP/needed.txt"
+          : > "$RUNNER_TEMP/download.txt"
+          while IFS= read -r p; do
+            [ -s "public/$p" ] || echo "$p" >> "$RUNNER_TEMP/download.txt"
+          done < "$RUNNER_TEMP/needed.txt"
+          echo "Будет скачано с Google Drive:"
+          cat "$RUNNER_TEMP/download.txt"
+
+      - name: Скачивание исходников с Google Drive (только чтение)
+        env:
+          RCLONE_CONFIG: ${{ runner.temp }}/rclone-empty.conf
+          RCLONE_CONFIG_GDRIVE_TYPE: drive
+          RCLONE_CONFIG_GDRIVE_SCOPE: drive.readonly
+          RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GDRIVE_SA_JSON }}
+          RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID: ${{ vars.ROMAN_ASSETS_FOLDER_ID }}
+        run: |
+          : > "$RCLONE_CONFIG"
+          if [ ! -s "$RUNNER_TEMP/download.txt" ]; then echo "Скачивать нечего"; exit 0; fi
+          rclone copy gdrive: public --files-from "$RUNNER_TEMP/download.txt" \
+            --retries 3 --stats 20s --stats-one-line --log-level NOTICE
+
+      - name: Проверка исходников перед рендером
+        run: node scripts/check-assets.mjs "$COMPOSITION"
+
+      - name: Браузер для Remotion
+        if: inputs.mode == 'render'
+        run: npx remotion browser ensure
+
+      - name: Рендер (исходное качество, без лимита 30 МБ)
+        if: inputs.mode == 'render'
+        run: npm run render:quality -- "$COMPOSITION"
+
+      - name: Параметры результата
+        if: inputs.mode == 'render'
+        run: |
+          f="out/$COMPOSITION.mp4"
+          [ -s "$f" ] || { echo "::error::Нет результата $f"; exit 1; }
+          ls -l "$f"
+          npx remotion ffprobe -v error \
+            -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate \
+            -of default=noprint_wrappers=1 "$f"
+
+      - name: Artifact с готовым MP4
+        if: inputs.mode == 'render'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.composition }}
+          path: roman-reels/pv/out/${{ inputs.composition }}.mp4
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
