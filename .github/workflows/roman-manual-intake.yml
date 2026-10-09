@@ -23,7 +23,9 @@ jobs:
         with:
           node-version: '22'
       - name: Safety tests (no network services)
-        run: node --test roman-reels/scripts/manual-intake.test.mjs
+        run: |
+          node --test roman-reels/scripts/manual-intake.test.mjs
+          node --test roman-reels/scripts/apps-script.test.mjs
       - name: Read authenticated approval snapshot
         if: inputs.mode == 'live'
         env:
