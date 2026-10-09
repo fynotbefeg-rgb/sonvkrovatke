@@ -12,6 +12,11 @@ on:
         description: "Композиция, например R-manychat-h1"
         required: true
         default: "R-manychat-h1"
+      upload_to_drive:
+        description: "Загрузить MP4 в личный Google Drive после рендера (нужна OAuth-настройка)"
+        required: true
+        type: boolean
+        default: false
       mode:
         description: "check-sources — только скачать и проверить исходники; render — плюс рендер и artifact"
         required: true
@@ -156,6 +161,34 @@ jobs:
           npx remotion ffprobe -v error \
             -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate \
             -of default=noprint_wrappers=1 "$f"
+
+      - name: Проверка OAuth для загрузки на Google Drive
+        if: inputs.mode == 'render' && inputs.upload_to_drive
+        env:
+          CLIENT_ID: ${{ secrets.GDRIVE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.GDRIVE_OAUTH_CLIENT_SECRET }}
+          TOKEN_JSON: ${{ secrets.GDRIVE_OAUTH_TOKEN_JSON }}
+          FOLDER_ID: ${{ vars.ROMAN_OUTPUT_FOLDER_ID }}
+        run: |
+          if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ] || [ -z "$TOKEN_JSON" ] || [ -z "$FOLDER_ID" ]; then
+            echo "::error::Загрузка выключена: не настроены OAuth Secrets или ROMAN_OUTPUT_FOLDER_ID."
+            exit 1
+          fi
+
+      - name: Загрузка MP4 в личный Google Drive без перекодирования
+        if: inputs.mode == 'render' && inputs.upload_to_drive
+        env:
+          RCLONE_CONFIG: ${{ runner.temp }}/rclone-upload.conf
+          RCLONE_CONFIG_OUTPUT_TYPE: drive
+          RCLONE_CONFIG_OUTPUT_SCOPE: drive.file
+          RCLONE_CONFIG_OUTPUT_CLIENT_ID: ${{ secrets.GDRIVE_OAUTH_CLIENT_ID }}
+          RCLONE_CONFIG_OUTPUT_CLIENT_SECRET: ${{ secrets.GDRIVE_OAUTH_CLIENT_SECRET }}
+          RCLONE_CONFIG_OUTPUT_TOKEN: ${{ secrets.GDRIVE_OAUTH_TOKEN_JSON }}
+          RCLONE_CONFIG_OUTPUT_ROOT_FOLDER_ID: ${{ vars.ROMAN_OUTPUT_FOLDER_ID }}
+        run: |
+          : > "$RCLONE_CONFIG"
+          rclone copyto "out/$COMPOSITION.mp4" "output:$COMPOSITION.mp4" --retries 3 --stats 20s --log-level NOTICE
+          echo "MP4 передан в указанную папку Google Drive"
 
       - name: Artifact с готовым MP4
         if: inputs.mode == 'render'
