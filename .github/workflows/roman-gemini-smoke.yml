@@ -15,12 +15,16 @@ jobs:
       - name: Generate one test topic (no approval or publishing)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash
         run: |
           set -euo pipefail
           test -n "$GEMINI_API_KEY" || { echo "::error::Missing GEMINI_API_KEY"; exit 1; }
           node roman-reels/scripts/generate-gemini-drafts.mjs roman-reels/examples/gemini-smoke-topics.json "$RUNNER_TEMP/drafts.json"
           node roman-reels/scripts/validate-approvals.mjs "$RUNNER_TEMP/drafts.json"
+      - name: Send pending drafts to Roman approval sheet
+        env:
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: node roman-reels/scripts/send-drafts-to-sheet.mjs "$RUNNER_TEMP/drafts.json"
       - name: Save draft JSON for review
         uses: actions/upload-artifact@v4
         with:
