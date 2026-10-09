@@ -1,0 +1,236 @@
+{
+  "reviewed_at": "2026-10-09",
+  "origin": "Existing project source files; no live scraping or Actor execution",
+  "items": [
+    {
+      "url": "https://www.instagram.com/reel/Ddt5T--xm2k/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py"
+      ],
+      "labels": [
+        "WhatsApp: Claude + официальный WhatsApp Business MCP (@erickcastilio.ia)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DdMMPYUzvcK/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py"
+      ],
+      "labels": [
+        "WhatsApp за 5 минут через Claude (@aiwithanushka)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/Dc3h-JKKFyC/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py"
+      ],
+      "labels": [
+        "Instagram: ChatGPT + ManyChat, ответы в директ (@mavgpt)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DYTE2YSC1TR/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py"
+      ],
+      "labels": [
+        "Instagram: Claude + ManyChat (@askcatgpt)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DYP3hPSsqvV/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py"
+      ],
+      "labels": [
+        "Салон красоты: ассистент ChatGPT для записи и оплаты (@debiichris)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DahV1ehhJaF/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py",
+        "roman-reels/scripts/guide1.py",
+        "roman-reels/scripts/guide2.py"
+      ],
+      "labels": [
+        "Формат «5 инструментов» — 286 тыс. просмотров (@anna_freydina)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DbnvWe5sDuP/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve2.py",
+        "roman-reels/scripts/guide2.py"
+      ],
+      "labels": [
+        "ИИ-менеджер звонит клиентам — 343 тыс. (@donat_sellergpt)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.tiktok.com/@itmaxxer/video/7693927761303325984",
+      "platform": "tiktok",
+      "sources": [
+        "roman-reels/scripts/approve2.py",
+        "roman-reels/scripts/approve3.py",
+        "roman-reels/scripts/guide3.py"
+      ],
+      "labels": [
+        "Исходный рилс по теме (@itmaxxer, TikTok)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DbRXFuLHb26/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve3.py"
+      ],
+      "labels": [
+        "«Хочешь фокус?» — зритель пишет слово и получает директ, 482 тыс. просмотров (@digitally.sb) — основа хука 1"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/Db34NZaMgSf/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve3.py"
+      ],
+      "labels": [
+        "«Пиши „блог“ и забирай курс» — RU, 44 тыс. (@bondar_idm) — основа хука 2"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DcRIZTTOeVo/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve3.py"
+      ],
+      "labels": [
+        "«В конце видео я попрошу оставить комментарий» — 131 тыс. (@victor_ofrank) — основа хука 3"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/Db9_o-Co7tq/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve3.py"
+      ],
+      "labels": [
+        "RU: кейс с автоматизацией и гайдом за комментарий — 187 тыс. (@maley94)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DcUNlNvy6J9/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/approve3.py"
+      ],
+      "labels": [
+        "ManyChat: обзор обновления Open Reply — 103 тыс. (@benkimball.ai)"
+      ],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/Dbvqv1GDH2v/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide1.py",
+        "roman-reels/scripts/guide2.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DbFY8mdAz9d/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide1.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.tiktok.com/@yohnmav/video/7673182186551495949",
+      "platform": "tiktok",
+      "sources": [
+        "roman-reels/scripts/guide1.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DbTi2lZRuSA/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide1.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DdrS_9Msgv0/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide1.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DanV1AECgVn/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide1.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DcJuw1HRbkS/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide1.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.tiktok.com/@darbyirl_/video/7676175627254369550",
+      "platform": "tiktok",
+      "sources": [
+        "roman-reels/scripts/guide2.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    },
+    {
+      "url": "https://www.instagram.com/reel/Dam5OVyNcmZ/",
+      "platform": "instagram",
+      "sources": [
+        "roman-reels/scripts/guide2.py"
+      ],
+      "labels": [],
+      "verification": "historical_reference_not_refetched"
+    }
+  ]
+}
