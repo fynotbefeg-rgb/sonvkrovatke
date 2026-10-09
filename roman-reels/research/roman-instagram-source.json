@@ -4,7 +4,18 @@
   "origin": "Profile URL supplied by user on 2026-10-09; tracking query removed",
   "initial_reel_url": "https://www.instagram.com/reel/Dd-BrltxRS1/",
   "profile_metadata_verified": false,
-  "reel_author_verified": false,
-  "paid_collection_approved": false,
-  "initial_test": "roman-first-reel-plan.json"
+  "reel_author_verified": true,
+  "paid_collection_approved": true,
+  "initial_test": "roman-first-reel-plan.json",
+  "approved_scope": {
+    "type": "one_reel",
+    "reel_url": "https://www.instagram.com/reel/Dd-BrltxRS1/",
+    "max_total_charge_usd": 0.05,
+    "user_confirmation": "Разрешаю",
+    "authorization_consumed": true
+  },
+  "initial_test_status": "SUCCEEDED",
+  "apify_run_id": "ucmFFJAjXkoTgoT8s",
+  "github_run_id": 37983894672,
+  "result_file": "roman-first-reel-result.json"
 }
