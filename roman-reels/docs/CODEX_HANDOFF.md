@@ -1,6 +1,13 @@
 # Codex handoff — Roman Reels automation
 Updated: 2026-10-09
 
+## Codex continuation — 2026-10-09
+- Existing history cloned into `/workspace/sonvkrovatke` on `automation/roman-reels-v1`; `main` unchanged.
+- Added metadata-only manual HeyGen intake planner, strict approval snapshot export, safety tests and manual `roman-manual-intake.yml` workflow (default tests; live needs verified incoming folder).
+- Verified previous successful Gemini and render/upload Actions jobs and read Google Sheet/Drive; three visible test scripts remain pending. No new paid service calls or renders started.
+- Fixed legacy `prep_topic.py` repo paths and ffmpeg discovery; it is not a safe production transcription gate.
+- Read [MANUAL_HEYGEN_INTAKE.md](MANUAL_HEYGEN_INTAKE.md) for verified IDs, contracts, blockers and remaining production work. Apps Script source and incoming-folder access remain unverified. Do not equate this dry-run planner with end-to-end automation.
+
 ## Mission
 Build a reliable pipeline for **90 vertical Reels per month** for Roman. Desired only human action: Roman approves scripts. User works mainly from iPhone and prefers concise Russian, one action at a time. No Windows laptop required for current development. Do not claim full automation while HeyGen API is unavailable.
 

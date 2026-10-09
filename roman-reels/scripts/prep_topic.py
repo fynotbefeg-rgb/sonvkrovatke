@@ -4,14 +4,16 @@ python prep_topic.py <topic> [--fake]
 выравнивает их с утверждённым текстом (texts.json) и пишет тайминги в pv/src/romanWords.json.
 --fake: без распознавания, тайминги по темпу 2.4 слова/с (для проверки шаблона).
 """
-import json, os, re, subprocess, sys, difflib
+import json, os, re, subprocess, sys, difflib, shutil
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # scratchpad
-FF = "/usr/local/lib/python3.11/dist-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # roman-reels
+FF = os.environ.get("ROMAN_FFMPEG") or shutil.which("ffmpeg")
+if len(sys.argv) < 2:
+    raise SystemExit("Usage: python prep_topic.py <topic> [--fake] [--keys=h1,h2,h3,body]")
 topic = sys.argv[1]
 fake = "--fake" in sys.argv
 only = next((a.split("=",1)[1].split(",") for a in sys.argv if a.startswith("--keys=")), None)
-texts = json.load(open(os.path.join(ROOT, "roman/gen/texts.json")))[topic]
+texts = json.load(open(os.path.join(ROOT, "scripts/texts.json")))[topic]
 out_p = os.path.join(ROOT, "pv/src/romanWords.json")
 data = json.load(open(out_p)) if os.path.exists(out_p) else {}
 
@@ -19,6 +21,8 @@ def norm(w):
     return re.sub(r"[^a-zа-я0-9]+", "", w.lower().replace("ё", "е"))
 
 def dur(path):
+    if not FF:
+        raise RuntimeError("ffmpeg is required; install it or set ROMAN_FFMPEG")
     r = subprocess.run([FF, "-i", path], capture_output=True, text=True).stderr
     m = re.search(r"Duration: (\d+):(\d+):([\d.]+)", r)
     return int(m[1]) * 3600 + int(m[2]) * 60 + float(m[3])

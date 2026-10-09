@@ -1,0 +1,61 @@
+name: Roman Reels — приём HeyGen (только dry run)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'tests — без сервисов; live — только чтение очереди и списка MP4'
+        type: choice
+        options: [tests, live]
+        default: tests
+permissions:
+  contents: read
+concurrency:
+  group: roman-manual-intake-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Safety tests (no network services)
+        run: node --test roman-reels/scripts/manual-intake.test.mjs
+      - name: Read authenticated approval snapshot
+        if: inputs.mode == 'live'
+        env:
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: node roman-reels/scripts/check-production-queue.mjs "$RUNNER_TEMP/approvals.json"
+      - name: List incoming Drive metadata (no download)
+        if: inputs.mode == 'live'
+        env:
+          INCOMING_FOLDER_ID: ${{ vars.ROMAN_INCOMING_FOLDER_ID }}
+          RCLONE_CONFIG_GDRIVE_TYPE: drive
+          RCLONE_CONFIG_GDRIVE_SCOPE: drive.readonly
+          RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GDRIVE_SA_JSON }}
+          RCLONE_CONFIG_GDRIVE_ROOT_FOLDER_ID: ${{ vars.ROMAN_INCOMING_FOLDER_ID }}
+        run: |
+          set -euo pipefail
+          [[ "$INCOMING_FOLDER_ID" =~ ^[a-zA-Z0-9_-]+$ ]] || { echo '::error::Set verified ROMAN_INCOMING_FOLDER_ID'; exit 1; }
+          test -n "$RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_CREDENTIALS" || { echo '::error::Missing Drive read credential'; exit 1; }
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq rclone
+          export RCLONE_CONFIG="$RUNNER_TEMP/intake-rclone.conf"
+          touch "$RCLONE_CONFIG"
+          chmod 600 "$RCLONE_CONFIG"
+          rclone lsjson gdrive: --files-only --max-depth 1 --hash --retries 3 > "$RUNNER_TEMP/files.json"
+          node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync(process.env.RUNNER_TEMP + "/inventory.json", JSON.stringify({folder_id: process.env.INCOMING_FOLDER_ID, files: JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/files.json", "utf8"))}));'
+      - name: Plan only (no transcription, render, upload, or status updates)
+        if: inputs.mode == 'live'
+        run: node roman-reels/scripts/plan-manual-intake.mjs "$RUNNER_TEMP/approvals.json" "$RUNNER_TEMP/inventory.json" "$RUNNER_TEMP/intake-plan.json"
+      - name: Save metadata plan (approval text is excluded)
+        if: inputs.mode == 'live'
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-manual-intake-plan
+          path: ${{ runner.temp }}/intake-plan.json
+          retention-days: 3
