@@ -1,0 +1,28 @@
+name: Roman Reels — Apify access (no Actor runs)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'tests — без сети; access — только проверка токена Apify'
+        type: choice
+        options: [tests, access]
+        default: tests
+permissions:
+  contents: read
+jobs:
+  check:
+    if: github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline safety tests
+        run: node --test roman-reels/scripts/apify-access.test.mjs
+      - name: Read-only account access (never starts Actors)
+        if: inputs.mode == 'access'
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: node roman-reels/scripts/check-apify-access.mjs

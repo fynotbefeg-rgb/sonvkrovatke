@@ -2,6 +2,8 @@
 Updated: 2026-10-09
 
 ## Codex continuation — 2026-10-09
+- User restored the original Apps Script by removing the comment markers; functions appeared again. Prepared approval replacement is **not installed**. Avoid more whole-file mobile edits without a workable installation method.
+- Roman supplied an Apify API token to the user (not present in workspace). Added read-only account access checker, four offline tests and manual `roman-apify-check.yml` (tests by default, access only with GitHub secret APIFY_TOKEN). See `APIFY_SETUP.md`. Actor/Dataset and sources remain unspecified; no paid Actor runs authorized or started by this integration.
 - User supplied three Apps Script screenshots. Existing queue lacks topic/hook IDs, approval status, timestamp, approver and hash; production-ready marking only checks dropdown/status. Token-before-action and GET rejection are visible, but no trusted approval identity/snapshot is recorded.
 - Prepared full replacement `../apps-script/Code.gs` with trusted approval receipts in Script Properties, allowlisted edit identity, complete queue schema, locking, draft validation and revocation. See `../apps-script/README.md` for install steps and limitations. **Not installed or redeployed remotely.** Requires verified `ROMAN_APPROVER_EMAILS`, setup of an installable edit trigger and real-world `e.user` validation. Do not guess the email or use the trigger owner's identity as fallback.
 - Nine additional Apps Script mock tests passed (17 total with intake). The manual dry-run workflow now includes both suites. No Google Sheet production state was changed.
