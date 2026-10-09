@@ -28,6 +28,7 @@
     "lint": "eslint src && tsc",
     "render": "remotion render SleepReel out/son-bez-ukachivaniya-reel.mp4 --codec=h264 --crf=18",
     "render:quality": "node scripts/render-quality.mjs",
-    "render:topic": "node scripts/render-topic.mjs"
+    "render:topic": "node scripts/render-topic.mjs",
+    "upload:topic": "node scripts/upload-topic.mjs"
   }
 }
