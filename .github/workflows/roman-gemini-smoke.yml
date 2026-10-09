@@ -25,6 +25,11 @@ jobs:
           ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
         run: node roman-reels/scripts/send-drafts-to-sheet.mjs "$RUNNER_TEMP/drafts.json"
+      - name: Read approved production queue (no rendering)
+        env:
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: node roman-reels/scripts/check-production-queue.mjs
       - name: Save draft JSON for review
         uses: actions/upload-artifact@v4
         with:
