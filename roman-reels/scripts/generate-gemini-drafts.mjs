@@ -16,7 +16,7 @@ if(!listResponse.ok)throw Error(`Cannot list Gemini models: HTTP ${listResponse.
 const modelList=await listResponse.json();
 const supported=(modelList.models||[]).filter(m=>m.supportedGenerationMethods?.includes('generateContent')).map(m=>m.name.replace(/^models\//,''));
 const preferred=process.env.GEMINI_MODEL;
-const candidates=(preferred?[preferred]:['gemini-2.5-flash-lite','gemini-2.5-flash','gemini-2.0-flash-lite','gemini-2.0-flash']).filter(m=>supported.includes(m));
+const candidates=(preferred?[preferred]:['gemini-3-flash-preview','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-2.0-flash-lite','gemini-2.0-flash']).filter(m=>supported.includes(m));
 if(!candidates.length)throw Error('No preferred generateContent model listed. Available: '+supported.join(', '));
 console.log('Candidate models:',candidates.join(', '));
 const items=[];
