@@ -96,8 +96,27 @@ jobs:
         run: |
           : > "$RCLONE_CONFIG"
           if [ ! -s "$RUNNER_TEMP/download.txt" ]; then echo "Скачивать нечего"; exit 0; fi
+          echo "Проверяем доступность корня Google Drive:"
+          rclone lsf gdrive: --dirs-only --max-depth 2 || { echo "::error::Не удалось прочитать папку Google Drive"; exit 1; }
+          echo "Проверяем папку rr/manychat:"
+          rclone lsf gdrive:rr/manychat --files-only || { echo "::error::Не удалось открыть rr/manychat"; exit 1; }
+          echo "Скачиваем исходники:"
           rclone copy gdrive: public --files-from "$RUNNER_TEMP/download.txt" \
-            --retries 3 --stats 20s --stats-one-line --log-level NOTICE
+            --retries 3 --stats 20s --stats-one-line --log-level INFO
+          echo "Проверяем результат скачивания:"
+          failed=0
+          while IFS= read -r p; do
+            if [ -s "public/$p" ]; then
+              echo "OK public/$p ($(wc -c < "public/$p") bytes)"
+            else
+              echo "::error::Файл не скачан: $p"
+              failed=1
+            fi
+          done < "$RUNNER_TEMP/download.txt"
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::rclone завершился без ошибки, но некоторые исходники отсутствуют. Проверьте список папок и файлов выше."
+            exit 1
+          fi
 
       - name: Проверка исходников перед рендером
         run: node scripts/check-assets.mjs "$COMPOSITION"
