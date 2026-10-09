@@ -1,0 +1,33 @@
+name: Roman Reels — Gemini draft smoke test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout isolated automation branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/roman-reels-v1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate one test topic (no approval or publishing)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.5-flash
+        run: |
+          set -euo pipefail
+          test -n "$GEMINI_API_KEY" || { echo "::error::Missing GEMINI_API_KEY"; exit 1; }
+          node roman-reels/scripts/generate-gemini-drafts.mjs roman-reels/examples/gemini-smoke-topics.json "$RUNNER_TEMP/drafts.json"
+          node roman-reels/scripts/validate-approvals.mjs "$RUNNER_TEMP/drafts.json"
+      - name: Save draft JSON for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-gemini-test-drafts
+          path: ${{ runner.temp }}/drafts.json
+          retention-days: 3
