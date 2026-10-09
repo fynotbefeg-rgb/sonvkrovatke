@@ -162,33 +162,37 @@ jobs:
             -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate \
             -of default=noprint_wrappers=1 "$f"
 
-      - name: Проверка OAuth для загрузки на Google Drive
+      - name: Проверка настроек загрузки на Google Drive
         if: inputs.mode == 'render' && inputs.upload_to_drive
         env:
-          CLIENT_ID: ${{ secrets.GDRIVE_OAUTH_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.GDRIVE_OAUTH_CLIENT_SECRET }}
-          TOKEN_JSON: ${{ secrets.GDRIVE_OAUTH_TOKEN_JSON }}
-          FOLDER_ID: ${{ vars.ROMAN_OUTPUT_FOLDER_ID }}
+          HAS_RCLONE_CONFIG: ${{ secrets.RCLONE_CONFIG != '' }}
         run: |
-          if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ] || [ -z "$TOKEN_JSON" ] || [ -z "$FOLDER_ID" ]; then
-            echo "::error::Загрузка выключена: не настроены OAuth Secrets или ROMAN_OUTPUT_FOLDER_ID."
+          if [ "$HAS_RCLONE_CONFIG" != "true" ]; then
+            echo "::error::Отсутствует секрет RCLONE_CONFIG"
             exit 1
           fi
 
       - name: Загрузка MP4 в личный Google Drive без перекодирования
         if: inputs.mode == 'render' && inputs.upload_to_drive
         env:
-          RCLONE_CONFIG: ${{ runner.temp }}/rclone-upload.conf
-          RCLONE_CONFIG_OUTPUT_TYPE: drive
-          RCLONE_CONFIG_OUTPUT_SCOPE: drive.file
-          RCLONE_CONFIG_OUTPUT_CLIENT_ID: ${{ secrets.GDRIVE_OAUTH_CLIENT_ID }}
-          RCLONE_CONFIG_OUTPUT_CLIENT_SECRET: ${{ secrets.GDRIVE_OAUTH_CLIENT_SECRET }}
-          RCLONE_CONFIG_OUTPUT_TOKEN: ${{ secrets.GDRIVE_OAUTH_TOKEN_JSON }}
-          RCLONE_CONFIG_OUTPUT_ROOT_FOLDER_ID: ${{ vars.ROMAN_OUTPUT_FOLDER_ID }}
+          RCLONE_CONFIG_CONTENT: ${{ secrets.RCLONE_CONFIG }}
         run: |
-          : > "$RCLONE_CONFIG"
-          rclone copyto "out/$COMPOSITION.mp4" "output:$COMPOSITION.mp4" --retries 3 --stats 20s --log-level NOTICE
-          echo "MP4 передан в указанную папку Google Drive"
+          set -euo pipefail
+          config_file="$RUNNER_TEMP/roman-rclone-upload.conf"
+          umask 077
+          printf '%s' "$RCLONE_CONFIG_CONTENT" > "$config_file"
+          unset RCLONE_CONFIG_CONTENT
+          if ! grep -q '^\[roman-drive\]' "$config_file"; then
+            echo "::error::В RCLONE_CONFIG отсутствует remote roman-drive"
+            exit 1
+          fi
+          rclone --config "$config_file" copyto "out/$COMPOSITION.mp4" "roman-drive:$COMPOSITION.mp4" \
+            --drive-root-folder-id 118fywgyvKvd4Pf6XHW5i3dwN4HPJ8fdN \
+            --retries 3 --stats 20s --log-level NOTICE
+          rclone --config "$config_file" lsf roman-drive: \
+            --drive-root-folder-id 118fywgyvKvd4Pf6XHW5i3dwN4HPJ8fdN \
+            --files-only | grep -Fx "$COMPOSITION.mp4"
+          echo "MP4 загружен и найден в папке Романа"
 
       - name: Artifact с готовым MP4
         if: inputs.mode == 'render'
