@@ -1,10 +1,10 @@
 # Apify: подключение к проекту
 
-Роман предоставил пользователю API-токен Apify, сохранённый пользователем в GitHub Secrets. Значение токена не передано в рабочее окружение Codex. Доступ проверен через Actions, но Apify вернул HTTP 401. Конкретный Actor/Dataset и задача сбора пока неизвестны. Нельзя считать этот токен доказательством API-доступа HeyGen.
+Роман предоставил пользователю API-токен Apify, сохранённый пользователем в GitHub Secrets. Значение токена не передано в рабочее окружение Codex. После обновления токена доступ к аккаунту подтверждён через Actions. Конкретный Actor/Dataset и задача сбора пока неизвестны. Нельзя считать этот токен доказательством API-доступа HeyGen.
 
 ## Последняя проверка — 2026-10-09
 
-Пользователь сообщил, что сохранил `APIFY_TOKEN` в GitHub Secrets. Codex запустил `roman-reels-check.yml` с `check_apify_access=true` в рабочей ветке: run [37973225979](https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/37973225979), commit `176ce636dacf813f2534c8b2bb0284d66f40cd79`. Четыре теста прошли на Node 22. Секрет поступил в runner (значение скрыто), но `GET /v2/users/me` вернул **401 Unauthorized**. Доступ Apify пока не подтверждён; нужны проверка/замена значения секрета самим пользователем и повторный read-only запуск. Никакие Actors не запускались, Remotion job пропущен. Codex не читал значение токена.
+После обновления секрета Codex повторно запустил `roman-reels-check.yml` с `check_apify_access=true` в рабочей ветке: run [37977950725](https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/37977950725), commit `c93dae8cbc45037b3a7dda966e6c13f3a5510eeb`. Четыре теста прошли на Node 22, `GET /v2/users/me` успешно проверил доступ к аккаунту. Лог: `Apify account access verified. No Actors started.` Remotion job пропущен. Codex не читал значение токена. Первоначальный run `37973225979` вернул HTTP 401; эта ошибка устранена обновлением секрета. Доступ к конкретным Actors/Datasets, наличие средств и лимиты этой проверкой не установлены.
 
 Подготовлены `scripts/check-apify-access.mjs` и ручной workflow `roman-apify-check.yml`. Проверка делает только `GET https://api.apify.com/v2/users/me` с Bearer-токеном. Токен не включается в URL, логи, репозиторий или artifacts. Actor/task run endpoints не вызываются. Редиректы запрещены, время запроса ограничено 30 секундами. В ответе не публикуются данные аккаунта, сообщения сервера или баланс.
 
