@@ -2,6 +2,7 @@
 Updated: 2026-10-09
 
 ## Codex continuation — 2026-10-09
+- Apify secret saved by user; live account check run `37973225979` on `176ce636dacf813f2534c8b2bb0284d66f40cd79` failed with HTTP 401. Four offline tests passed on Actions Node 22; token was provided to runner but rejected by Apify. Ask user to replace/check APIFY_TOKEN; do not request its value in chat. No Actor calls. Remotion job skipped. Trigger the registered `roman-reels-check.yml` with `check_apify_access=true` on the automation branch; the separate new workflow is not registered on default branch. main unchanged.
 - User restored the original Apps Script by removing the comment markers; functions appeared again. Prepared approval replacement is **not installed**. Avoid more whole-file mobile edits without a workable installation method.
 - Roman supplied an Apify API token to the user (not present in workspace). Added read-only account access checker, four offline tests and manual `roman-apify-check.yml` (tests by default, access only with GitHub secret APIFY_TOKEN). See `APIFY_SETUP.md`. Actor/Dataset and sources remain unspecified; no paid Actor runs authorized or started by this integration.
 - User supplied three Apps Script screenshots. Existing queue lacks topic/hook IDs, approval status, timestamp, approver and hash; production-ready marking only checks dropdown/status. Token-before-action and GET rejection are visible, but no trusted approval identity/snapshot is recorded.
