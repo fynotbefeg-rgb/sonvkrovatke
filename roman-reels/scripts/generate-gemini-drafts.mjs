@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+// Generates draft Reels scripts using Gemini REST API. Never approves or publishes.
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {dirname} from 'node:path';
+const key=process.env.GEMINI_API_KEY;
+if(!key){console.error('Missing GEMINI_API_KEY');process.exit(1);}
+const input=process.argv[2],output=process.argv[3];
+if(!input||!output){console.error('Usage: node generate-gemini-drafts.mjs topics.json output.json');process.exit(2);}
+const topics=JSON.parse(readFileSync(input,'utf8'));
+if(!Array.isArray(topics)||topics.length<1||topics.length>30)throw Error('Expected array of 1–30 topics');
+for(const t of topics)if(!t||!(/^[a-z0-9][a-z0-9_-]*$/).test(t.topic_id)||typeof t.topic!=='string'||!t.topic.trim())throw Error('Each topic requires topic_id and topic');
+if(new Set(topics.map(x=>x.topic_id)).size!==topics.length)throw Error('Duplicate topic IDs');
+const model=process.env.GEMINI_MODEL||'gemini-2.5-flash';
+const items=[];
+for(const t of topics){
+ const prompt=`Ты сценарист коротких вертикальных видео для Романа. Тема: ${t.topic}. Контекст бренда: ${t.context||'Не задан; не придумывай факты о Романе, продукте или результатах клиентов.'}. Подготовь ровно 3 разных хука и 3 полных сценария на русском языке, каждый 100–160 слов. Не выдумывай статистику, отзывы, медицинские обещания и личный опыт Романа. Ответ только JSON: {"versions":[{"hook_id":1,"hook_text":"...","script_text":"..."},{"hook_id":2,...},{"hook_id":3,...}]}. Каждый сценарий должен соответствовать своему хуку.`;
+ const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+ let response,body;
+ for(let attempt=0;attempt<3;attempt++){
+  response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.7}})});
+  if(response.ok)break;
+  const message=await response.text();
+  if(![429,500,502,503,504].includes(response.status)||attempt===2)throw Error(`Gemini HTTP ${response.status}: ${message.slice(0,400)}`);
+  await new Promise(r=>setTimeout(r,1500*(attempt+1)));
+ }
+ body=await response.json();
+ const raw=body.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('');
+ if(!raw)throw Error(`Empty Gemini response for ${t.topic_id}`);
+ const parsed=JSON.parse(raw);
+ if(!Array.isArray(parsed.versions)||parsed.versions.length!==3)throw Error(`Expected 3 versions for ${t.topic_id}`);
+ for(const v of parsed.versions){
+  if(![1,2,3].includes(v.hook_id)||typeof v.hook_text!=='string'||!v.hook_text.trim()||typeof v.script_text!=='string'||!v.script_text.trim())throw Error('Invalid Gemini version');
+  items.push({topic_id:t.topic_id,hook_id:v.hook_id,version_id:`R-${t.topic_id}-h${v.hook_id}`,script_revision:1,hook_text:v.hook_text,script_text:v.script_text,status:'pending_approval'});
+ }
+ console.log(`Drafted: ${t.topic_id}`);
+}
+if(new Set(items.map(x=>x.version_id)).size!==items.length)throw Error('Duplicate version IDs');
+mkdirSync(dirname(output),{recursive:true});writeFileSync(output,JSON.stringify({items},null,2)+'\n');
+console.log(`Wrote ${items.length} drafts to ${output}; nothing was approved or sent to HeyGen.`);
