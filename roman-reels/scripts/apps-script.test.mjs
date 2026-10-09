@@ -12,7 +12,7 @@ const draft = () => ({topic_id: 'test-hooks', hook_id: 1, version_id: 'R-test-ho
 const rowOf = item => [item.topic_id, item.hook_id, item.version_id, item.script_revision, item.hook_text,
   item.script_text, 'На проверке', '', '', '', 'Ожидает утверждения'];
 
-function harness() {
+function harness(scriptSource = source) {
   const rows = [Array(11).fill('header'), rowOf(draft())];
   const properties = new Map([['ROMAN_REELS_WEBHOOK_TOKEN', 'local-test-token'], ['ROMAN_APPROVER_EMAILS', 'roman@example.test']]);
   const triggers = [{getHandlerFunction: () => 'checkApprovedScripts'}, {getHandlerFunction: () => 'checkProductionSafety'}];
@@ -46,7 +46,7 @@ function harness() {
     Logger: {log() {}},
     ScriptApp: {getProjectTriggers: () => triggers, newTrigger: handler => ({forSpreadsheet: () => ({onEdit: () => ({create: () => triggers.push({getHandlerFunction: () => handler})})})})},
   });
-  vm.runInContext(source, context);
+  vm.runInContext(scriptSource, context);
   const edit = (column, email = 'roman@example.test', options = {}) => context.onRomanApprovalEdit({
     range: sheet.getRange(2, column, options.numRows ?? 1, options.numColumns ?? 1),
     source: {getId: () => options.sheetId ?? sheetId},
@@ -170,4 +170,35 @@ test('revoked approver is removed from the queue and setup retains existing trig
   assert.equal(h.triggers.length, 3);
   h.properties.delete('ROMAN_APPROVER_EMAILS');
   assert.throws(() => h.context.setupRomanApproval(), /ROMAN_APPROVER_EMAILS/);
+});
+
+test('additive file coexists with legacy globals while the POST queue enforces receipts', () => {
+  const addon = readFileSync(new URL('../apps-script/RomanApproval.gs', import.meta.url), 'utf8');
+  const legacy = `const SPREADSHEET_ID = '${sheetId}';
+    function legacyDoPost() { return 'old-post'; }
+    function doGet() { return 'old-get-denies-scripts'; }
+    function getApprovedProductionQueue() { return ['old-unverified-queue']; }
+    function checkApprovedScripts() { return 'old-timer'; }
+    function checkProductionSafety() { return 'old-safety'; }
+    function markApprovedForProduction() { return 'old-mark'; }
+    function testConnection() { return 'old-test'; }`;
+  const h = harness(legacy + '\n' + addon);
+  assert.equal(h.context.legacyDoPost(), 'old-post');
+  assert.equal(h.context.doGet(), 'old-get-denies-scripts');
+  assert.equal(h.context.checkProductionSafety(), 'old-safety');
+  assert.equal(h.context.getApprovedProductionQueue()[0], 'old-unverified-queue');
+  h.rows[1][6] = 'Утверждено';
+  h.rows[1][10] = 'Готов к производству'; // A legacy timer is not an approval receipt.
+  assert.equal(h.post({token: 'local-test-token', action: 'get_production_queue'}).items.length, 0);
+  h.edit(7);
+  const approved = h.post({token: 'local-test-token', action: 'get_production_queue'});
+  assert.equal(approved.items.length, 1);
+  validateManifest(approved);
+  h.rows[1][5] = 'Changed before edit trigger runs';
+  assert.equal(h.post({token: 'local-test-token', action: 'get_production_queue'}).items.length, 0);
+  h.context.romanApprovalSafetyV1();
+  assert.equal(h.rows[1][6], 'На проверке');
+  h.context.setupRomanApproval();
+  h.context.setupRomanApproval();
+  assert.equal(h.triggers.length, 3);
 });
