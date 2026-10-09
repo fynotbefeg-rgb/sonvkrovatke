@@ -10,7 +10,16 @@ const topics=JSON.parse(readFileSync(input,'utf8'));
 if(!Array.isArray(topics)||topics.length<1||topics.length>30)throw Error('Expected array of 1–30 topics');
 for(const t of topics)if(!t||!(/^[a-z0-9][a-z0-9_-]*$/).test(t.topic_id)||typeof t.topic!=='string'||!t.topic.trim())throw Error('Each topic requires topic_id and topic');
 if(new Set(topics.map(x=>x.topic_id)).size!==topics.length)throw Error('Duplicate topic IDs');
-const model=process.env.GEMINI_MODEL||'gemini-2.5-flash';
+// Query the models actually available to this API key instead of assuming a model ID.
+const listResponse=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{headers:{'x-goog-api-key':key}});
+if(!listResponse.ok)throw Error(`Cannot list Gemini models: HTTP ${listResponse.status} ${(await listResponse.text()).slice(0,250)}`);
+const modelList=await listResponse.json();
+const supported=(modelList.models||[]).filter(m=>m.supportedGenerationMethods?.includes('generateContent')).map(m=>m.name.replace(/^models\//,''));
+const preferred=process.env.GEMINI_MODEL;
+const candidates=preferred?[preferred]:['gemini-2.5-flash','gemini-2.0-flash','gemini-2.5-flash-lite','gemini-2.0-flash-lite'];
+const model=candidates.find(m=>supported.includes(m));
+if(!model)throw Error('No supported preferred Gemini model. Available generateContent models: '+supported.join(', '));
+console.log('Using available Gemini model:',model);
 const items=[];
 for(const t of topics){
  const prompt=`Ты сценарист коротких вертикальных видео для Романа. Тема: ${t.topic}. Контекст бренда: ${t.context||'Не задан; не придумывай факты о Романе, продукте или результатах клиентов.'}. Подготовь ровно 3 разных хука и 3 полных сценария на русском языке, каждый 100–160 слов. Не выдумывай статистику, отзывы, медицинские обещания и личный опыт Романа. Ответ только JSON: {"versions":[{"hook_id":1,"hook_text":"...","script_text":"..."},{"hook_id":2,...},{"hook_id":3,...}]}. Каждый сценарий должен соответствовать своему хуку.`;
