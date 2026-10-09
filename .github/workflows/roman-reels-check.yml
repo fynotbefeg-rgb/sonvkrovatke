@@ -1,11 +1,16 @@
 # Roman Reels — ручная проверка проекта в облаке (этап 1).
-# Только установка зависимостей и проверка композиций Remotion:
-# без рендера видео, без загрузки на Google Drive и без секретов.
+# По умолчанию проверка Remotion; отдельные взаимоисключающие режимы
+# проверяют доступ к сервисам или выполняют явно согласованный сбор одного Reel.
 name: Roman Reels — проверка (ручной запуск)
 
 on:
   workflow_dispatch:
     inputs:
+      check_google_queue:
+        description: "Только чтение очереди Google, без генерации, записи и рендера"
+        required: false
+        type: boolean
+        default: false
       collect_one_apify_reel:
         description: "Платный пробный сбор одного Reel, API-лимит $0.05 (только после согласования)"
         required: false
@@ -33,8 +38,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  google-queue:
+    if: inputs.check_google_queue && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read authenticated Google queue (no production)
+        env:
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: node roman-reels/scripts/check-production-queue.mjs
   one-reel:
-    if: inputs.collect_one_apify_reel && !inputs.check_apify_access && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: inputs.collect_one_apify_reel && !inputs.check_apify_access && !inputs.check_google_queue && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
@@ -61,7 +80,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
   apify:
-    if: inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -76,7 +95,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.check_apify_access && !inputs.collect_one_apify_reel }}
+    if: ${{ !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
