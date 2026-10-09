@@ -19,7 +19,6 @@ jobs:
       - name: Generate one test topic (no approval or publishing)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash
         run: |
           set -euo pipefail
           test -n "$GEMINI_API_KEY" || { echo "::error::Missing GEMINI_API_KEY"; exit 1; }
