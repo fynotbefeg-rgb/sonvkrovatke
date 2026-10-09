@@ -2,6 +2,8 @@
 
 ## Автоматизация без HeyGen API
 
+Первый сценарий с тремя хуками для проверки: [REVIEW.md](research/roman-pilot-review/REVIEW.md). Подготовка точного пакета и текущие ограничения утверждения: [SCRIPT_REVIEW.md](docs/SCRIPT_REVIEW.md).
+
 Текущий проверенный статус, формат приёма MP4 и ручной dry run: [MANUAL_HEYGEN_INTAKE.md](docs/MANUAL_HEYGEN_INTAKE.md).
 Проверки: `node roman-reels/scripts/manual-intake.test.mjs` из корня репозитория. Приёмщик пока строит план, производство не запускает.
 
