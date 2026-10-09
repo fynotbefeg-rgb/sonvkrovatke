@@ -99,10 +99,28 @@ jobs:
           echo "Проверяем доступность корня Google Drive:"
           rclone lsf gdrive: --dirs-only --max-depth 2 || { echo "::error::Не удалось прочитать папку Google Drive"; exit 1; }
           echo "Проверяем папку rr/manychat:"
-          rclone lsf gdrive:rr/manychat --files-only || { echo "::error::Не удалось открыть rr/manychat"; exit 1; }
+          # Drive can contain a folder literally named "rr " (with trailing space).
+          # Detect it explicitly and translate requested paths to that actual folder.
+          source_root="rr"
+          if ! rclone lsf "gdrive:rr/manychat" --files-only; then
+            echo "Пробуем папку с пробелом в конце имени: 'rr '"
+            rclone lsf "gdrive:rr /manychat" --files-only || { echo "::error::Не удалось открыть ни rr/manychat, ни rr /manychat"; exit 1; }
+            source_root="rr "
+          fi
+          if [ "$source_root" = "rr " ]; then
+            sed 's@^rr/@rr /@' "$RUNNER_TEMP/download.txt" > "$RUNNER_TEMP/download-drive.txt"
+          else
+            cp "$RUNNER_TEMP/download.txt" "$RUNNER_TEMP/download-drive.txt"
+          fi
           echo "Скачиваем исходники:"
-          rclone copy gdrive: public --files-from "$RUNNER_TEMP/download.txt" \
+          rclone copy gdrive: public --files-from "$RUNNER_TEMP/download-drive.txt" \
             --retries 3 --stats 20s --stats-one-line --log-level INFO
+          if [ "$source_root" = "rr " ]; then
+            mkdir -p public/rr
+            if [ -d "public/rr /manychat" ]; then
+              cp -a "public/rr /manychat/." "public/rr/manychat/"
+            fi
+          fi
           echo "Проверяем результат скачивания:"
           failed=0
           while IFS= read -r p; do
