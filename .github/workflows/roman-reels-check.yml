@@ -6,6 +6,17 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      apify_reference_research:
+        description: 'Approved $1 probe: metadata or selected transcript/video (feature branch only)'
+        type: boolean
+        default: false
+      apify_reference_stage:
+        type: choice
+        options: [metadata, details]
+        default: metadata
+      apify_reference_urls:
+        description: 'For details: 1–2 selected Instagram Reel URLs separated by spaces'
+        default: ''
       test_production_queue:
         description: "Offline-проверки Telegram-кнопки и смены ручного/Windows этапа, без сервисов"
         required: false
@@ -53,6 +64,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  reference-research:
+    if: inputs.apify_reference_research && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Budget and identity tests
+        run: node --test roman-reels/scripts/apify-reference-research.test.mjs
+      - name: Bounded research (owner approved aggregate $1)
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          APIFY_RESEARCH_APPROVED: 'true'
+          RESEARCH_STAGE: ${{ inputs.apify_reference_stage }}
+          RESEARCH_URLS: ${{ inputs.apify_reference_urls }}
+        run: |
+          read -r -a selected_urls <<< "$RESEARCH_URLS"
+          node roman-reels/scripts/apify-reference-research.mjs "$RESEARCH_STAGE" "$RUNNER_TEMP/reference-research" "${selected_urls[@]}"
+      - name: Preserve run journals, research and selected media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-apify-reference-${{ inputs.apify_reference_stage }}
+          path: ${{ runner.temp }}/reference-research/
+          if-no-files-found: ignore
+          retention-days: 3
   production-queue-tests:
     if: inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
@@ -139,7 +178,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:

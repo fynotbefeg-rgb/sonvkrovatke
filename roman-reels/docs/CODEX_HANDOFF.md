@@ -7,10 +7,13 @@ Apify requested for reference analysis. Read-only account access verified by suc
 GitHub Actions run 38040963236, automation/roman-reels-v1; no Actor started.
 APIFY_TOKEN absent locally, GitHub secrets cannot be read/listed by current integration,
 but Actions can use the existing secret. No Apify connector found in plugin search.
-Official Instagram Reel Scraper offers transcript/video add-ons; existing one-Reel
-collector disables them and cannot provide content analysis. Concrete pending budget
-plan: research/apify-reference-probe-plan.json, 30 metadata candidates + 2 transcripts,
-sum of four run caps <= $1. Budget not approved; staged collector not yet implemented.
+Owner explicitly approved up to $1 including transcript and video. Bounded staged
+collector implemented in scripts/apify-reference-research.mjs: two profile runs
+at $0.10 each, then up to two selected Reel runs at $0.40 each. Metadata contains
+no media add-ons; detail stage enables transcripts and downloaded videos.
+Eight regression tests pass, including ambiguous POST/no retry and cap verification.
+Manual opt-in Actions job on feature/codex-pipeline only; do not rerun paid stages
+in a fresh workspace under this budget. Results pending; no reference yet verified.
 Public reach remains unavailable; transcript does not constitute montage inspection.
 
 LATEST live review layout simplified at explicit owner request. Sole visible tab
