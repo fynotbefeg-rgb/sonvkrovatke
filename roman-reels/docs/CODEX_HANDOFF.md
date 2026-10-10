@@ -3,6 +3,14 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Owner requests autonomous reference discovery and handoff to Windows HeyGen,
+then Claude's montage runtime. Reviewable integration proposal recorded in
+AUTONOMOUS_PRODUCTION_FLOW.md and CODEX_TASKS.md. Weekly Apify cap $1,
+proposed monthly cap $5, neither scheduled nor authorized for recurring spend.
+Existing $1 permission was one probe only. Four parts per topic -> three reels.
+Simple Sheet gates/Telegram transport/durable cloud ledger remain disconnected;
+HeyGen UI has policy_permission_required and Windows remains unavailable.
+
 Apify requested for reference analysis. Read-only account access verified by successful
 GitHub Actions run 38040963236, automation/roman-reels-v1; no Actor started.
 APIFY_TOKEN absent locally, GitHub secrets cannot be read/listed by current integration,
@@ -11,7 +19,7 @@ Owner explicitly approved up to $1 including transcript and video. Bounded stage
 collector implemented in scripts/apify-reference-research.mjs: two profile runs
 at $0.10 each, then up to two selected Reel runs at $0.40 each. Metadata contains
 no media add-ons; detail stage enables transcripts and downloaded videos.
-Eight regression tests pass, including ambiguous POST/no retry and cap verification.
+Nine regression tests pass, including ambiguous POST/no retry and cap verification.
 Manual opt-in Actions job on feature/codex-pipeline only; do not rerun paid stages
 in a fresh workspace under this budget. Two references verified: speech and MP4 obtained, 20 frames inspected each.
 See APIFY_REFERENCE_ANALYSIS.md and research/apify-reference-results.json.
@@ -28,7 +36,7 @@ LATEST live review layout simplified at explicit owner request. Sole visible tab
 is `Темы и хуки` (323200067), A:G: topic, topic decision, hook, hook decision,
 reference analysis, metrics, URL. One topic = 3 rows; B/D accept Утверждено or
 Не утверждено. Canonical texts/decisions unchanged; all old tabs preserved hidden.
-Rows 2–4 existing rejected pilot, rows 5–7 unviewed business-growth candidate.
+Rows 2–4 existing rejected pilot, rows 5–7 SEO reference, rows 8–10 cross-platform topic.
 No hook generation or production launch. NEW VIEW DECISIONS NOT YET CONNECTED
 to Apps Script: do not treat hook approval as full-script approval. See SIMPLE_ROMAN_REVIEW.md.
 
