@@ -1,10 +1,21 @@
 name: Roman Reels — Gemini draft smoke test
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Offline preview by default; generation requires single-call authorization'
+        type: choice
+        default: prepare_research
+        options: [prepare_research, generate_research, legacy_smoke]
+      allow_generation:
+        description: 'Explicit permission for Gemini generation; billing/free tier must be agreed separately'
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
   generate:
+    if: github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -12,7 +23,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Generate one test topic (no approval or publishing)
+      - name: Check existing Gemini access (model catalogue GET only)
+        if: inputs.mode != 'legacy_smoke'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node roman-reels/scripts/check-gemini-access.mjs
+      - name: Research-backed request preview or authorized generation
+        if: inputs.mode != 'legacy_smoke'
+        env:
+          MODE: ${{ inputs.mode }}
+          ROMAN_GEMINI_ALLOW_GENERATE: ${{ inputs.allow_generation }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          node --test roman-reels/scripts/researched-gemini-drafts.test.mjs
+          case "$MODE" in
+            prepare_research) action=prepare ;;
+            generate_research) action=generate ;;
+            *) echo 'Invalid mode'; exit 2 ;;
+          esac
+          node roman-reels/scripts/run-researched-gemini.mjs "$action" roman-reels/research/gemini-revision-seo/brief-v2.json "$RUNNER_TEMP/drafts.json"
+      - name: Generate legacy smoke topic (explicit authorization)
+        if: inputs.mode == 'legacy_smoke' && inputs.allow_generation
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -21,11 +53,13 @@ jobs:
           node roman-reels/scripts/generate-gemini-drafts.mjs roman-reels/examples/gemini-smoke-topics.json "$RUNNER_TEMP/drafts.json"
           node roman-reels/scripts/validate-approvals.mjs "$RUNNER_TEMP/drafts.json"
       - name: Send pending drafts to Roman approval sheet
+        if: inputs.mode == 'legacy_smoke' && inputs.allow_generation
         env:
           ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
         run: node roman-reels/scripts/send-drafts-to-sheet.mjs "$RUNNER_TEMP/drafts.json"
       - name: Read approved production queue (no rendering)
+        if: inputs.mode == 'legacy_smoke' && inputs.allow_generation
         env:
           ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}

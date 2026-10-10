@@ -8,6 +8,7 @@ on:
       - 'roman-reels/scripts/**'
       - 'roman-reels/schemas/**'
       - 'roman-reels/research/platform-ending-drafts-v2.json'
+      - 'roman-reels/research/gemini-revision-seo/**'
       - '.github/workflows/roman-source-set-tests.yml'
 
 permissions:
@@ -45,3 +46,4 @@ jobs:
           python roman-reels/scripts/factory-media.test.py
           node --test roman-reels/scripts/platform-ending-drafts.test.mjs
           node --test roman-reels/scripts/shared-body-drafts.test.mjs
+          node --test roman-reels/scripts/researched-gemini-drafts.test.mjs

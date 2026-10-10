@@ -302,3 +302,16 @@ choices и owner-relayed ending approval не изменены. Google Doc дл�
 awaiting_script_revision, downloaded=0, stateSequence=16. Новые записи
 утверждений и генерация видео не выполнялись. Доказательства сохранены
 в research/drive-intake-integration-report.json.
+
+## Gemini revision 2 — подготовка
+
+Добавлен исследовательский запрос для одной SEO-темы: явное учебное демо,
+источники, замечания Романа, сравнение способов. Три строки Search Console
+обработаны локально, CRM CTR=1%, не кейс клиента и не доказанный эффект ИИ.
+Существующий legacy generator сохранён; отдельный researched runner создаёт
+pending revision 2, без отправки в Sheets/Drive и без inherited approvals.
+В зарегистрированном roman-gemini-smoke.yml default prepare_research только
+проверяет доступ GET и сохраняет запрос; генерация требует allow_generation.
+Ограничение: max 1 POST, 4096 output tokens, no retry/fallback; стоимость неизвестна.
+Исследование и настоящий текст ещё требуют редакционной проверки.
+См. GEMINI_RESEARCH_REVISIONS.md. Не запускать legacy smoke для revision 2.

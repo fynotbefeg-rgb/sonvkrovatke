@@ -1,0 +1,11 @@
+{
+  "demoVersion": "1.0.0",
+  "synthetic": true,
+  "label": "Учебные данные, не сайт клиента и не результат SEO-эксперимента",
+  "period": "2026-09-01/2026-09-30",
+  "rows": [
+    {"page":"https://demo-business.example/crm-setup", "query":"внедрение crm для малого бизнеса", "impressions":1200,"clicks":12,"position":4.8,"title":"CRM — Главная","firstScreen":"Настраиваем CRM для малого бизнеса: заявки, этапы продаж и уведомления менеджеров."},
+    {"page":"https://demo-business.example/chatbot", "query":"чат бот для записи клиентов", "impressions":800,"clicks":64,"position":4.2,"title":"Чат-бот для записи клиентов","firstScreen":"Запись клиентов и подтверждение времени через чат-бота."},
+    {"page":"https://demo-business.example/automation", "query":"автоматизация бизнеса", "impressions":1500,"clicks":9,"position":18.0,"title":"Автоматизация бизнеса","firstScreen":"Разбираем процесс работы с заявками и настраиваем автоматизацию."}
+  ]
+}
