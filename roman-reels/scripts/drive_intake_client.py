@@ -53,7 +53,7 @@ class DriveClient:
     def request(self, method, path, query=None, body=None, etag=None, upload=False):
         base = "https://www.googleapis.com/" + ("upload/drive/v3/" if upload else "drive/v3/")
         url = base + path + ("?" + urllib.parse.urlencode(query) if query else "")
-        headers = {"Authorization": "Bearer " + self.token}
+        headers = {"Authorization": "Bearer " + self.token, "Cache-Control": "no-cache"}
         if body is not None:
             headers["Content-Type"] = "application/json; charset=utf-8"
         if etag:

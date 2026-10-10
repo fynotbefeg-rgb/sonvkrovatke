@@ -1,5 +1,6 @@
 """A stable user-owned Drive JSON file stores intake state across Actions runners."""
 import json
+import hashlib
 from drive_intake_client import DriveError
 
 STATE_FILE_ID = "1hOa9obXHrlj-BKQw9vTfHYoUJ6gp5EYP"
@@ -23,10 +24,10 @@ class DriveStore:
             etag = response.headers.get("ETag") or metadata_etag
         if len(data) > MAX_STATE_BYTES: raise DriveError("Drive journal size limit exceeded")
         after, _ = self.client.metadata(STATE_FILE_ID)
-        if after["version"] != metadata["version"]: raise DriveError("Drive journal changed during read")
         if not etag and not self.single_writer:
             raise DriveError("Drive journal ETag unavailable; requires serialized Actions writer")
-        return json.loads(data), {"etag": etag, "version": metadata["version"]}
+        return json.loads(data), {"etag": etag, "version": after["version"],
+                                 "contentHash": hashlib.sha256(data).hexdigest()}
 
     def verify_conditionals(self):
         state, revision = self.load()
@@ -41,9 +42,10 @@ class DriveStore:
         raise DriveError("Drive ignored conditional write; intake is blocked")
 
     def save(self, state, revision):
-        current, _ = self.client.metadata(STATE_FILE_ID)
-        if current["version"] != revision["version"]: raise DriveError("Drive journal revision conflict")
-        self.client.update_json(STATE_FILE_ID, state, revision["etag"], single_writer=self.single_writer)
+        _, current = self.load()
+        if current["contentHash"] != revision["contentHash"]:
+            raise DriveError("Drive journal content changed; refusing stale state write")
+        self.client.update_json(STATE_FILE_ID, state, current["etag"], single_writer=self.single_writer)
         actual, new_revision = self.load()
         if actual != state: raise DriveError("Drive journal write verification failed")
         return new_revision

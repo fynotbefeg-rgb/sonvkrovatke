@@ -39,7 +39,7 @@ if __name__ == "__main__":
         packets = json.loads((SCRIPT_DIR.parent / "research/platform-ending-drafts-v2.json").read_text())
         report = scan(client, journal, INCOMING, packets, current_approvals)
         report.update(stateSequence=journal.state["sequence"], durableState=True,
-                      writerProtection="etag_conditional" if conditional else "serialized_actions_with_drive_version_checks")
+                      writerProtection="etag_conditional" if conditional else "serialized_actions_with_content_hash_checks")
         Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-report.json").write_text(json.dumps(report, indent=2)+"\n")
         print(json.dumps(report))
     except (DriveError, ValueError) as error:

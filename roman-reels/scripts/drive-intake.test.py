@@ -160,5 +160,22 @@ class DriveIntakeTests(unittest.TestCase):
         state,revision=DriveStore(NoEtag(),single_writer=True).load()
         self.assertEqual(state,intake.empty_state());self.assertIsNone(revision['etag'])
 
+    def test_drive_store_ignores_metadata_only_changes_but_rejects_changed_content(self):
+        class JsonDrive:
+            def __init__(self):self.body=json.dumps(intake.empty_state()).encode();self.version=0
+            def metadata(self,key):
+                self.version+=1
+                return {'mimeType':'application/json','parents':['1PojAtqPHjfg_uknzp66sOuZcoFVQqbhE'],'version':str(self.version),'capabilities':{'canEdit':True}},None
+            def request(self,*args):
+                import io
+                stream=io.BytesIO(self.body);stream.headers={};return stream
+            def update_json(self,key,data,etag,single_writer=False):self.body=json.dumps(data).encode()
+        client=JsonDrive();store=DriveStore(client,single_writer=True)
+        state,revision=store.load();state['sequence']=1
+        updated=store.save(state,revision)
+        self.assertNotEqual(updated['contentHash'],revision['contentHash'])
+        client.body=json.dumps({**state,'sequence':2}).encode()
+        with self.assertRaises(DriveError):store.save({**state,'sequence':3},updated)
+
 
 if __name__=='__main__':unittest.main()
