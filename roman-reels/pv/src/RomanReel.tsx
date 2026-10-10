@@ -21,7 +21,7 @@ export type Ins = Base & (
   | { kind: "big"; top: string; big: string; bottom?: string }
   | { kind: "compare"; yes: string[]; no: string[] }
   | { kind: "flow" }
-  | { kind: "mcflow"; word: string; reply: string; btn: string }
+  | { kind: "mcflow"; word: string; reply: string; btn: string; dm?: boolean }
   | { kind: "approve" }
   | { kind: "cta"; l1: string; chip: string; l2: string }
   | { kind: "chat"; app: "whatsapp" | "instagram" | "avito" | "wb" | "telegram"; q: string; a: string; stars?: number; pre?: string; badge?: string }
@@ -68,6 +68,24 @@ export const TOPICS: Record<string, Topic> = {
       { kind: "cta", from: { p: ["напиши в комментариях"] }, to: 999, l1: "Напиши в комментах", chip: "БОТ", l2: "пришлю инструкцию в директ" },
     ],
   },
+  mctiktok: {
+    dir: "rr/mctiktok",
+    hookFull: true,
+    plates: { h1: "Напиши «Промт» в личку — и смотри 🪄", h2: "Автоответ в личке TikTok ⚡", h3: "Одно слово в личку — ответ придёт сам 🤖" },
+    body: [
+      { kind: "phone", src: "tt_open.mp4", trim: 0, rate: 0.8, h: 2400, bg: "#ffffff", full: [[0, 900, 1]], from: 0.1, to: { p: ["человек пишет"], d: -0.1 } },
+      { kind: "mcflow", dm: true, from: { p: ["человек пишет"] }, to: { p: ["как настроить"], d: -0.1 }, word: "Промт", reply: "Привет! Держи промт для сайта 👇", btn: "" },
+      { kind: "big", from: { p: ["первое"] }, to: { p: ["второе"], d: -0.1 }, top: "шаг 1", big: "бизнес-аккаунт", bottom: "в TikTok" },
+      { kind: "big", from: { p: ["второе"] }, to: { p: ["третье"], d: -0.1 }, top: "шаг 2", big: "ManyChat", bottom: "приложение + твой TikTok" },
+      { kind: "phone", src: "tt_tpl.mp4", trim: 0, rate: 0.88, h: 2400, bg: "#ffffff", full: [[0, 900, 1]], from: { p: ["третье"] }, to: { p: ["четвертое"], d: -0.1 } },
+      { kind: "phone", src: "tt_kw.mp4", trim: 0, h: 1388, bg: "#ffffff", full: [[0, 494, 1]], from: { p: ["четвертое"] }, to: { p: ["пятое"], d: -0.1 } },
+      { kind: "phone", src: "tt_paste.mp4", trim: 0, h: 2400, bg: "#ffffff", full: [[0, 900, 1]], from: { p: ["пятое"] }, to: { p: ["сохрани"], d: -0.1 } },
+      { kind: "phone", src: "tt_live.mp4", trim: 0.3, h: 2400, bg: "#ffffff", full: [[0, 900, 1]], from: { p: ["сохрани"] }, to: { p: ["совет"], d: -0.1 } },
+      { kind: "big", from: { p: ["совет"] }, to: { p: ["а в ответе"], d: -0.1 }, top: "кодовое слово —", big: "«Промт»", bottom: "одно и короткое" },
+      { kind: "big", from: { p: ["а в ответе"] }, to: { p: ["хочешь мой"], d: -0.1 }, top: "в ответе —", big: "сразу польза", bottom: "ссылка, гайд или прайс" },
+      { kind: "cta", from: { p: ["хочешь мой"] }, to: 999, l1: "Напиши мне в личку", chip: "Промт", l2: "пришлю промт для сайта" },
+    ],
+  },
   otvety: {
     dir: "rr/otvety",
     plates: { h1: "Нейросеть отвечает клиентам за тебя ⚡", h2: "Ответ за час = ×7 к сделке 📈", h3: "3 уровня ИИ-ответов клиентам 🤖" },
@@ -111,6 +129,21 @@ export const TOPICS: Record<string, Topic> = {
   },
 };
 
+// переходы между лицом и полноэкранной вставкой (отзыв: переключение было слишком быстрым)
+const XFADE = 0.7; // с, полная длина наплыва
+const FACE_AFTER_HOOK = 1.2; // с лица в начале основы до первой полноэкранной вставки
+const isFull = (x: Ins) => x.kind === "phone" || x.kind === "web" || x.kind === "chat" || x.kind === "mcflow";
+// прозрачность вставки: плавное появление/исчезновение; 0 = без наплыва (стык двух экранов)
+const fadeP = (t: number, a: number, b: number, inF: number, outF: number) => {
+  const lim = (b - a) / 2.5;
+  const i = Math.min(inF, lim), o = Math.min(outF, lim);
+  if (t < a || t >= b) return 0;
+  const e = { ...clamp, easing: Easing.inOut(Easing.cubic) };
+  const pin = i > 0 ? interpolate(t, [a, a + i], [0, 1], e) : 1;
+  const pout = o > 0 ? interpolate(t, [b - o, b], [1, 0], e) : 1;
+  return Math.min(pin, pout);
+};
+
 // ---------- поиск фраз в расшифровке ----------
 const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9×%]+/g, " ").trim();
 const flat = (words: W[]) => {
@@ -147,7 +180,7 @@ const Marks: React.FC<{ marks?: Mark[]; t: number }> = ({ marks, t }) => (
 );
 // контент на весь экран: точка фокуса держится на высоте 760 px кадра
 const FullLayer: React.FC<{ p: number; fy: number; sc: number; h: number; children: React.ReactNode; bg?: string }> = ({ p, fy, sc, h, children, bg = "#1f1e1d" }) => (
-  <AbsoluteFill style={{ background: bg, opacity: p, overflow: "hidden" }}>
+  <AbsoluteFill style={{ background: bg, opacity: p, overflow: "hidden", transform: `scale(${0.96 + 0.04 * p})` }}>
     <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: h, transformOrigin: `540px ${fy}px`, transform: `translate(0px, ${760 - fy}px)` }}>{children}</div>{/* без зума: экран всегда целиком по ширине */}
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 480, background: "linear-gradient(180deg, rgba(20,20,20,0) 0%, rgba(20,20,20,.7) 60%)" }} />
   </AbsoluteFill>
@@ -158,7 +191,8 @@ const keyf = (k: [number, number, number][], t: number) => {
 };
 
 // анимированная схема: комментарий → ManyChat → директ (моушн-вставка на весь экран)
-const McFlow: React.FC<{ word: string; reply: string; btn: string; p: number }> = ({ word, reply, btn, p }) => {
+// dm: вход — личные сообщения TikTok (а не комментарий под рилсом), ответ — в ту же личку
+const McFlow: React.FC<{ word: string; reply: string; btn: string; p: number; dm?: boolean }> = ({ word, reply, btn, p, dm }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = f / fps;
@@ -184,9 +218,9 @@ const McFlow: React.FC<{ word: string; reply: string; btn: string; p: number }> 
       {step("1", 420, 0.1)}{step("2", 815, 1.9)}{step("3", 1200, 3.2)}
       {/* комментарий под рилсом */}
       <div style={{ position: "absolute", left: 170, right: 90, top: 330, height: 270, borderRadius: 34, background: "#fff", padding: "30px 36px", transform: `translateY(${(1 - a) * 60}px)`, opacity: a, boxShadow: "0 20px 60px rgba(0,0,0,.4)" }}>
-        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#8a8f98" }}>Комментарии · рилс</div>
+        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#8a8f98" }}>{dm ? "TikTok · личные сообщения" : "Комментарии · рилс"}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 22, marginTop: 34 }}>
-          <div style={{ width: 84, height: 84, borderRadius: 42, background: "linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)" }} />
+          <div style={{ width: 84, height: 84, borderRadius: 42, background: dm ? "linear-gradient(135deg,#25f4ee,#111 50%,#fe2c55)" : "linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)" }} />
           <div style={{ fontFamily: FONT, fontSize: 44, color: "#111" }}><b>anna_k</b>{"  "}<span style={{ fontWeight: 900 }}>{typed}</span><span style={{ opacity: t < 1.4 && Math.floor(t * 4) % 2 ? 1 : 0 }}>|</span></div>
         </div>
       </div>
@@ -200,11 +234,11 @@ const McFlow: React.FC<{ word: string; reply: string; btn: string; p: number }> 
       {dot(d2, t > 2.7 && t < 3.35)}
       {/* директ */}
       <div style={{ position: "absolute", left: 170, right: 90, top: 1110, borderRadius: 34, background: "#fff", padding: "26px 32px", transform: `scale(${0.85 + c * 0.15})`, opacity: c, boxShadow: "0 20px 60px rgba(0,0,0,.4)" }}>
-        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#8a8f98", marginBottom: 18 }}>Директ</div>
-        <div style={{ background: "#3797f0", color: "#fff", fontFamily: FONT, fontWeight: 700, fontSize: 40, borderRadius: 30, padding: "18px 26px", display: "inline-block" }}>{reply}</div>
-        <div style={{ marginTop: 18, border: "3px solid #3797f0", color: "#3797f0", fontFamily: FONT, fontWeight: 800, fontSize: 36, borderRadius: 22, padding: "14px 0", textAlign: "center" }}>{btn}</div>
+        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: "#8a8f98", marginBottom: 18 }}>{dm ? "Ответ в личку" : "Директ"}</div>
+        <div style={{ background: dm ? "#fe2c55" : "#3797f0", color: "#fff", fontFamily: FONT, fontWeight: 700, fontSize: 40, borderRadius: 30, padding: "18px 26px", display: "inline-block" }}>{reply}</div>
+        {btn && <div style={{ marginTop: 18, border: `3px solid ${dm ? "#fe2c55" : "#3797f0"}`, color: dm ? "#fe2c55" : "#3797f0", fontFamily: FONT, fontWeight: 800, fontSize: 36, borderRadius: 22, padding: "14px 0", textAlign: "center" }}>{btn}</div>}
       </div>
-      <div style={{ position: "absolute", right: 70, top: 1075, background: "#ffd400", color: "#111", fontFamily: FONT, fontWeight: 900, fontSize: 38, borderRadius: 40, padding: "10px 26px", transform: `scale(${badge}) rotate(-6deg)` }}>за 1 секунду</div>
+      <div style={{ position: "absolute", right: 70, top: 1075, background: "#ffd400", color: "#111", fontFamily: FONT, fontWeight: 900, fontSize: 38, borderRadius: 40, padding: "10px 26px", transform: `scale(${badge}) rotate(-6deg)` }}>{dm ? "автоматически" : "за 1 секунду"}</div>
      </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -265,7 +299,7 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
       </Card>
     );
   }
-  if (ins.kind === "mcflow") return <McFlow word={ins.word} reply={ins.reply} btn={ins.btn} p={p} />;
+  if (ins.kind === "mcflow") return <McFlow word={ins.word} reply={ins.reply} btn={ins.btn} dm={ins.dm} p={p} />;
   if (ins.kind === "flow") {
     const a = spring({ frame: f - 2, fps, config: { damping: 12 } });
     const b = spring({ frame: f - 10, fps, config: { damping: 12 } });
@@ -415,16 +449,30 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook, cap }) => {
   const lt = inBody ? t - hookDur : t;
   const list: { x: Ins; a: number; b: number }[] = [];
   for (const x of T.hookIns?.[hook] ?? []) { const a = resolve(x.from, hw, hookDur), b = resolve(x.to, hw, hookDur); if (a >= 0 && b > a) list.push({ x, a, b }); }
-  for (const x of T.body) { const a = resolve(x.from, bw, bodyDur), b = resolve(x.to, bw, bodyDur); if (a >= 0 && b > a) list.push({ x, a: a + hookDur, b: b + hookDur }); }
+  for (const x of T.body) {
+    let a = resolve(x.from, bw, bodyDur);
+    const b = resolve(x.to, bw, bodyDur);
+    // после хука лицо держится хотя бы FACE_AFTER_HOOK, а не сразу уходит на экран приложения
+    if (a >= 0 && isFull(x) && a < FACE_AFTER_HOOK) a = FACE_AFTER_HOOK;
+    if (a >= 0 && b > a) list.push({ x, a: a + hookDur, b: b + hookDur });
+  }
   list.sort((m, n) => m.a - n.a);
   // короткие промежутки между вставками не показываем — иначе лицо мелькает
   for (let i = 0; i + 1 < list.length; i++) if (list[i + 1].a - list[i].b < 2.5) list[i].b = list[i + 1].a + 0.25;
+  // наплывы: лицо ↔ экран — XFADE; экран → экран встык — новый экран просто проявляется поверх
+  const fades = list.map(({ x, a, b }, i) => {
+    if (!isFull(x)) return { inF: 0.25, outF: 0.25 };
+    const prevFull = list.slice(0, i).some((m) => isFull(m.x) && m.b > a - 0.01);
+    const nextFull = list.slice(i + 1).some((m) => isFull(m.x) && m.a < b + 0.01);
+    return { inF: prevFull ? 0.3 : XFADE, outF: nextFull ? 0 : XFADE };
+  });
   let fullP = 0;
   let fullOn = false;
-  for (const { x, a, b } of list) if (x.kind === "phone" || x.kind === "web" || x.kind === "chat" || x.kind === "mcflow") {
-    fullP = Math.max(fullP, interpolate(t, [a - 0.1, a + 0.2, b - 0.2, b + 0.1], [0, 1, 1, 0], clamp));
+  list.forEach(({ x, a, b }, i) => {
+    if (!isFull(x)) return;
+    fullP = Math.max(fullP, fadeP(t, a, b, fades[i].inF, fades[i].outF));
     if (t >= a && t < b) fullOn = true;
-  }
+  });
   // лёгкий наезд на лицо на каждой новой фразе (по точкам в расшифровке)
   const cuts: number[] = [];
   for (const [w, s] of [...hw.map((x) => x), ...bw.map((x) => [x[0], x[1] + hookDur, x[2]] as W)]) if (/[.!?]$/.test(w)) cuts.push(s + 0.3);
@@ -453,7 +501,7 @@ export const RomanReel: React.FC<RVersion> = ({ topic, hook, cap }) => {
       {!full && <div style={{ position: "absolute", left: 0, right: 0, top: 850, height: 30, background: "linear-gradient(180deg,#1d2531,#1d253100)" }} />}
       {list.map(({ x, a, b }, i) => (
         <Sequence key={i} from={Math.round(a * FPS)} durationInFrames={Math.max(1, Math.round((b - a) * FPS))}>
-          <Insert ins={x} p={interpolate(t, [a, a + 0.25, b - 0.25, b], [0, 1, 1, 0], clamp)} />
+          <Insert ins={x} p={fadeP(t, a, b, fades[i].inF, fades[i].outF)} />
         </Sequence>
       ))}
       <div style={{ position: "absolute", left: 70, right: 150, top: 230, background: "#fff", borderRadius: 34, padding: "22px 30px", textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 52, lineHeight: 1.12, color: "#111", boxShadow: "0 14px 40px rgba(0,0,0,.18)", opacity: 1 - fullP }}>
