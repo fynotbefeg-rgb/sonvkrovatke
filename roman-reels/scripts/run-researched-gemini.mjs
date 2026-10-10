@@ -9,20 +9,20 @@ if(existsSync(output))throw Error('Output already exists; no request or overwrit
 const brief=JSON.parse(readFileSync(input,'utf8')),prompt=researchPrompt(brief);
 if(prompt.length>16000)throw Error('Prompt exceeds input character cap');
 if(mode==='prepare'){
- writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model:'gemini-2.5-flash-lite',prompt,
+ writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model:'gemini-3-flash-preview',prompt,
   maxOutputTokens:4096,maxGenerateCalls:1,timeoutSeconds:90,sendsToSheets:false,productionReady:false},null,2)+'\n',{flag:'wx'});
  console.log('Prepared one request; no API calls.');
 }else{
  if(process.env.ROMAN_GEMINI_ALLOW_GENERATE!=='true')throw Error('Explicit single-call authorization required');
  const key=process.env.GEMINI_API_KEY;if(!key)throw Error('Missing existing GEMINI_API_KEY');
- const model='gemini-2.5-flash-lite';
+ const model='gemini-3-flash-preview';
  const list=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{headers:{'x-goog-api-key':key},signal:AbortSignal.timeout(30000)});
  if(!list.ok)throw Error(`Gemini models HTTP ${list.status}; no generation attempted`);
  const models=await list.json();
  if(!models.models?.some(m=>m.name===`models/${model}`&&m.supportedGenerationMethods?.includes('generateContent')))throw Error('Selected model unavailable; no fallback generation');
  const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
   method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:AbortSignal.timeout(90000),
-  body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.4,maxOutputTokens:4096,thinkingConfig:{thinkingBudget:0}}})});
+  body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.4,maxOutputTokens:4096}})});
  if(!response.ok){
   // Preserve a bounded, redacted provider message; never log the key or headers.
   let errorCode=null,errorMessage='Provider error details unavailable';
