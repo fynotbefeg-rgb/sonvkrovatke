@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-10",
+  "runId": "38060761370",
+  "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38060761370",
+  "codeCommit": "83ddad981fdba7969b3b53588194e616c1f75483",
+  "conclusion": "success",
+  "existingKeyWorks": true,
+  "model": "gemini-2.5-flash-lite",
+  "modelAvailable": true,
+  "generationCalls": 0,
+  "requestPrepared": true,
+  "freeTierAndBilling": "unknown",
+  "newDraftGenerated": false,
+  "sheetsModified": false,
+  "localResearchTestScenarios": 5
+}

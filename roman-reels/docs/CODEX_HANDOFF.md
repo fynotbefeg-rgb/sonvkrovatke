@@ -315,3 +315,10 @@ pending revision 2, без отправки в Sheets/Drive и без inherited 
 Ограничение: max 1 POST, 4096 output tokens, no retry/fallback; стоимость неизвестна.
 Исследование и настоящий текст ещё требуют редакционной проверки.
 См. GEMINI_RESEARCH_REVISIONS.md. Не запускать legacy smoke для revision 2.
+
+Проверка prepare_research на 83ddad9: Actions 38060761370 success.
+Существующий ключ работает, gemini-2.5-flash-lite доступна; generationCalls=0.
+Точный запрос сохранён в артефакте, Sheets/утверждения не менялись.
+5 сценариев исследовательского теста и 2 существующих JS-файла прошли;
+оба workflow YAML проверены. Тариф/бесплатный лимит неизвестны; нужен
+согласованный один generation POST перед generate_research.
