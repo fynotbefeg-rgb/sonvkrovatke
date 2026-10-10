@@ -10,6 +10,7 @@ import {
 } from "./director.ts";
 import type { FactoryJob, MontageEvent, MontagePlan, SafeZone, Word } from "./director.ts";
 import { captionFontSize, CAPTION_LINE_HEIGHT, conservativeLayout } from "./layout.ts";
+import { FADES, fadeKeyframes } from "./timing.ts";
 
 // RomanFactoryV1: full assembled source MP4 (hook already inside) + word captions + Director accents.
 // Source time = output time: no cuts, no speed change, the original audio track is kept as is.
@@ -63,13 +64,16 @@ const NoSource: React.FC = () => (
 
 const active = (events: MontageEvent[], t: number) => events.filter((e) => e.start <= t && t < e.end);
 
-// Smooth in/out envelope of an event, seconds.
-const envelope = (event: MontageEvent, t: number, inS = 0.25, outS = 0.25) =>
-  interpolate(t, [event.start, event.start + inS, event.end - outS, event.end], [0, 1, 1, 0], { ...clamp, easing: EASE });
+// Smooth in/out envelope of an event; fade lengths scale down for short (trimmed) events.
+const envelope = (event: MontageEvent, t: number, inS: number, outS: number) => {
+  const range = fadeKeyframes(event.start, event.end, inS, outS);
+  if (!range) return t >= event.start && t < event.end ? 1 : 0;
+  return interpolate(t, range, [0, 1, 1, 0], { ...clamp, easing: EASE });
+};
 
 const ZoomedSource: React.FC<{ job: FactoryJob; zooms: MontageEvent[]; t: number }> = ({ job, zooms, t }) => {
   const zoom = zooms.find((e) => e.start <= t && t < e.end);
-  const scale = zoom ? 1 + (conservativeLayout.zoomScale - 1) * envelope(zoom, t, 0.6, 0.6) : 1;
+  const scale = zoom ? 1 + (conservativeLayout.zoomScale - 1) * envelope(zoom, t, FADES.zoom.in, FADES.zoom.out) : 1;
   return (
     <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: conservativeLayout.zoomOrigin }}>
       <OffthreadVideo src={staticFile(job.sourceVideo.localPath)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -119,7 +123,7 @@ const TopBand: React.FC<{ zone: SafeZone; width: number; children: React.ReactNo
 );
 
 const Accent: React.FC<{ event: MontageEvent; words: Word[]; t: number; zone: SafeZone; width: number }> = ({ event, words, t, zone, width }) => {
-  const k = envelope(event, t, 0.22, 0.25);
+  const k = envelope(event, t, FADES.accent.in, FADES.accent.out);
   const pop = interpolate(t, [event.start, event.start + 0.18, event.start + 0.3], [0.7, 1.06, 1], { ...clamp, easing: EASE });
   if (event.type === "diagram") {
     const items = listItemRanges(words, event.wordStart, event.wordEnd);

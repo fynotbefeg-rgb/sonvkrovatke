@@ -3,6 +3,9 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Claude answered PR #6 review: C1 fixed (`pv/src/factory/timing.ts` fadeKeyframes, 7 regression tests incl. Remotion
+interpolate; 14 Director tests; tsc 0). Merged 6652bb9 audio preservation; control h1 render passed QC with source-identical PCM.
+
 Claude delivered PR #6, HEAD 9eff02d, with Director/RomanFactoryV1 and 3 claimed renders.
 Codex independently verified tsc, 14 Director tests, existing 21 Python checks, and full h1 render/QC.
 Review found blocker C1: fixed envelope fade times become non-monotonic for short trimmed accents,
