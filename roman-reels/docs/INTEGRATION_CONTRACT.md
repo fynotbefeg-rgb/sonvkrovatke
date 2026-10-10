@@ -1,6 +1,7 @@
 # Контракт Codex ↔ Claude Code — кандидат 1.0.0
 
-Статус: **на согласование**, существующие workflow не переведены на этот контракт.
+Статус: **согласован владельцем 2026-10-10** после PR #5. Production workflow ещё не переведены
+на этот контракт; development JSON и интеграционный wrapper используют v1 отдельно.
 Файл [factory-job-v1.schema.json](../schemas/factory-job-v1.schema.json) и offline validator
 задают проверяемый кандидат; это не deployed production gate.
 

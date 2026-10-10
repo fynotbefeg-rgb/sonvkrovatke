@@ -3,6 +3,16 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Owner agreed contract v1 and P1 after PR #5, 2026-10-10. New Codex work on feature/codex-pipeline:
+81 real ASR words; zero-duration preposition blocked two raw attempts; one 23-word segment was
+acoustically realigned by local Russian Wav2Vec2 CTC, no interpolation. Development job and source
+technical QC pass. Precise benchmark/versions/limitations: FIRST_MONTAGE_P1.md.
+Director and generalized Remotion are still NOT delivered; development runner stops before render
+when missing. Seven new media tests, six contract tests and two updated Claude packet tests pass.
+prepare-claude-job now reads CLAUDE_P1_EXECUTION.md. No actual Claude run, upload, Sheets mutations,
+HeyGen execution or paid model calls. GitHub variables read is 403; configured OAuth is unverified.
+Await clarification whether cloud Claude is connected. No Windows setup required now.
+
 Latest user specification supersedes conflicting role/approval/branch suggestions below.
 Codex owns pipeline integration; Claude Code owns AI Montage Director and Remotion.
 Approvals remain in existing Google Sheets; Telegram is the production start control, not a substitute identity receipt.

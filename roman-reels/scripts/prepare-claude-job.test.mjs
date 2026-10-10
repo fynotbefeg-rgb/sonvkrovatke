@@ -7,7 +7,8 @@ test('packet binds exact task and preserves proposal-only restrictions', () => {
   assert.equal(a.metadata.approval_granted, false);
   assert.equal(a.metadata.ai_started, false);
   assert.equal(a.metadata.automatic_push, false);
-  assert.equal(a.metadata.branch, 'automation/roman-reels-v1');
+  assert.equal(a.metadata.branch, 'feature/claude-montage');
+  assert.equal(a.metadata.integration_branch, 'automation/roman-reels-v1');
   assert.match(a.prompt, /Bash недоступен/);
   assert.notEqual(a.metadata.task_sha256, prepareClaudeJob('Создай другой шаблон').metadata.task_sha256);
 });

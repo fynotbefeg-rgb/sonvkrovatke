@@ -1,0 +1,31 @@
+{
+  "technicalPassed": true,
+  "technicalChecks": {
+    "decode": true,
+    "resolution": true,
+    "audio": true,
+    "duration": true,
+    "fps": true,
+    "codecs": true
+  },
+  "outputSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+  "metadata": {
+    "duration": 33.72,
+    "width": 1080,
+    "height": 1920,
+    "fps": 25.0,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "audioChannels": 2
+  },
+  "productionReady": false,
+  "remainingChecks": [
+    "trusted_current_approval",
+    "transcript_match",
+    "montage_plan",
+    "visual_assets",
+    "subtitle_layout",
+    "visual_review"
+  ],
+  "checkedAt": "2026-10-10T03:42:15.960753+00:00"
+}
