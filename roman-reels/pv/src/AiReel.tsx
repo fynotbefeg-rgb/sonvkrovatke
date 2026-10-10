@@ -29,7 +29,6 @@ const SITE: Omit<Chan, "at"> = { icon: "🌐", label: "Сайт", bg: "#8b5cf6" 
 const COMM: Omit<Chan, "at"> = { icon: "🗨️", label: "Комментарии", bg: "#f59e0b" };
 
 // окна панорамы для записей экрана (время записи, px)
-const PAN_S3: [number, number][] = [[0, 360], [2.9, 360], [3.3, 230], [7.2, 230], [10.5, 640]];
 const PAN_S4: [number, number][] = [[0, 450], [2.9, 450], [3.3, 380], [4.6, 380], [5.8, 880]];
 const PAN_S2: [number, number][] = [[0, 360], [2.9, 360], [3.3, 230], [6.6, 230], [8.6, 660]];
 
@@ -129,7 +128,7 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
     <Card p={p}>
       <AbsoluteFill style={{ background: "#111", justifyContent: "center", alignItems: "center", textAlign: "center", gap: 14 }}>
         <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 52, color: "#fff" }}>Напиши в комментах</div>
-        <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 56, color: "#111", background: "#ffd400", padding: "6px 30px", borderRadius: 26, fontSize: 48, transform: `scale(${s * pulse})` }}>где общаешься<br />с клиентами</div>
+        <div style={{ fontFamily: FONT, fontWeight: 900, color: "#111", background: "#ffd400", padding: "6px 30px", borderRadius: 26, fontSize: 48, transform: `scale(${s * pulse})` }}>где общаешься<br />с клиентами</div>
         <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 36, color: "rgba(255,255,255,.8)" }}>разберу в следующем видео</div>
         <div style={{ fontSize: 56, transform: `translateY(${Math.sin(f / 4) * 10}px)` }}>👇</div>
       </AbsoluteFill>

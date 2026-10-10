@@ -3,6 +3,10 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Claude P1 delivered on `feature/claude-montage` (PR into feature/codex-pipeline): `pv/src/factory/director.ts`,
+`RomanFactoryV1`, 14 Director tests, tsc 0 errors, three development renders passed the wrapper's technical QC.
+Open item: rendered audio is a constant 42.7 ms late vs the assembled source. See CLAUDE_P1_RESULT.md.
+
 Latest user requirement: 3 separate hooks + ONE shared body. Implemented development FFmpeg source
 assembly (assemble-source-set.py), source-set schema, local rr/incoming (video ignored by Git),
 3 real assembled/QC-passed sources, and future Gemini common-body drafts builder. No paid Gemini run.
