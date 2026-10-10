@@ -47,7 +47,9 @@ class Journal:
                 and isinstance(self.state.get("waiting"), dict), "Invalid durable journal")
         for key, job in self.state["jobs"].items():
             require(re.fullmatch(r"[a-f0-9]{64}", key) and job.get("key") == key and
-                    job.get("status") in {"downloading", "awaiting_approval", "source_set_ready", "retryable_error", "superseded"},
+                    job.get("status") in {"downloading", "awaiting_approval", "source_set_ready", "retryable_error", "manual_attention", "superseded"}
+                    and job.get("renderAllowed") is False
+                    and key == digest([job["slot"], job["sourceFiles"], job["scriptHashes"]]),
                     "Invalid durable job")
 
     def save(self):
@@ -63,9 +65,13 @@ class Journal:
 
     def claim(self, key, slot, metadata, now):
         previous = self.state["jobs"].get(key)
-        if previous and previous["status"] in {"awaiting_approval", "source_set_ready"}:
+        if previous and previous["status"] in {"awaiting_approval", "source_set_ready", "manual_attention"}:
             return None, previous
         if previous and previous["status"] == "downloading" and previous["leaseUntil"] > now:
+            return None, previous
+        if previous and previous.get("attempts", 0) >= 3:
+            previous.update(status="manual_attention", leaseUntil=0, nextStage="retry_limit_reached")
+            self.save()
             return None, previous
         for old_key, job in self.state["jobs"].items():
             if job["slot"] == slot and old_key != key and job["status"] != "superseded":
@@ -203,7 +209,8 @@ def scan(client, journal, incoming_id, packets, approval_loader, now=None):
             report["sets"].append({"slot": slot, "key": key, "status": status})
         except (ValueError, OSError, DriveError) as error:
             if token:
-                journal.finish(key, token, "retryable_error", errorCode=type(error).__name__,
+                retryable = isinstance(error, DriveError) and error.status not in {400, 401, 403, 404}
+                journal.finish(key, token, "retryable_error" if retryable else "manual_attention", errorCode=type(error).__name__,
                                nextStage="inspect_and_retry_input_only")
             else:
                 if key in journal.state["jobs"] and journal.state["jobs"][key]["status"] == "source_set_ready":

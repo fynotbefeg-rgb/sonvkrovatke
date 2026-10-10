@@ -100,8 +100,8 @@ class DriveClient:
                     stream.write(block)
         return count
 
-    def update_json(self, file_id, data, etag):
-        if not etag: raise DriveError("Drive state has no ETag; conditional writes disabled")
+    def update_json(self, file_id, data, etag, single_writer=False):
+        if not etag and not single_writer: raise DriveError("Drive state has no ETag or serialized writer")
         body = json.dumps(data, ensure_ascii=False, allow_nan=False).encode("utf-8")
         with self.request("PATCH", "files/" + urllib.parse.quote(file_id, safe=""),
             {"uploadType": "media", "fields": "id,version"}, body, etag, upload=True) as response:

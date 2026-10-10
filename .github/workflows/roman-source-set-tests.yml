@@ -38,6 +38,7 @@ jobs:
       - name: Offline checks with synthetic MP4s, no service credentials
         run: |
           python roman-reels/scripts/platform-source-set.test.py
+          python roman-reels/scripts/drive-intake.test.py
           python roman-reels/scripts/source-set.test.py
           python roman-reels/scripts/assembled-jobs.test.py
           python roman-reels/scripts/factory-contract.test.py

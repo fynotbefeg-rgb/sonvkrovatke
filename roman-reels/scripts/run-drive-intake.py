@@ -31,12 +31,15 @@ if __name__ == "__main__":
         metadata, _ = client.metadata(INCOMING)
         if metadata.get("mimeType") != "application/vnd.google-apps.folder" or ASSETS not in metadata.get("parents", []):
             raise DriveError("Incoming identity mismatch")
-        store = DriveStore(client)
-        store.verify_conditionals()
+        serialized = (os.environ.get("GITHUB_ACTIONS") == "true" and
+                      os.environ.get("ROMAN_INTAKE_SINGLE_WRITER") == "true")
+        store = DriveStore(client, single_writer=serialized)
+        conditional = store.verify_conditionals()
         journal = Journal(store)
         packets = json.loads((SCRIPT_DIR.parent / "research/platform-ending-drafts-v2.json").read_text())
         report = scan(client, journal, INCOMING, packets, current_approvals)
-        report.update(stateSequence=journal.state["sequence"], durableState=True, conditionalsVerified=True)
+        report.update(stateSequence=journal.state["sequence"], durableState=True,
+                      writerProtection="etag_conditional" if conditional else "serialized_actions_with_drive_version_checks")
         Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-report.json").write_text(json.dumps(report, indent=2)+"\n")
         print(json.dumps(report))
     except (DriveError, ValueError) as error:
