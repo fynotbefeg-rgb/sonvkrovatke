@@ -55,5 +55,17 @@
   "scheduleChildIntakeRun": "38059561816",
   "mainChangeScope": [
     ".github/workflows/roman-intake-scheduler.yml"
-  ]
+  ],
+  "editorialGateVerification": {
+    "runId": "38059814561",
+    "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38059814561",
+    "codeCommit": "a09a127c5bb7757e9b97fdcf198f0acd1d591deb",
+    "conclusion": "success",
+    "downloadedSets": 0,
+    "status": "awaiting_script_revision",
+    "stateSequence": 16,
+    "renderAllowed": false,
+    "localPythonTests": 50,
+    "localJavascriptTestFiles": 2
+  }
 }

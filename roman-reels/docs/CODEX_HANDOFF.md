@@ -296,3 +296,9 @@ Tool responsibilities follow [PROJECT_ROLES.md](PROJECT_ROLES.md). Claude Code d
 старых approval records. Исходные версии сохранены; Google topic/hook
 choices и owner-relayed ending approval не изменены. Google Doc для
 Романа помечен «На доработке». Новых фактических демо/основ пока нет.
+
+Проверка запрета на коде a09a127: локально 50 Python-тестов (intake 15)
+и две JS-проверки прошли. Реальный Actions intake 38059814561 — success,
+awaiting_script_revision, downloaded=0, stateSequence=16. Новые записи
+утверждений и генерация видео не выполнялись. Доказательства сохранены
+в research/drive-intake-integration-report.json.
