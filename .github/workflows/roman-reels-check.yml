@@ -85,6 +85,8 @@ jobs:
           run-id: 38041968344
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: saved-media
+      - name: Install media inspection tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Inspect downloaded files without service credentials
         run: python roman-reels/scripts/inspect-apify-media.py
   read-saved-apify:
