@@ -51,3 +51,5 @@ node roman-reels/scripts/manual-intake.test.mjs
 12 новых проверок: привязка текста, запрет pending/чужого хука, повторная доставка, чужой оператор/группа, spoofed approvals, срок/владелец кнопки, смена текста/хука/ревизии, атомарность пакета, смена provider без дубля, ошибка approval-read, коллизия callback и восстановление SQLite после перезапуска. Fixtures тестовые, они не утверждают реальные пилоты. Дополнительно восемь существующих intake-тестов проходят.
 
 Ручной workflow `roman-reels-check.yml` с `test_production_queue=true` проверяет это offline на Node22, без секретов, без Gemini/Apify/Claude/HeyGen и без подключения к реальному Telegram.
+
+Проверка в GitHub Actions [38019089716](https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38019089716) на коммите `6fecade` завершилась успешно: 12 queue + 8 intake тестов на Node22. Выполнился только offline-job; остальные сервисные jobs пропущены.
