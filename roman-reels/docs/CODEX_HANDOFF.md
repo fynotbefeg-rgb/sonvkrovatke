@@ -3,6 +3,13 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Live Google Sheet review layout updated at owner's request: first tab `3 хука + основа`
+shows one shared body and three hook/status links. Test rows 2–4 removed from working `Сценарии`,
+with a full hidden archive retained. Canonical pilot rows now 2–4, full texts remain literal F values;
+technical columns hidden, existing G approval dropdown unchanged. Verified readback preserves texts
+and decisions: knowledge-price h1/h2 pending, h3 redo. These are real pilot drafts, not approved scripts.
+No component-level approval migration or messages/generation performed. See SHEETS_SHARED_BODY_REVIEW.md.
+
 Latest user requirement: 3 separate hooks + ONE shared body. Implemented development FFmpeg source
 assembly (assemble-source-set.py), source-set schema, local rr/incoming (video ignored by Git),
 3 real assembled/QC-passed sources, and future Gemini common-body drafts builder. No paid Gemini run.
