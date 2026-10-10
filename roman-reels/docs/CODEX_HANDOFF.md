@@ -3,6 +3,14 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+LATEST live review layout simplified at explicit owner request. Sole visible tab
+is `Темы и хуки` (323200067), A:G: topic, topic decision, hook, hook decision,
+reference analysis, metrics, URL. One topic = 3 rows; B/D accept Утверждено or
+Не утверждено. Canonical texts/decisions unchanged; all old tabs preserved hidden.
+Rows 2–4 existing rejected pilot, rows 5–7 unviewed business-growth candidate.
+No hook generation or production launch. NEW VIEW DECISIONS NOT YET CONNECTED
+to Apps Script: do not treat hook approval as full-script approval. See SIMPLE_ROMAN_REVIEW.md.
+
 New editorial requirement from Roman: select topics FIRST, each backed by analysis
 and an external successful example; generate shared body + 3 hooks only for selected
 topics. Topic selection is separate from exact-script approval and video launch.
