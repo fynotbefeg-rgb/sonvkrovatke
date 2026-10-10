@@ -6,6 +6,11 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      test_production_queue:
+        description: "Offline-проверки Telegram-кнопки и смены ручного/Windows этапа, без сервисов"
+        required: false
+        type: boolean
+        default: false
       run_claude_task:
         description: "Claude Code: прочитать задание 01 и подготовить предложение (расход лимита подписки)"
         required: false
@@ -48,15 +53,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  production-queue-tests:
+    if: inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline queue and manual intake checks
+        run: |
+          node roman-reels/scripts/production-queue.test.mjs
+          node roman-reels/scripts/manual-intake.test.mjs
   claude-task:
-    if: inputs.run_claude_task && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: inputs.run_claude_task && !inputs.test_production_queue && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
     uses: ./.github/workflows/roman-claude-task.yml
     with:
       enabled: ${{ vars.ROMAN_CLAUDE_ENABLED == 'true' }}
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
   google-queue:
-    if: (inputs.check_google_queue || inputs.send_pilot_drafts) && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: (inputs.check_google_queue || inputs.send_pilot_drafts) && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -79,7 +97,7 @@ jobs:
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
         run: node roman-reels/scripts/send-drafts-to-sheet.mjs roman-reels/research/roman-pilot-drafts.json
   one-reel:
-    if: inputs.collect_one_apify_reel && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: inputs.collect_one_apify_reel && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
@@ -106,7 +124,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
   apify:
-    if: inputs.check_apify_access && !inputs.run_claude_task && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1'
+    if: inputs.check_apify_access && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -121,7 +139,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
