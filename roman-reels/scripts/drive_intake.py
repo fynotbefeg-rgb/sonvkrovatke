@@ -227,10 +227,12 @@ def scan(client, journal, incoming_id, packets, approval_loader, now=None):
             if token:
                 retryable = isinstance(error, DriveError) and error.status not in {400, 401, 403, 404}
                 journal.finish(key, token, "retryable_error" if retryable else "manual_attention", errorCode=type(error).__name__,
+                               errorReason=str(error)[:200],
                                nextStage="inspect_and_retry_input_only")
             else:
                 if key in journal.state["jobs"] and journal.state["jobs"][key]["status"] == "source_set_ready":
                     journal.state["jobs"][key].update(status="awaiting_approval", nextStage="recheck_live_approval")
                 journal.waiting(slot, "manual_attention")
-            report["sets"].append({"slot": slot, "status": "manual_attention", "errorCode": type(error).__name__})
+            report["sets"].append({"slot": slot, "status": "manual_attention", "errorCode": type(error).__name__,
+                                   "errorReason": str(error)[:200]})
     return report

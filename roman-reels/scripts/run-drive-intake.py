@@ -38,11 +38,22 @@ if __name__ == "__main__":
         journal = Journal(store)
         packets = json.loads((SCRIPT_DIR.parent / "research/platform-ending-drafts-v2.json").read_text())
         synthetic = os.environ.get("ROMAN_INTAKE_SELF_TEST") == "true"
-        if synthetic: packets = [self_test_packet(packets[0])]
+        if synthetic:
+            packets = [self_test_packet(packets[0])]
+            # Reset only a FAILED synthetic fixture for a deliberate diagnostic rerun.
+            # Real source sets and validated fixtures are never reset by this path.
+            changed = False
+            for job in journal.state["jobs"].values():
+                if job.get("syntheticFixtures") is True and job["topicId"] == packets[0]["sourceSet"]["topic_id"] and job["status"] == "manual_attention":
+                    job.update(status="superseded", attempts=0, leaseUntil=0,
+                               selfTestResets=job.get("selfTestResets", 0)+1)
+                    changed = True
+            if changed: journal.save()
         report = scan(client, journal, INCOMING, packets, current_approvals)
         report.update(stateSequence=journal.state["sequence"], durableState=True, syntheticFixtures=synthetic,
                       writerProtection="etag_conditional" if conditional else "serialized_actions_with_content_hash_checks")
         Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-report.json").write_text(json.dumps(report, indent=2)+"\n")
         print(json.dumps(report))
+        print(f"IntakeSummary downloaded={report['downloadedSets']} skipped={report['skippedSets']} sequence={report['stateSequence']} synthetic={synthetic}")
     except (DriveError, ValueError) as error:
         raise SystemExit(str(error)) from None
