@@ -3,9 +3,21 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
-Claude P1 delivered on `feature/claude-montage` (PR into feature/codex-pipeline): `pv/src/factory/director.ts`,
-`RomanFactoryV1`, 14 Director tests, tsc 0 errors, three development renders passed the wrapper's technical QC.
-Open item: rendered audio is a constant 42.7 ms late vs the assembled source. See CLAUDE_P1_RESULT.md.
+Claude delivered PR #6, HEAD 9eff02d, with Director/RomanFactoryV1 and 3 claimed renders.
+Codex independently verified tsc, 14 Director tests, existing 21 Python checks, and full h1 render/QC.
+Review found blocker C1: fixed envelope fade times become non-monotonic for short trimmed accents,
+e.g. adjacent Claude/Gemini terms. PR remains unmerged; exact reproduction/fix task: CODEX_PR6_REVIEW.md.
+Codex fixed P1 source-audio preservation in the development wrapper: original AAC stream copy,
+full decoded PCM hash + audio clock verification, no re-encoding; 10 media tests pass.
+Actual h1 Remotion delay measured 42.625ms; corrected full h1 PCM/clock matches source exactly.
+Evidence in research/first-montage-v1/codex-pr6-review; no production, Google write or paid call.
+
+Live Google Sheet review layout updated at owner's request: first tab `3 хука + основа`
+shows one shared body and three hook/status links. Test rows 2–4 removed from working `Сценарии`,
+with a full hidden archive retained. Canonical pilot rows now 2–4, full texts remain literal F values;
+technical columns hidden, existing G approval dropdown unchanged. Verified readback preserves texts
+and decisions: knowledge-price h1/h2 pending, h3 redo. These are real pilot drafts, not approved scripts.
+No component-level approval migration or messages/generation performed. See SHEETS_SHARED_BODY_REVIEW.md.
 
 Latest user requirement: 3 separate hooks + ONE shared body. Implemented development FFmpeg source
 assembly (assemble-source-set.py), source-set schema, local rr/incoming (video ignored by Git),

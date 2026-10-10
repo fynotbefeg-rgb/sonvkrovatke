@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 
 from factory_media import public_source, probe, sha256, technical_qc
+from preserve_source_audio import preserve
 
 ROOT = Path(__file__).resolve().parents[1]
 PV = ROOT / "pv"
@@ -32,7 +33,7 @@ def check_input(job):
         raise ValueError("Claude Director not delivered: expected pv/src/factory/director.ts")
 
 
-def run(job, output_directory):
+def run(job, output_directory, browser_executable=None):
     check_input(job)
     if not (PV / "node_modules/@remotion/cli/package.json").is_file():
         raise ValueError("Install locked Remotion dependencies with npm ci first")
@@ -53,11 +54,20 @@ const plan=await buildMontagePlan(JSON.parse(s));process.stdout.write(JSON.strin
     output.mkdir(parents=True, exist_ok=False)
     props = output / "montage-job.json"
     props.write_text(json.dumps(job, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    raw_video = output / "remotion-encoded.mp4"
     video = output / "development.mp4"
     # --no-install prevents fetching an unexpected CLI; Node deps must be installed first.
-    subprocess.run(["npx", "--no-install", "remotion", "render", COMPOSITION_ID, str(video),
+    browser_args = []
+    if browser_executable is not None:
+        browser = Path(browser_executable).resolve(strict=True)
+        if not browser.is_file():
+            raise ValueError("Browser executable must be a local file")
+        browser_args = ["--browser-executable", str(browser)]
+    subprocess.run(["npx", "--no-install", "remotion", "render", COMPOSITION_ID, str(raw_video),
                     "--props", str(props), "--codec", "h264", "--audio-codec", "aac",
-                    "--crf", "18", "--concurrency", "2"], cwd=PV, timeout=900, check=True)
+                    "--crf", "18", "--concurrency", "2", *browser_args], cwd=PV, timeout=900, check=True)
+    audio_report = preserve(public_source(source["localPath"]), raw_video, video, source["sha256"])
+    (output / "source-audio-preservation.json").write_text(json.dumps(audio_report, indent=2) + "\n")
     job.update(productionStatus="rendered", outputPath=str(video))
     contract.validate(job)
     report = technical_qc(video, source["duration"], source["fps"])
@@ -73,9 +83,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("job")
     parser.add_argument("--out", required=True, help="New output directory")
+    parser.add_argument("--browser-executable", help="Optional already installed local Chromium binary")
     args = parser.parse_args()
     try:
-        run(json.loads(Path(args.job).read_text(encoding="utf-8")), args.out)
+        run(json.loads(Path(args.job).read_text(encoding="utf-8")), args.out, args.browser_executable)
     except (ValueError, OSError, subprocess.SubprocessError) as error:
         # Static validation reasons only; process response bodies are not printed.
         raise SystemExit(str(error) if isinstance(error, ValueError) else "Local montage failed; inspect logs privately.")
