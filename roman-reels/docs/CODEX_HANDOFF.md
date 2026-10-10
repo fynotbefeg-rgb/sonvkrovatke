@@ -3,6 +3,21 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+LATEST Drive intake: DRIVE_AUTOMATIC_INTAKE.md. Existing GDRIVE_SA_JSON reader
+confirmed incoming access on Actions; writer granted only to user-owned state JSON
+1hOa9obXHrlj-BKQw9vTfHYoUJ6gp5EYP under assets/_pipeline-state. No new secrets.
+New bounded scan downloads by ID, verifies Drive MD5/metadata, receipt revision/text
+hashes/SHA/decode and persists source-set handoffs. No render/generation performed.
+API returned no ETag; ONLY serialized Actions writer plus journal content-hash
+readback guard, not a distributed CAS. Do not allow Windows to write this ledger.
+Transient retries capped at 3; leases persist; revoked/missing full approvals block
+ready handoff. renderAllowed=false always. Fixed two-topic editorial registry remains.
+Real isolated six-MP4+receipt fixture downloaded/validated; synthetic approval forbidden.
+Default branch is main. Draft PR #7 contains only a three-hour schedule dispatcher,
+feature/roman-intake-scheduler, 9da0b6a. No main changes/merge/schedule enabled.
+OWNER PERMISSION needed for that one file because of explicit main restriction.
+See research/drive-intake-integration-report.json for repeat and CI evidence.
+
 LATEST: six-part DEVELOPMENT intake/assembly implemented, INCOMING_SIX_PARTS.md.
 Native Drive incoming created/verified: 1Qs3YJQB9Hr8H7B0Fa7MWlwsQ0LLGBPoQ inside
 existing assets folder; empty, not connected to Actions/rclone/watchers yet.

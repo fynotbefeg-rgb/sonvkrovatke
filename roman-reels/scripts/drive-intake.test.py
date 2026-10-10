@@ -80,6 +80,7 @@ class DriveIntakeTests(unittest.TestCase):
         self.assertEqual(first['downloadedSets'],1);self.assertEqual(self.drive.downloads,7)
         job=next(iter(self.store.state['jobs'].values()))
         self.assertEqual(job['status'],'awaiting_approval');self.assertTrue(job['downloadValidated']);self.assertFalse(job['renderAllowed'])
+        self.assertEqual(len(job['sourceSha256']),6);self.assertEqual(len(job['partTextHashes']),6)
         shutil.rmtree(self.root);self.root.mkdir()  # Simulate loss of all runner files.
         second=self.run_scan(200)
         self.assertEqual(second['skippedSets'],1);self.assertEqual(self.drive.downloads,7)
@@ -93,6 +94,14 @@ class DriveIntakeTests(unittest.TestCase):
         self.approvals['items'][0]['script_text']='Changed approved text';self.run_scan()
         self.assertEqual(next(iter(self.store.state['jobs'].values()))['status'],'awaiting_approval')
         self.assertEqual(self.drive.downloads,7)
+
+    def test_synthetic_fixture_never_uses_approval_loader_or_becomes_ready(self):
+        packet=copy.deepcopy(self.packet);packet['syntheticFixtures']=True
+        def forbidden():raise RuntimeError('Must not read approvals for synthetic fixtures')
+        with patch.object(media,'PUBLIC',self.root):
+            intake.scan(self.drive,intake.Journal(self.store),'incoming',[packet],forbidden,100)
+        job=next(iter(self.store.state['jobs'].values()))
+        self.assertEqual(job['status'],'awaiting_approval');self.assertTrue(job['syntheticFixtures'])
 
     def test_changed_remote_version_creates_new_input_key_and_supersedes_old(self):
         self.run_scan();old=next(iter(self.store.state['jobs']))

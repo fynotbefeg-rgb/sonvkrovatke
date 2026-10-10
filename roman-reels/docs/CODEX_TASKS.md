@@ -5,6 +5,12 @@ Codex отвечает за весь конвейер; Claude — Director и в
 
 ## Актуальный следующий этап — 2026-10-10
 
+Drive bounded scan/download и постоянный serialized-writer журнал реализованы,
+проверены отдельно на реальных synthetic Drive inputs: DRIVE_AUTOMATIC_INTAKE.md.
+Ready source-set handoff не запускает монтаж; следующие работы — assembler/ASR/
+speech review/Director/Remotion/QC/output ledger. До постоянного опроса требуется
+разрешение владельца на один main dispatcher из draft PR #7. Main не изменён.
+
 Development intake шести MP4, platform assembly и ending speech adapter проверены:
 INCOMING_SIX_PARTS.md. Drive incoming создана/прочитана, но Actions credential,
 download/watch, authenticated full-text approvals и постоянный production ledger

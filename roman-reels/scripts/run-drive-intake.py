@@ -55,5 +55,7 @@ if __name__ == "__main__":
         Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-report.json").write_text(json.dumps(report, indent=2)+"\n")
         print(json.dumps(report))
         print(f"IntakeSummary downloaded={report['downloadedSets']} skipped={report['skippedSets']} sequence={report['stateSequence']} synthetic={synthetic}")
+        if any(item["status"] == "manual_attention" for item in report["sets"]):
+            raise DriveError("Intake needs attention; diagnostic state persisted, production remains blocked")
     except (DriveError, ValueError) as error:
         raise SystemExit(str(error)) from None

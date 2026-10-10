@@ -8,9 +8,11 @@
 Создана и прочитана через подключённый Google Drive папка
 [incoming](https://drive.google.com/drive/folders/1Qs3YJQB9Hr8H7B0Fa7MWlwsQ0LLGBPoQ)
 в существующей `roman-reels-assets` (`1bLzHi6K1HxXesmRj_dhghCsWk5spcPuf`).
-Она пустая. Это входящая папка; готовые работы остаются в прежней finished-папке.
-Права сервисного аккаунта GitHub Actions на новую папку пока не проверены;
-Drive watcher, скачивание по расписанию и `ROMAN_INCOMING_FOLDER_ID` не настроены.
+На момент создания она была пустой. Позже добавлена отдельная synthetic self-test папка.
+Это входящая папка; готовые работы остаются в прежней finished-папке.
+При создании права сервисного аккаунта GitHub Actions на новую папку ещё не были проверены.
+Обновление: bounded Drive downloader и постоянный журнал проверены через существующий
+service account, см. DRIVE_AUTOMATIC_INTAKE.md. Расписание пока не включено.
 Доступ через ChatGPT-коннектор не доказывает доступ через rclone/Actions.
 
 После скачивания допустимого комплекта локальная структура:

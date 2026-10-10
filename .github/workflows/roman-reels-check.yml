@@ -111,10 +111,12 @@ jobs:
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
         run: python roman-reels/scripts/run-drive-intake.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: roman-drive-intake-report
           path: ${{ runner.temp }}/drive-intake-report.json
           retention-days: 7
+          if-no-files-found: ignore
   drive-intake-access:
     if: inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest

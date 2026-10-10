@@ -80,6 +80,9 @@ class Journal:
 
     def claim(self, key, slot, metadata, now):
         previous = self.state["jobs"].get(key)
+        if (previous and previous["status"] in {"awaiting_approval", "source_set_ready"} and
+                (len(previous.get("sourceSha256", {})) != 6 or len(previous.get("partTextHashes", {})) != 6)):
+            previous.update(status="superseded", attempts=0)  # Reverify older validation records once.
         if previous and previous["status"] in {"awaiting_approval", "source_set_ready", "manual_attention"}:
             return None, previous
         if previous and previous["status"] == "downloading" and previous["leaseUntil"] > now:
@@ -217,9 +220,12 @@ def scan(client, journal, incoming_id, packets, approval_loader, now=None):
                 require(stable(current) == stable(file), "Source changed during set validation")
             allowed = not packet.get("syntheticFixtures") and approvals_match(packet, approval_loader())
             status = "source_set_ready" if allowed else "awaiting_approval"
+            verified_parts = [result["plan"]["body"], *result["plan"]["hooks"], *result["plan"]["endings"]]
             # This is a durable source-set handoff, not an authorized render job.
             journal.finish(key, token, status, downloadValidated=True,
                 variantIds=[i["version_id"] for i in packet["items"]],
+                sourceSha256={Path(p["localPath"]).name: p["sha256"] for p in verified_parts},
+                partTextHashes={Path(p["localPath"]).name: p["textHash"] for p in verified_parts},
                 nextStage="assemble_then_verify_speech" if allowed else "wait_for_exact_full_script_approval")
             report["downloadedSets"] += 1
             report["sets"].append({"slot": slot, "key": key, "status": status})
