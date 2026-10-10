@@ -1,0 +1,26 @@
+{
+  "feedbackVersion": "1.0.0",
+  "recordedAt": "2026-10-10",
+  "source": "owner_relayed_telegram_screenshot",
+  "approvalIdentityVerified": false,
+  "scope": "body_and_full_script_revision_only",
+  "topicDecisionsChanged": false,
+  "hookDecisionsChanged": false,
+  "endingApprovalChanged": false,
+  "rejectedSourceSets": [
+    {
+      "topicId": "ai-seo-audit",
+      "scriptVersion": 1,
+      "bodyTextHash": "60d9d2318a591b15017315d8e6063ec18bf61a0e723429931c176090e8dc8f6f",
+      "status": "needs_revision",
+      "reason": "Нет явной пользы для бизнеса; общий SEO-аудит не впечатляет."
+    },
+    {
+      "topicId": "ai-cross-platform-content",
+      "scriptVersion": 1,
+      "bodyTextHash": "5292073fc8083a8d5451ceadbcbff097e3ddc70e0f5e8c11b6b9b16e0da973a9",
+      "status": "needs_revision",
+      "reason": "Общий и слишком простой текст о соцсетях; очевидные советы об общении с ИИ."
+    }
+  ]
+}

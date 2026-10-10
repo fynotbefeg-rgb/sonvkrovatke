@@ -281,3 +281,18 @@ Tool responsibilities follow [PROJECT_ROLES.md](PROJECT_ROLES.md). Claude Code d
 - Apps Script web app has an externally reachable URL; shared secret must be validated server-side.
 - GitHub branch has diverged from `main`; avoid broad merges.
 - Existing draft smoke test generates scripts; it is not evidence of complete 90-video production.
+
+## 2026-10-10: расписание и замечания Романа
+
+С разрешения владельца PR #7 слит в main: только dispatcher, merge
+534f9cc39403a292d3bc563dd1a3639df004a251. Первый запуск dispatcher
+38059552695 и child intake 38059561816 успешны. Проверка Drive каждые
+3 часа; рендер/платные API не подключены, cron ещё не наблюдался.
+
+Обе основы revision 1 отклонены по переданному скриншоту Telegram.
+Это Codex editorial drafts, не Gemini-generation. Новые критерии и
+история источников: ROMAN_REVISION_BRIEF.md. Реализован точный редакционный
+запрет в intake; старые body/fullscript не продвигаются даже при наличии
+старых approval records. Исходные версии сохранены; Google topic/hook
+choices и owner-relayed ending approval не изменены. Google Doc для
+Романа помечен «На доработке». Новых фактических демо/основ пока нет.

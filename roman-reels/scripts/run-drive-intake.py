@@ -49,7 +49,11 @@ if __name__ == "__main__":
                                selfTestResets=job.get("selfTestResets", 0)+1)
                     changed = True
             if changed: journal.save()
-        report = scan(client, journal, INCOMING, packets, current_approvals)
+        feedback = json.loads((SCRIPT_DIR.parent / "research/roman-editorial-feedback-v1.json").read_text())
+        if feedback.get("feedbackVersion") != "1.0.0" or not isinstance(feedback.get("rejectedSourceSets"), list):
+            raise DriveError("Editorial feedback unavailable or invalid; intake remains blocked")
+        report = scan(client, journal, INCOMING, packets, current_approvals,
+                      rejected_source_sets=feedback["rejectedSourceSets"])
         report.update(stateSequence=journal.state["sequence"], durableState=True, syntheticFixtures=synthetic,
                       writerProtection="etag_conditional" if conditional else "serialized_actions_with_content_hash_checks")
         Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-report.json").write_text(json.dumps(report, indent=2)+"\n")

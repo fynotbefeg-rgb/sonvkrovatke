@@ -103,6 +103,30 @@ class DriveIntakeTests(unittest.TestCase):
         job=next(iter(self.store.state['jobs'].values()))
         self.assertEqual(job['status'],'awaiting_approval');self.assertTrue(job['syntheticFixtures'])
 
+    def test_editorial_rejection_supersedes_ready_job_without_download_or_approval_read(self):
+        self.approvals=self.approved();self.run_scan()
+        self.assertEqual(next(iter(self.store.state['jobs'].values()))['status'],'source_set_ready')
+        record={'topicId':self.packet['sourceSet']['topic_id'],'scriptVersion':1,
+                'bodyTextHash':self.packet['sourceSet']['body_text_hash']}
+        def forbidden():raise RuntimeError('Rejected body must not reach approvals')
+        with patch.object(media,'PUBLIC',self.root):
+            result=intake.scan(self.drive,intake.Journal(self.store),'incoming',[self.packet],forbidden,200,[record])
+        self.assertEqual(result['sets'][0]['status'],'awaiting_script_revision')
+        self.assertEqual(self.drive.downloads,7)
+        self.assertEqual(next(iter(self.store.state['jobs'].values()))['status'],'superseded')
+        self.assertFalse(result['renderAllowed'])
+        self.assertEqual(self.approvals,self.approved())  # No approval mutation.
+
+    def test_editorial_rejection_matches_exact_revision_and_body(self):
+        base={'topicId':self.packet['sourceSet']['topic_id'],'scriptVersion':1,
+              'bodyTextHash':self.packet['sourceSet']['body_text_hash']}
+        self.approvals=self.approved()
+        for field,value in [('scriptVersion',2),('bodyTextHash','0'*64),('topicId','another-topic')]:
+            with self.subTest(field=field),patch.object(media,'PUBLIC',self.root):
+                result=intake.scan(self.drive,intake.Journal(self.store),'incoming',[self.packet],lambda:self.approvals,
+                                   200,[{**base,field:value}])
+                self.assertEqual(result['sets'][0]['status'],'source_set_ready')
+
     def test_changed_remote_version_creates_new_input_key_and_supersedes_old(self):
         self.run_scan();old=next(iter(self.store.state['jobs']))
         self.drive.files['hook-1.mp4']['version']='2';self.run_scan(200)

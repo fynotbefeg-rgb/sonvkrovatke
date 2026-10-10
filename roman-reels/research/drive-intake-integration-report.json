@@ -40,14 +40,20 @@
   "pythonTests": 48,
   "javascriptTestFiles": 2,
   "writerProtection": "serialized_actions_with_content_hash_checks",
-  "scheduleEnabled": false,
+  "scheduleEnabled": true,
   "scheduleDraftPR": 7,
-  "mainChanged": false,
+  "mainChanged": true,
   "limitations": [
     "No distributed CAS; only the serialized Actions writer may update the journal",
     "Only the two current editorial topics are scanned in normal mode",
     "Real full-script approval receipt mapping for these topics is not yet connected",
     "Source-set handoff is persisted but assembly, transcription and final montage dispatch are not wired",
     "No HeyGen, paid model API, production render or publication performed"
+  ],
+  "scheduleMergeCommit": "534f9cc39403a292d3bc563dd1a3639df004a251",
+  "scheduleDispatcherRun": "38059552695",
+  "scheduleChildIntakeRun": "38059561816",
+  "mainChangeScope": [
+    ".github/workflows/roman-intake-scheduler.yml"
   ]
 }

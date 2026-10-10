@@ -159,7 +159,7 @@ def approvals_match(packet, snapshot):
     return True
 
 
-def scan(client, journal, incoming_id, packets, approval_loader, now=None):
+def scan(client, journal, incoming_id, packets, approval_loader, now=None, rejected_source_sets=()):
     now = time.time() if now is None else now
     require(len(packets) <= 30, "Too many topics in one bounded scan")
     report = {"sets": [], "downloadedSets": 0, "skippedSets": 0, "renderAllowed": False}
@@ -168,6 +168,16 @@ def scan(client, journal, incoming_id, packets, approval_loader, now=None):
         slot = f"{topic}:v{version}"
         token, key = None, None
         try:
+            # Owner-relayed editorial rejection is a veto, never an approval.
+            # Match the exact body and revision; later revisions remain reviewable.
+            rejected = any(record.get("topicId") == topic and
+                           record.get("scriptVersion") == version and
+                           record.get("bodyTextHash") == packet["sourceSet"]["body_text_hash"]
+                           for record in rejected_source_sets)
+            if rejected:
+                journal.waiting(slot, "script_revision_rejected")
+                report["sets"].append({"slot": slot, "status": "awaiting_script_revision"})
+                continue
             topic_folder = one_child(client, incoming_id, topic, FOLDER)
             folder = one_child(client, topic_folder["id"], f"v{version}", FOLDER) if topic_folder else None
             if not folder:
