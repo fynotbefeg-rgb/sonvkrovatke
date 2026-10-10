@@ -3,6 +3,14 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+B5/B8 now read as Утверждено. After primary-source checks, Codex prepared
+6 editorial hooks in C5:C10 and 2 shared-body drafts in
+research/approved-topics-drafts-v1.json (not Gemini API-generated).
+B decisions preserved; D decisions still blank; no canonical approval changes.
+sharedBodyDrafts validates both sets and body hashes; full variants 128–136 words.
+See SELECTED_TOPICS_RESEARCH.md for methods/sources and remaining research limits.
+Live sheet-change automation is not wired; this was explicit one-shot completion.
+
 Owner supplied Roman's voice-message screen recording; local CPU ASR completed
 without paid APIs. Roman wants deep research of the selected business problem,
 current alternatives, costs and practitioner examples BEFORE script generation.
