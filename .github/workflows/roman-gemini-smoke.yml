@@ -27,7 +27,7 @@ jobs:
         if: inputs.mode != 'legacy_smoke'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: node roman-reels/scripts/check-gemini-access.mjs
+        run: node roman-reels/scripts/check-gemini-access.mjs "$RUNNER_TEMP/gemini-access.json"
       - name: Research-backed request preview or authorized generation
         if: inputs.mode != 'legacy_smoke'
         env:
@@ -65,8 +65,13 @@ jobs:
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
         run: node roman-reels/scripts/check-production-queue.mjs
       - name: Save draft JSON for review
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: roman-gemini-test-drafts
-          path: ${{ runner.temp }}/drafts.json
+          path: |
+            ${{ runner.temp }}/drafts.json
+            ${{ runner.temp }}/gemini-access.json
+            ${{ runner.temp }}/gemini-generation-report.json
+          if-no-files-found: ignore
           retention-days: 3
