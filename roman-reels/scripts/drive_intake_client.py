@@ -9,7 +9,9 @@ import urllib.request
 
 
 class DriveError(RuntimeError):
-    pass
+    def __init__(self, message, status=None):
+        super().__init__(message)
+        self.status = status
 
 
 class DriveClient:
@@ -66,7 +68,7 @@ class DriveClient:
                 if code == 401 and attempt == 0 and method == "GET":
                     self.refresh();headers["Authorization"] = "Bearer " + self.token
                     continue
-                raise DriveError(f"Drive {method} failed: HTTP {code}") from None
+                raise DriveError(f"Drive {method} failed: HTTP {code}", status=code) from None
             except (OSError, TimeoutError):
                 # Writes are never blindly retried after an ambiguous response.
                 raise DriveError(f"Drive {method} connection failed; inspect state before retry") from None

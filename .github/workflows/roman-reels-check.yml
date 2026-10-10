@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      run_drive_intake:
+        description: 'Bounded incoming scan and durable state; no render or avatar generation'
+        type: boolean
+        default: false
       check_drive_intake_access:
         description: 'Read-only incoming access check using existing Drive OAuth; no generation'
         type: boolean
@@ -77,6 +81,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  drive-intake:
+    if: inputs.run_drive_intake && !inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: roman-drive-intake-single-writer-v1
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install media, validation and Drive transport
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r roman-reels/schemas/requirements.txt -r roman-reels/scripts/drive-intake-requirements.txt
+      - name: Discover, validate and persist source sets without production
+        env:
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: python roman-reels/scripts/run-drive-intake.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: roman-drive-intake-report
+          path: ${{ runner.temp }}/drive-intake-report.json
+          retention-days: 7
   drive-intake-access:
     if: inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest
@@ -251,7 +283,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.check_drive_intake_access && !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.run_drive_intake && !inputs.check_drive_intake_access && !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:

@@ -1,0 +1,3 @@
+# Runtime transport only; local synthetic intake tests do not need credentials.
+google-auth==2.43.0
+requests==2.32.5
