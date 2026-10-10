@@ -54,8 +54,12 @@ a proposed next development step, not an implemented montage change.
 
 ## Live review and provenance
 
-Simple Sheet `Темы и хуки`: topic group rows 5–7 = SEO audit; rows 8–10 = YouTube
-workflow. E contains qualified analysis, F counters/date/unknown reach, G exact URL.
+Simple Sheet `Темы и хуки`: topic group rows 5–7 = SEO audit; rows 8–10 = cross-platform
+content workflow for YouTube, Instagram and Telegram (owner-requested adaptation).
+The external reference demonstrates YouTube only; support for Instagram/Telegram
+by its advertised tool is not verified. Proposed Roman angle: one business idea
+becomes a YouTube script, an Instagram Reel and a Telegram post, reviewed by the
+entrepreneur before publication. E contains qualified analysis, F counters/date/unknown reach, G exact URL.
 Topic decisions B5/B8 and new hook texts/decisions remain blank. No full scripts
 were generated and no approval or production launch was performed. Simple-view
 decisions are still not connected to Apps Script production gates.

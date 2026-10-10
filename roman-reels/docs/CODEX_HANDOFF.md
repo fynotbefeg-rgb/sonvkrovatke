@@ -16,6 +16,8 @@ Manual opt-in Actions job on feature/codex-pipeline only; do not rerun paid stag
 in a fresh workspace under this budget. Two references verified: speech and MP4 obtained, 20 frames inspected each.
 See APIFY_REFERENCE_ANALYSIS.md and research/apify-reference-results.json.
 Live simple Sheet A5:G10 now contains two topics, analysis, counters and links;
+owner broadened topic 3 (A8/E8) to YouTube + Instagram + Telegram. Reference
+remains YouTube-only; cross-platform content adaptation is our proposed angle.
 B5/B8 blank and hook fields blank. No decisions or production status changed.
 Metadata feed included collaborations owned by other accounts; initial strict check
 failed after both paid runs. Read-only recovery preserved results, collector now
