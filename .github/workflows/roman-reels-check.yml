@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      read_saved_apify:
+        description: 'Read existing research run 38041724125 only; no Actor creation'
+        type: boolean
+        default: false
       apify_reference_research:
         description: 'Approved $1 probe: metadata or selected transcript/video (feature branch only)'
         type: boolean
@@ -58,12 +62,32 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: roman-reels-check-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  read-saved-apify:
+    if: inputs.read_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: roman-apify-reference-metadata
+          run-id: 38041724125
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: saved-research
+      - name: Read existing datasets only
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: node roman-reels/scripts/read-saved-apify.mjs
   reference-research:
     if: inputs.apify_reference_research && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest
@@ -178,7 +202,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
