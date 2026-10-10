@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      inspect_saved_apify:
+        description: 'Inspect media from saved run 38041968344; no Actors or service calls'
+        type: boolean
+        default: false
       read_saved_apify:
         description: 'Read existing research run 38041724125 only; no Actor creation'
         type: boolean
@@ -69,6 +73,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  inspect-saved-apify:
+    if: inputs.inspect_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: roman-apify-reference-details
+          run-id: 38041968344
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: saved-media
+      - name: Inspect downloaded files without service credentials
+        run: python roman-reels/scripts/inspect-apify-media.py
   read-saved-apify:
     if: inputs.read_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest
@@ -207,7 +225,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
