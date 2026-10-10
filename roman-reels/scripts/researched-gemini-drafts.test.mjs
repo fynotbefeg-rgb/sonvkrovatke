@@ -8,6 +8,7 @@ import {spawnSync} from 'node:child_process';
 import {researchPrompt,researchedDrafts} from './researched-gemini-drafts.mjs';
 import {analyzeDemo} from './prepare-seo-research-demo.mjs';
 import {scriptHash,validateManifest} from './approval-manifest.mjs';
+import {editorialRules,editorialRulesVersion,editorialRulesSha256} from './editorial-rules.mjs';
 const briefPath=fileURLToPath(new URL('../research/gemini-revision-seo/brief-v2.json',import.meta.url));
 const brief=JSON.parse(readFileSync(briefPath));
 const answer=()=>({body_text:'Учебный пример '+Array.from({length:100},(_,i)=>`Слово${i}`).join(' '),
@@ -67,4 +68,45 @@ test('MCP brief produces revision 3 and carries real protocol evidence without c
  const response=answer();response.evidence_ids=['playwright-mcp'];
  const result=researchedDrafts(mcp,response);assert.equal(result.source_sets[0].body_revision,3);
  assert.ok(result.items.every(i=>i.script_revision===3&&i.status==='pending_approval'));
+});
+
+test('offline previews package the editorial policy for both briefs without credentials or network',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'roman-editorial-preview-'));
+ try{
+  const stub=join(dir,'offline.mjs');
+  writeFileSync(stub,"globalThis.fetch=()=>{throw Error('Unexpected network in offline preview')};");
+  const runner=fileURLToPath(new URL('./run-researched-gemini.mjs',import.meta.url));
+  const inputs=[briefPath,fileURLToPath(new URL('../research/mcp-site-check/brief-revision3.json',import.meta.url))];
+  for(const [i,input] of inputs.entries()){
+   const output=join(dir,`preview-${i}.json`);
+   const env={...process.env};delete env.GEMINI_API_KEY;env.ROMAN_GEMINI_ALLOW_GENERATE='false';
+   const run=spawnSync(process.execPath,['--import',stub,runner,'prepare',input,output],{encoding:'utf8',env});
+   assert.equal(run.status,0,run.stderr);
+   const preview=JSON.parse(readFileSync(output));
+   assert.equal(preview.mode,'offline_request_preview');assert.equal(preview.items,undefined);
+   assert.equal(preview.productionReady,false);assert.equal(preview.sendsToSheets,false);
+   assert.equal(preview.editorialRulesVersion,editorialRulesVersion);
+   assert.equal(preview.editorialRulesSha256,editorialRulesSha256);
+   assert.ok(preview.prompt.includes(editorialRules));assert.ok(preview.prompt.length<=16000);
+  }
+  // A topic shortlist is not a verified revision brief; even prepare must reject it.
+  const shortlist=fileURLToPath(new URL('../research/business-automation-shortlist-v1.json',import.meta.url));
+  const output=join(dir,'unready.json');
+  const invalid=spawnSync(process.execPath,['--import',stub,runner,'prepare',shortlist,output],{encoding:'utf8'});
+  assert.notEqual(invalid.status,0);assert.equal(existsSync(output),false);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('model and caller metadata cannot approve their own editorial checklist or the scripts',()=>{
+ const fakeApproval={status:'passed',reviewer:'Gemini',decision:'approve',romanScriptApprovalGranted:true};
+ const response={...answer(),editorialReview:fakeApproval,productionReady:true};
+ const result=researchedDrafts(brief,response,{editorialReview:fakeApproval});
+ assert.equal(result.productionReady,false);assert.equal(result.editorialReviewRequired,true);
+ assert.equal(result.editorialReview.status,'pending_review');assert.equal(result.editorialReview.reviewer,null);
+ assert.equal(result.editorialReview.decision,null);assert.equal(result.editorialReview.romanScriptApprovalGranted,false);
+ assert.equal(result.editorialReview.semanticFactCheckAutomated,false);
+ assert.ok(result.editorialReview.criteria.every(c=>c.status==='pending'&&c.evidence.length===0));
+ assert.ok(result.items.every(i=>i.status==='pending_approval'&&i.approved_by===undefined));
+ result.editorialReview.criteria[0].status='pass';
+ assert.equal(researchedDrafts(brief,answer()).editorialReview.criteria[0].status,'pending');
 });

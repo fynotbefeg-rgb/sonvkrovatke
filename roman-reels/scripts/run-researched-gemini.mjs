@@ -3,6 +3,7 @@
 import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import {dirname,join} from 'node:path';
 import {researchPrompt,researchedDrafts} from './researched-gemini-drafts.mjs';
+import {editorialRulesVersion,editorialRulesSha256} from './editorial-rules.mjs';
 const [mode,input,output]=process.argv.slice(2);
 if(!['prepare','generate'].includes(mode)||!input||!output)throw Error('Usage: run-researched-gemini.mjs prepare|generate brief.json output.json');
 if(existsSync(output))throw Error('Output already exists; no request or overwrite allowed');
@@ -10,7 +11,8 @@ const brief=JSON.parse(readFileSync(input,'utf8')),prompt=researchPrompt(brief);
 if(prompt.length>16000)throw Error('Prompt exceeds input character cap');
 if(mode==='prepare'){
  writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model:'gemini-3-flash-preview',prompt,
-  maxOutputTokens:4096,maxGenerateCalls:1,timeoutSeconds:90,sendsToSheets:false,productionReady:false},null,2)+'\n',{flag:'wx'});
+  maxOutputTokens:4096,maxGenerateCalls:1,timeoutSeconds:90,sendsToSheets:false,productionReady:false,
+  editorialReviewRequired:true,editorialRulesVersion,editorialRulesSha256},null,2)+'\n',{flag:'wx'});
  console.log('Prepared one request; no API calls.');
 }else{
  if(process.env.ROMAN_GEMINI_ALLOW_GENERATE!=='true')throw Error('Explicit single-call authorization required');
