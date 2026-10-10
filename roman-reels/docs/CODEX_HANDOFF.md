@@ -7,7 +7,17 @@ Latest user requirement: 3 separate hooks + ONE shared body. Implemented develop
 assembly (assemble-source-set.py), source-set schema, local rr/incoming (video ignored by Git),
 3 real assembled/QC-passed sources, and future Gemini common-body drafts builder. No paid Gemini run.
 See SHARED_BODY_ASSEMBLY.md. Four assembly tests + three draft tests pass. Production and Drive
-4-part intake are NOT wired; no approval bypass. Director receives assembled full video + fresh timings.
+4-part intake are NOT wired; no approval bypass. Director receives assembled full video + verified timings.
+
+Next completed step: real local hook ASR (14/18/10 words) combined with verified 81-word body cache.
+`prepare-assembled-jobs.py` verifies original/output SHA, actual media, assembly geometry, intervals,
+and produces three pending development contract jobs (95/99/91 words). Evidence and jobs live in
+`research/first-montage-v1/assembled-jobs/`; see SHARED_BODY_ASSEMBLY.md for repeatable commands.
+`check-assembly-audio.py` verified 18 decoded audio windows at exact part offsets (all >0.9997).
+These are cached part timings with offsets, NOT a new ASR/forced alignment of assembled audio.
+Four new assembled-job integration tests plus 7 media, 6 contract, 2 Claude packet tests pass.
+Claude P1 task now names the three complete inputs. Director/composition still absent; no final render,
+production approval, paid request, upload or Sheets write was performed.
 
 Owner agreed contract v1 and P1 after PR #5, 2026-10-10. New Codex work on feature/codex-pipeline:
 81 real ASR words; zero-duration preposition blocked two raw attempts; one 23-word segment was

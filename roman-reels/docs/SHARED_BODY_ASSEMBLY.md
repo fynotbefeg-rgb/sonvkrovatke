@@ -68,9 +68,34 @@ python roman-reels/scripts/source-set.test.py
 node roman-reels/scripts/shared-body-drafts.test.mjs
 ```
 
-Дальше: транскрибировать **собранный** файл свежими timestamps либо кешировать проверенные слова
-по SHA каждой части и сдвигать body-тайминги на точный bodyStart из карты. Кеш/сдвиг пока не реализован.
-Старые body1 timings нельзя выдавать за полные тайминги собранного ролика без этого сдвига.
+Реализован второй путь: реальные hook ASR (14/18/10 слов) + проверенный body cache (81 слово).
+`prepare-assembled-jobs.py` проверяет SHA оригиналов и сборок, metadata/QC, порядок частей,
+границы и нормализацию карты, затем сдвигает основу на 6.52/7.80/4.76 с.
+Запись происходит после проверки всех трёх вариантов, существующая папка не перезаписывается.
+В `research/first-montage-v1/assembled-jobs/` три полных job v1 и sidecar speech evidence:
+95/99/91 слово, ASR-текст сохранён, все pending_approval/development. Это не утверждённые сценарии.
+Сырые hook ASR находятся в `research/first-montage-v1/hooks/h{1,2,3}/speech.json`.
+Основа — `aligned-speech.json`; источник методов и ограничений — FIRST_MONTAGE_P1.md.
+
+```sh
+python roman-reels/scripts/prepare-assembled-jobs.py \
+  roman-reels/research/first-montage-v1/shared-body-assembly.json \
+  --body-speech roman-reels/research/first-montage-v1/aligned-speech.json \
+  --hook-speech roman-reels/research/first-montage-v1/hooks/h1/speech.json \
+    roman-reels/research/first-montage-v1/hooks/h2/speech.json \
+    roman-reels/research/first-montage-v1/hooks/h3/speech.json \
+  --public-directory rr/incoming/shared-body-test --out /tmp/new-assembled-jobs
+python roman-reels/scripts/check-assembly-audio.py \
+  roman-reels/research/first-montage-v1/shared-body-assembly.json \
+  --public-directory rr/incoming/shared-body-test --out /tmp/new-audio-mapping.json
+python roman-reels/scripts/assembled-jobs.test.py
+```
+
+Звуковая диагностика: 18 окон по одной секунде (начало/середина/конец каждой части в каждом варианте),
+decoded mono PCM 16 kHz, Pearson correlation без подбора задержки, порог >0.95.
+`verified-audio-mapping.json`: все окна прошли, минимальная корреляция 0.999747.
+Это подтверждает выборочные смещения исходного звука, не точность распознанных слов и не весь звук.
+Кешированные тайминги не являются новым распознаванием всей сборки; нужен speech/visual review.
 Claude получает уже собранный полный source и не должен повторно склеивать hook/body в Remotion.
 
 ## Остаточные ограничения
@@ -78,5 +103,5 @@ Claude получает уже собранный полный source и не д
 Drive watcher пока ожидает цельные входы; приём четырёх Drive частей ещё не подключён.
 Их реальные file IDs/checksums/versions и incoming folder access нужно проверить до production.
 Собранные development имена без approval hash не совместимы с production naming gate и не обходят его.
-Нужны live approval binding, речь трёх вариантов, доставленный Claude Director/Remotion, финальный QC.
+Нужны live approval binding, проверка распознанного текста, доставленный Claude Director/Remotion, финальный QC.
 Новые цельные исходники — не профессионально готовые Reels, нет upload/публикации/Sheets ready.
