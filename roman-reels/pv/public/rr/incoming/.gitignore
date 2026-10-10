@@ -1,0 +1,4 @@
+# Downloaded/assembled source video is local runtime data, never committed by default.
+*
+!.gitignore
+!README.md

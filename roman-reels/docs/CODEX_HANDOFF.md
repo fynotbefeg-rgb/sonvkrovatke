@@ -3,6 +3,12 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Latest user requirement: 3 separate hooks + ONE shared body. Implemented development FFmpeg source
+assembly (assemble-source-set.py), source-set schema, local rr/incoming (video ignored by Git),
+3 real assembled/QC-passed sources, and future Gemini common-body drafts builder. No paid Gemini run.
+See SHARED_BODY_ASSEMBLY.md. Four assembly tests + three draft tests pass. Production and Drive
+4-part intake are NOT wired; no approval bypass. Director receives assembled full video + fresh timings.
+
 Owner agreed contract v1 and P1 after PR #5, 2026-10-10. New Codex work on feature/codex-pipeline:
 81 real ASR words; zero-duration preposition blocked two raw attempts; one 23-word segment was
 acoustically realigned by local Russian Wav2Vec2 CTC, no interpolation. Development job and source
