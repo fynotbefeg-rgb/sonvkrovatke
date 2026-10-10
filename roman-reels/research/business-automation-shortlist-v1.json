@@ -1,0 +1,254 @@
+{
+  "schemaVersion": "research-shortlist-v1",
+  "researchedOn": "2026-10-10",
+  "scope": "Конкретные ИИ-автоматизации для бизнеса и предпринимателей; не только MCP.",
+  "status": "topic_shortlist_not_approved_scripts",
+  "limitations": [
+    "4 внешних видео для 5 тем; темы 1 и 2 используют один длинный курс.",
+    "Ни один новый ролик не просмотрен полностью; содержание проверено по публичным текстовым разборам/главам и техническим страницам.",
+    "Счётчики получены из сторонних страниц и поискового индекса, не новым запуском Apify.",
+    "Даты наблюдения и публикации не являются датами актуальности счётчиков.",
+    "Уникальный охват неизвестен, просмотры не равны охвату.",
+    "Лайки/комментарии не доказывают намерение купить; платформа/формат/возраст различаются.",
+    "Нет новых проверенных популярных Reels/TikTok; длинные видео — референсы процесса, не доказательство формата короткого ролика.",
+    "Шаблоны сообщества на n8n не означают, что интеграция запущена или протестирована у нас."
+  ],
+  "nextGate": "Roman selects topic numbers → stronger reference/video validation and own narrow demo → Gemini one body + three hooks → separate exact text approval.",
+  "videos": [
+    {
+      "videoId": "Ey18PDiaAYI",
+      "title": "Build & Sell n8n AI Agents (8+ Hour Course, No Code)",
+      "author": "Nate Herk",
+      "publishedOn": "2025-05-23",
+      "url": "https://www.youtube.com/watch?v=Ey18PDiaAYI",
+      "format": "long_form_course",
+      "metrics": {
+        "views": 1937830,
+        "likes": 60327,
+        "comments": 1785,
+        "reach": null
+      },
+      "metricsSource": "https://socialcounts.org/youtube-video-live-view-count/Ey18PDiaAYI",
+      "metricsEvidence": "third_party_counter_page",
+      "metricsObservedOn": "2026-10-10",
+      "metricsAsOf": null,
+      "metricsScope": "entire_8_hour_course_not_individual_chapters",
+      "contentSource": "https://glasp.co/youtube/Ey18PDiaAYI",
+      "contentEvidence": "public_summary_and_published_chapter_list",
+      "videoPlaybackVerified": false
+    },
+    {
+      "videoId": "ldETapkr8Hg",
+      "title": "I Built a Marketing Team with 1 AI Agent and No Code (free n8n template)",
+      "author": "Nate Herk",
+      "publishedOn": "2025-04-26",
+      "url": "https://www.youtube.com/watch?v=ldETapkr8Hg",
+      "format": "long_form_demo",
+      "metrics": {
+        "views": 853575,
+        "likes": null,
+        "comments": null,
+        "reach": null
+      },
+      "metricsSource": "https://lilys.ai/en/notes/ai-agent-20251205/ai-marketing-team-no-code",
+      "metricsEvidence": "public_summary_page_counter",
+      "metricsObservedOn": "2026-10-10",
+      "metricsAsOf": null,
+      "metricsScope": "entire_video",
+      "contentSource": "https://lilys.ai/en/notes/ai-agent-20251205/ai-marketing-team-no-code",
+      "contentEvidence": "public_transcript_summary",
+      "videoPlaybackVerified": false
+    },
+    {
+      "videoId": "viN9gX030T4",
+      "title": "I Built A $2,485 AI Proposal Generator In N8N (Copy This)",
+      "author": "Nick Saraev",
+      "publishedOn": "2025-02-04",
+      "url": "https://www.youtube.com/watch?v=viN9gX030T4",
+      "format": "long_form_tutorial",
+      "metrics": {
+        "views": 37323,
+        "likes": 885,
+        "comments": null,
+        "reach": null
+      },
+      "metricsSource": "https://www.youtube.com/watch?v=viN9gX030T4",
+      "metricsEvidence": "search_index_snapshot_not_direct_api",
+      "metricsObservedOn": "2026-10-10",
+      "metricsAsOf": null,
+      "metricsScope": "entire_video",
+      "contentSource": "https://glasp.co/youtube/viN9gX030T4",
+      "contentEvidence": "public_transcript_summary_and_author_template",
+      "videoPlaybackVerified": false
+    },
+    {
+      "videoId": "l0SiFihbetA",
+      "title": "This n8n AI Agent Will Manage Your Email Inbox (100% Automatic)",
+      "author": "Jono Catliff",
+      "publishedOn": "2025-02-12",
+      "url": "https://www.youtube.com/watch?v=l0SiFihbetA",
+      "format": "long_form_tutorial",
+      "metrics": {
+        "views": 80348,
+        "likes": 1100,
+        "comments": null,
+        "reach": null
+      },
+      "metricsSource": "https://www.youtube.com/watch?v=l0SiFihbetA",
+      "metricsEvidence": "search_index_snapshot_not_direct_api",
+      "metricsObservedOn": "2026-10-10",
+      "metricsAsOf": null,
+      "metricsScope": "entire_video",
+      "contentSource": "https://lilys.ai/en/notes/n8n-ai-workflow-20251103/n8n-ai-agent-email-inbox-automation",
+      "contentEvidence": "public_transcript_summary_and_published_chapter_list",
+      "videoPlaybackVerified": false
+    }
+  ],
+  "topics": [
+    {
+      "id": "business-auto-01",
+      "number": 1,
+      "title": "Заявка из почты → карточка клиента и черновик ответа",
+      "referenceVideoId": "Ey18PDiaAYI",
+      "editorialTier": "popular_source_topic_candidate",
+      "benefit": "Менеджер получает контакт и конкретный запрос без ручного переноса письма; ответ проверяет перед отправкой.",
+      "process": "Новое письмо → извлечение контакта, запроса и срока → строка в таблице/CRM → черновик ответа → проверка менеджером.",
+      "tools": [
+        "n8n",
+        "Gmail",
+        "Gemini",
+        "Google Sheets или CRM"
+      ],
+      "accessNeeded": [
+        "Google OAuth для почты/таблицы",
+        "Ключ Gemini",
+        "Правила обработки заявок"
+      ],
+      "technicalSource": "https://n8n.io/workflows/13740-route-and-qualify-email-leads-with-gmail-gemini-slack-sheets-and-salesforce/",
+      "adaptation": "Наш вариант: входящее письмо и Gemini. Внешний курс содержит другие связки исследования лида/персонализации; это не точная копия его примера.",
+      "demo": "Синтетическое письмо с запросом услуги → заполненная карточка → черновик; неизвестный бюджет остаётся пустым.",
+      "risk": "Не додумывать сведения о клиенте. Контакт, бюджет и срок должны иметь опору в письме. Без автоматической отправки.",
+      "caveat": "1 937 830 просмотров, 60 327 лайков, 1 785 комментариев — у всего курса, не у примера про заявки. Счётчики сторонние.",
+      "approvalStatus": "awaiting_topic_selection",
+      "workflowTested": false,
+      "scriptReady": false
+    },
+    {
+      "id": "business-auto-02",
+      "number": 2,
+      "title": "Счёт в PDF → сумма, реквизиты и срок в таблице",
+      "referenceVideoId": "Ey18PDiaAYI",
+      "referenceUrl": "https://www.youtube.com/watch?v=Ey18PDiaAYI&t=5578s",
+      "editorialTier": "popular_source_topic_candidate",
+      "benefit": "Бухгалтер проверяет извлечённые поля, вместо переноса каждого документа вручную.",
+      "process": "PDF → OCR/распознавание → поставщик, номер, сумма, валюта, срок → проверка дубля → таблица → подтверждение человеком.",
+      "tools": [
+        "n8n",
+        "OCR или мультимодальная модель",
+        "Google Sheets или Airtable"
+      ],
+      "accessNeeded": [
+        "Папка или почта с документами",
+        "Ключ распознавания",
+        "Доступ к таблице"
+      ],
+      "technicalSource": "https://n8n.io/workflows/4434-automated-invoice-processing-system-with-ocr-and-ai-ap-automation-with-airtable/",
+      "adaptation": "В шаблоне используется Airtable; Sheets — предлагаемый вариант. Платежи не автоматизируем.",
+      "demo": "Два учебных PDF, один повторный → строки с правильными суммами; повтор отмечен, плохое распознавание требует проверки.",
+      "risk": "Ошибки в сумме/валюте опасны. Сверка с PDF обязательна. Это не замена бухгалтерскому учёту.",
+      "caveat": "Глава Invoice Processing начинается на 01:32:58. Статистика та же, что у темы 1: весь курс, не отдельный ролик; дважды её не суммируем.",
+      "approvalStatus": "awaiting_topic_selection",
+      "workflowTested": false,
+      "scriptReady": false
+    },
+    {
+      "id": "business-auto-03",
+      "number": 3,
+      "title": "Голосовое в Telegram → рекламный баннер и правка того же файла",
+      "referenceVideoId": "ldETapkr8Hg",
+      "editorialTier": "popular_source_topic_candidate",
+      "benefit": "Владелец задаёт акцию голосом и получает визуальный черновик; следующая команда изменяет именно этот баннер.",
+      "process": "Голосовое → текст → изображение → сохранение ID в Drive → команда правки → новая версия связанного файла.",
+      "tools": [
+        "Telegram-бот",
+        "n8n",
+        "Распознавание речи",
+        "Модель генерации/редактирования изображений",
+        "Google Drive"
+      ],
+      "accessNeeded": [
+        "Токен бота",
+        "Ключи речи/изображений",
+        "Google OAuth",
+        "Разрешённые фото товара и условия акции"
+      ],
+      "technicalSource": null,
+      "adaptation": "Берём только баннер и его правку из широкой демонстрации автора. Не обещаем замену маркетингового отдела.",
+      "demo": "Свой товар и заданная цена → баннер → «измени фон, сохрани товар» → сравнение версий; проверить текст и цену вручную.",
+      "risk": "Модель может исказить товар, логотип или текст. Публикация только после проверки, стоимость генерации выяснить до запуска.",
+      "caveat": "853 575 просмотров показаны на странице разбора. Лайки и комментарии не получены; дату самого счётчика установить не удалось.",
+      "approvalStatus": "awaiting_topic_selection",
+      "workflowTested": false,
+      "scriptReady": false
+    },
+    {
+      "id": "business-auto-04",
+      "number": 4,
+      "title": "Анкета клиента → коммерческое предложение по своему шаблону",
+      "referenceVideoId": "viN9gX030T4",
+      "editorialTier": "reserve_needs_stronger_reference",
+      "benefit": "Консультант или агентство получает персонализированный черновик предложения без сборки документа с нуля.",
+      "process": "Форма → проверка полей → текст разделов → копия шаблона Google Slides → подстановка → проверка объёма и цены → PDF.",
+      "tools": [
+        "n8n",
+        "Gemini или другая LLM",
+        "Google Slides",
+        "Google Drive"
+      ],
+      "accessNeeded": [
+        "Свой шаблон",
+        "Утверждённый прайс и состав работ",
+        "Google OAuth",
+        "Ключ модели"
+      ],
+      "technicalSource": "https://n8n.io/workflows/4804-ai-premium-proposal-generator-with-openai-google-slides-and-pandadoc/",
+      "adaptation": "Автор использует OpenAI и также предлагает PandaDoc. Gemini/Google Slides — наш предполагаемый вариант, не проверенная здесь интеграция.",
+      "demo": "Учебный бриф и фиксированный прайс → два персонализированных PDF, одинаковые цены из справочника.",
+      "risk": "Модель не назначает цены и обязательства. Проверка человеком до передачи клиенту.",
+      "caveat": "Резерв: поисковый снимок — 37 323 просмотра и 885 лайков; комментарии неизвестны. Этого недостаточно, чтобы назвать ролик «залетевшим».",
+      "approvalStatus": "awaiting_topic_selection",
+      "workflowTested": false,
+      "scriptReady": false
+    },
+    {
+      "id": "business-auto-05",
+      "number": 5,
+      "title": "Входящая почта → очередь запросов и черновики по базе ответов",
+      "referenceVideoId": "l0SiFihbetA",
+      "editorialTier": "reserve_needs_stronger_reference",
+      "benefit": "Поддержка отделяет заявки, вопросы и жалобы; сотрудник видит приоритет и подготовленный ответ.",
+      "process": "Письмо → категория → метка/очередь → разрешённая база ответов → черновик → проверка сотрудником.",
+      "tools": [
+        "n8n",
+        "Gmail Trigger",
+        "Gmail Draft",
+        "Gemini или другая LLM"
+      ],
+      "accessNeeded": [
+        "Google OAuth",
+        "Ключ модели",
+        "Проверенная база ответов",
+        "Правила эскалации жалоб"
+      ],
+      "technicalSource": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.gmail/",
+      "adaptation": "У автора есть автоматическая отправка/пересылка. Наш первый вариант создаёт только черновики; база ответов — наше дополнение.",
+      "demo": "Три учебных письма: запрос, жалоба, вопрос без ответа в базе → правильные категории; неизвестный вопрос передан человеку.",
+      "risk": "Не отвечать выдуманными условиями. Без ответа в базе — эскалация. Тема близка к 1; не брать обе в одну короткую серию без различения продаж/поддержки.",
+      "caveat": "Резерв: поисковый снимок — 80 348 просмотров и 1 100 лайков; комментарии неизвестны. Не подтверждён viral-референс.",
+      "approvalStatus": "awaiting_topic_selection",
+      "workflowTested": false,
+      "scriptReady": false
+    }
+  ]
+}
+
