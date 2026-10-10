@@ -88,7 +88,10 @@ jobs:
       - name: Verify existing Drive credential without exposing it
         env:
           RCLONE_CONFIG_CONTENT: ${{ secrets.RCLONE_CONFIG }}
-        run: python roman-reels/scripts/check-drive-intake-access.py
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: |
+          python -m pip install google-auth==2.43.0 requests==2.32.5
+          python roman-reels/scripts/check-drive-intake-access.py
       - uses: actions/upload-artifact@v4
         with:
           name: roman-drive-intake-access

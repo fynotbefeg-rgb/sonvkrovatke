@@ -18,7 +18,24 @@ class DriveClient:
         self.incoming_id = incoming_id
         self.refresh()
 
+    @classmethod
+    def service_account(cls, info):
+        from google.oauth2 import service_account
+        instance = cls.__new__(cls)
+        instance.credentials = service_account.Credentials.from_service_account_info(
+            info, scopes=["https://www.googleapis.com/auth/drive"])
+        instance.refresh()
+        return instance
+
     def refresh(self):
+        if getattr(self, "credentials", None) is not None:
+            from google.auth.transport.requests import Request
+            try:
+                self.credentials.refresh(Request())
+                self.token = self.credentials.token
+                return
+            except Exception:
+                raise DriveError("Drive service-account authentication failed; no credential details logged") from None
         result = subprocess.run(["rclone", "--config", str(self.config_file), "lsf", "roman-drive:",
             "--drive-root-folder-id", self.incoming_id, "--max-depth", "1", "--retries", "1"],
             capture_output=True, timeout=60)

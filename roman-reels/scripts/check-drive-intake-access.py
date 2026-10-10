@@ -10,12 +10,13 @@ ASSETS = "1bLzHi6K1HxXesmRj_dhghCsWk5spcPuf"
 
 if __name__ == "__main__":
     try:
+        account = os.environ.get("GDRIVE_SA_JSON")
         content = os.environ.get("RCLONE_CONFIG_CONTENT")
-        if not content: raise DriveError("Existing RCLONE_CONFIG secret is unavailable")
+        if not content and not account: raise DriveError("Existing Drive credentials unavailable")
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / "rclone.conf"
-            config.write_text(content);config.chmod(0o600)
-            client = DriveClient(config, INCOMING)
+            config.write_text(content or "");config.chmod(0o600)
+            client = DriveClient.service_account(json.loads(account)) if account else DriveClient(config, INCOMING)
             with client.request("GET", "about", {"fields": "user(emailAddress)"}) as response:
                 identity = json.load(response)["user"]["emailAddress"]
             print(json.dumps({"actionsDriveAccount": identity}))
@@ -23,7 +24,7 @@ if __name__ == "__main__":
             if metadata["mimeType"] != "application/vnd.google-apps.folder" or ASSETS not in metadata["parents"]:
                 raise DriveError("Incoming folder identity/parent mismatch")
             files = client.children(INCOMING)
-            report = {"incomingId": INCOMING, "credential": "existing_actions_rclone_oauth",
+            report = {"incomingId": INCOMING, "credential": "existing_actions_service_account" if account else "existing_actions_rclone_oauth",
                       "readVerified": True, "canAddChildren": metadata.get("capabilities", {}).get("canAddChildren", False),
                       "fileCount": len(files), "productionStarted": False}
             Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-access.json").write_text(json.dumps(report, indent=2)+"\n")
