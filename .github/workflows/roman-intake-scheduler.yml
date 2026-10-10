@@ -1,0 +1,32 @@
+name: Roman Reels — incoming schedule dispatcher
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: roman-incoming-schedule-dispatcher
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Dispatch bounded intake on the integration branch
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'roman-reels-check.yml',
+              ref: 'feature/codex-pipeline',
+              inputs: {run_drive_intake: 'true'}
+            });
