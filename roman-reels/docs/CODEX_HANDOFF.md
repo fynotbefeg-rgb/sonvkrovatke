@@ -3,10 +3,19 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Owner supplied Roman's voice-message screen recording; local CPU ASR completed
+without paid APIs. Roman wants deep research of the selected business problem,
+current alternatives, costs and practitioner examples BEFORE script generation.
+Interest in two new themes is not exact-script approval. Owner separately says
+Roman records his own voice for now; require three audio hooks + shared audio body
+and verify allowed own-audio/avatar workflow in HeyGen before implementation.
+See ROMAN_EDITORIAL_REQUIREMENTS.md. No synthetic voice or real HeyGen launched.
+
 Owner requests autonomous reference discovery and handoff to Windows HeyGen,
 then Claude's montage runtime. Reviewable integration proposal recorded in
 AUTONOMOUS_PRODUCTION_FLOW.md and CODEX_TASKS.md. Weekly Apify cap $1,
-proposed monthly cap $5, neither scheduled nor authorized for recurring spend.
+monthly cap $5 APPROVED by owner 2026-10-10. Recurring scheduling and durable
+budget guard are not yet deployed.
 Existing $1 permission was one probe only. Four parts per topic -> three reels.
 Simple Sheet gates/Telegram transport/durable cloud ledger remain disconnected;
 HeyGen UI has policy_permission_required and Windows remains unavailable.
