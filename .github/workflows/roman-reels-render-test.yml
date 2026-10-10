@@ -1,7 +1,8 @@
 # Roman Reels — сборка темы в облаке и выгрузка в «Готовые работы» (ручной запуск).
 # Версия ветки claude/reels-videophone-footage-xdoy8a: запускать «Use workflow from» этой ветки.
-# Исходники берутся из папки Google Диска (секрет RCLONE_CONFIG, remote roman-drive),
-# три ролика (хук 1–3 + основа) рендерятся и загружаются в папку «Готовые работы».
+# Исходники скачиваются по ID файлов Google Диска (файлы открыты по ссылке): токен roman-drive
+# видит только свои файлы. Три ролика (хук 1–3 + основа) рендерятся и через rclone
+# (секрет RCLONE_CONFIG, remote roman-drive) загружаются в папку «Готовые работы».
 # Ролики не сохраняются как artifact: репозиторий публичный.
 name: Roman Reels — сборка темы → Готовые работы
 
@@ -12,22 +13,16 @@ on:
         description: "Тема из RomanReel.tsx (например mctiktok)"
         required: true
         default: "mctiktok"
-      source_folder:
-        description: "ID папки Google Диска с исходниками"
-        required: true
-        default: "134soywXMGz3BjjAI6hkNVbUe09kDrLtJ"
       hooks:
-        description: "Файлы хуков 1,2,3 в папке, через запятую"
+        description: "ID файлов Google Диска: хук 1,хук 2,хук 3"
         required: true
-        default: "1.mp4,2.mp4,3.mp4"
       body:
-        description: "Файл основы в папке"
+        description: "ID файла основы"
         required: true
-        default: "Видео аватара.mp4"
       screen:
-        description: "Запись экрана ManyChat TikTok (нужна для темы mctiktok)"
+        description: "ID записи экрана ManyChat TikTok (для темы mctiktok)"
         required: false
-        default: "запись экрана TikTok.mp4"
+        default: ""
       out_prefix:
         description: "Начало имени готовых файлов"
         required: true
@@ -53,7 +48,6 @@ jobs:
         working-directory: roman-reels/pv
     env:
       TOPIC: ${{ inputs.topic }}
-      SRC: ${{ inputs.source_folder }}
       HOOKS: ${{ inputs.hooks }}
       BODY: ${{ inputs.body }}
       SCREEN: ${{ inputs.screen }}
@@ -65,7 +59,9 @@ jobs:
           HAS_RCLONE: ${{ secrets.RCLONE_CONFIG != '' }}
         run: |
           [[ "$TOPIC" =~ ^[a-z0-9_]+$ ]] || { echo "::error::Недопустимая тема"; exit 1; }
-          [[ "$SRC" =~ ^[A-Za-z0-9_-]{10,}$ ]] || { echo "::error::Недопустимый ID папки"; exit 1; }
+          for id in ${HOOKS//,/ } $BODY $SCREEN; do
+            [[ "$id" =~ ^[A-Za-z0-9_-]{20,}$ ]] || { echo "::error::Недопустимый ID файла"; exit 1; }
+          done
           [[ "$PREFIX" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "::error::Недопустимый префикс"; exit 1; }
           [ "$HAS_RCLONE" = "true" ] || { echo "::error::Нет секрета RCLONE_CONFIG"; exit 1; }
 
@@ -96,19 +92,21 @@ jobs:
           printf '%s' "$RCLONE_CONFIG_CONTENT" > "$RUNNER_TEMP/rclone.conf"
           grep -q '^\[roman-drive\]' "$RUNNER_TEMP/rclone.conf" || { echo "::error::В RCLONE_CONFIG нет remote roman-drive"; exit 1; }
 
-      - name: Скачивание исходников из папки
+      - name: Скачивание исходников по ссылкам
         run: |
           set -euo pipefail
-          rc() { rclone --config "$RUNNER_TEMP/rclone.conf" --drive-root-folder-id "$SRC" --retries 3 --log-level NOTICE "$@"; }
-          echo "Файлы в папке:"; rc lsf roman-drive: --files-only
+          get() { # id файл — Drive отдаёт файл, открытый по ссылке; проверяем, что это видео
+            curl -fsSL --retry 3 -o "$2" "https://drive.usercontent.google.com/download?id=$1&export=download&confirm=t"
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$2" \
+              || { echo "::error::Файл $1 не скачался как видео (закрыт доступ по ссылке?)"; exit 1; }
+          }
           dir="public/rr/$TOPIC"; mkdir -p "$dir" public/ai
           IFS=',' read -r h1 h2 h3 <<< "$HOOKS"
-          rc copyto "roman-drive:$h1" "$dir/h1.mp4"
-          rc copyto "roman-drive:$h2" "$dir/h2.mp4"
-          rc copyto "roman-drive:$h3" "$dir/h3.mp4"
-          rc copyto "roman-drive:$BODY" "$dir/osnova.mp4"
+          get "$h1" "$dir/h1.mp4"; get "$h2" "$dir/h2.mp4"; get "$h3" "$dir/h3.mp4"
+          get "$BODY" "$dir/osnova.mp4"
           if [ "$TOPIC" = "mctiktok" ]; then
-            rc copyto "roman-drive:$SCREEN" "$RUNNER_TEMP/screen.mp4"
+            [ -n "$SCREEN" ] || { echo "::error::Для mctiktok нужен ID записи экрана"; exit 1; }
+            get "$SCREEN" "$RUNNER_TEMP/screen.mp4"
             bash ../scripts/cut-tiktok-clips.sh "$RUNNER_TEMP/screen.mp4" public/ai
           fi
           ls -l "$dir"
