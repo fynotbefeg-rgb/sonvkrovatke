@@ -16,6 +16,9 @@ if __name__ == "__main__":
             config = Path(directory) / "rclone.conf"
             config.write_text(content);config.chmod(0o600)
             client = DriveClient(config, INCOMING)
+            with client.request("GET", "about", {"fields": "user(emailAddress)"}) as response:
+                identity = json.load(response)["user"]["emailAddress"]
+            print(json.dumps({"actionsDriveAccount": identity}))
             metadata, _ = client.metadata(INCOMING)
             if metadata["mimeType"] != "application/vnd.google-apps.folder" or ASSETS not in metadata["parents"]:
                 raise DriveError("Incoming folder identity/parent mismatch")
