@@ -3,6 +3,12 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+New editorial requirement from Roman: select topics FIRST, each backed by analysis
+and an external successful example; generate shared body + 3 hooks only for selected
+topics. Topic selection is separate from exact-script approval and video launch.
+Target fields/gates and implementation limits: TOPIC_SELECTION_WORKFLOW.md.
+This is recorded specification only; live Sheets, approvals and runtime gates unchanged.
+
 LATEST montage extension: Codex added opt-in word-anchored local interface images
 to Claude's existing Director/RomanFactoryV1, without a schema migration.
 Original business illustration (client message / draft reply) is explicitly marked demo,
