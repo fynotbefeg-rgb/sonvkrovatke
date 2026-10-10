@@ -98,7 +98,11 @@ Scan `38056048020`: постоянный журнал реально обнов�
 Live fixture `38056542414`: семь реальных Drive-файлов (шесть MP4 и receipt, около 26 КБ)
 скачаны новым API-клиентом, проверены MD5/SHA/textHash/decode; downloadedSets=1,
 awaiting_approval, renderAllowed=false. Это synthetic tones/frames, не голос Романа.
-Повтор и итоговый CI фиксируются в `research/drive-intake-integration-report.json`.
+На итоговом коде `f4a0030` run `38057029342` заново проверил fixture и записал
+все шесть SHA/textHash (downloaded=1, skipped=0, stateSequence=11).
+Новый runner `38057142491` прочитал тот же Drive-журнал: downloaded=0, skipped=1,
+stateSequence=12, тот же pending статус. CI `38056939217`: **48 Python-тестов и
+оба JS-файла прошли**. Итог: `research/drive-intake-integration-report.json`.
 
 Fixture `intake-self-test-20261010/v1` расположена отдельно в incoming и игнорируется
 обычным scanner. Её можно повторить только opt-in self-test режимом; synthetic flag

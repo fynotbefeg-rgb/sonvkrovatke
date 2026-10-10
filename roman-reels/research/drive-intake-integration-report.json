@@ -1,0 +1,53 @@
+{
+  "reportVersion": "1.0.0",
+  "mode": "development",
+  "productionReady": false,
+  "credential": "existing_GDRIVE_SA_JSON",
+  "incomingFolderId": "1Qs3YJQB9Hr8H7B0Fa7MWlwsQ0LLGBPoQ",
+  "stateFileId": "1hOa9obXHrlj-BKQw9vTfHYoUJ6gp5EYP",
+  "testedCodeCommit": "f4a0030398b4c52b0cb33e2ab19ba7786d7421ae",
+  "fixtureBytes": 25985,
+  "fixtureFiles": 7,
+  "fixtureContainsRealRomanVoice": false,
+  "runs": [
+    {
+      "runId": "38057029342",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38057029342",
+      "downloadedSets": 1,
+      "skippedSets": 0,
+      "stateSequence": 11,
+      "syntheticFixtures": true,
+      "status": "awaiting_approval",
+      "renderAllowed": false
+    },
+    {
+      "runId": "38057142491",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38057142491",
+      "downloadedSets": 0,
+      "skippedSets": 1,
+      "stateSequence": 12,
+      "syntheticFixtures": true,
+      "status": "awaiting_approval",
+      "renderAllowed": false
+    }
+  ],
+  "ci": {
+    "conclusion": "success",
+    "headSha": "f4a0030398b4c52b0cb33e2ab19ba7786d7421ae",
+    "status": "completed",
+    "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38056939217"
+  },
+  "pythonTests": 48,
+  "javascriptTestFiles": 2,
+  "writerProtection": "serialized_actions_with_content_hash_checks",
+  "scheduleEnabled": false,
+  "scheduleDraftPR": 7,
+  "mainChanged": false,
+  "limitations": [
+    "No distributed CAS; only the serialized Actions writer may update the journal",
+    "Only the two current editorial topics are scanned in normal mode",
+    "Real full-script approval receipt mapping for these topics is not yet connected",
+    "Source-set handoff is persisted but assembly, transcription and final montage dispatch are not wired",
+    "No HeyGen, paid model API, production render or publication performed"
+  ]
+}
