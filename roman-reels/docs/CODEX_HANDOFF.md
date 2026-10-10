@@ -7,7 +7,12 @@ New editorial requirement from Roman: select topics FIRST, each backed by analys
 and an external successful example; generate shared body + 3 hooks only for selected
 topics. Topic selection is separate from exact-script approval and video launch.
 Target fields/gates and implementation limits: TOPIC_SELECTION_WORKFLOW.md.
-This is recorded specification only; live Sheets, approvals and runtime gates unchanged.
+Owner approved creation of the topic tab. Live Sheets now has `Темы и примеры`
+as the first tab, sheetId 128557826: 4 preliminary themes in A4:L7, decisions D,
+comments E, reference verification K, planning month L. All unselected/unviewed;
+source dates/limitations included. Existing scenario decisions were read before/after
+as all three `На доработку` (supersedes older pending descriptions).
+Runtime topic gates remain unimplemented; no approvals or scenario texts changed.
 
 LATEST montage extension: Codex added opt-in word-anchored local interface images
 to Claude's existing Director/RomanFactoryV1, without a schema migration.
