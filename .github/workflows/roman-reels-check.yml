@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      check_drive_intake_access:
+        description: 'Read-only incoming access check using existing Drive OAuth; no generation'
+        type: boolean
+        default: false
       inspect_saved_apify:
         description: 'Inspect media from saved run 38041968344; no Actors or service calls'
         type: boolean
@@ -73,6 +77,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  drive-intake-access:
+    if: inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install rclone
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rclone
+      - name: Verify existing Drive credential without exposing it
+        env:
+          RCLONE_CONFIG_CONTENT: ${{ secrets.RCLONE_CONFIG }}
+        run: python roman-reels/scripts/check-drive-intake-access.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: roman-drive-intake-access
+          path: ${{ runner.temp }}/drive-intake-access.json
+          retention-days: 7
   inspect-saved-apify:
     if: inputs.inspect_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest
@@ -227,7 +248,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.check_drive_intake_access && !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
