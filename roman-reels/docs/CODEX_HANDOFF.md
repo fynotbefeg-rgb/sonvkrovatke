@@ -3,6 +3,14 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Owner reports Roman approved platform endings (chat: Утвердил). Recorded all
+four exact ending texts/hashes in research/platform-endings-approval-record.json;
+scope is endings ONLY, source is owner relay, not authenticated bot identity.
+Complete review pack ROMAN_RECORDING_TEXTS.md prepared with both bodies, six hooks
+and approved endings. Live D5:D10 still blank at 12:01 UTC; no full-script approval
+reported. Do not request voice recording until hooks/shared bodies are approved.
+Existing full draft statuses and productionReady=false preserved. No paid calls.
+
 Owner requests Instagram/TikTok-specific endings. Opt-in editorial builder
 platform-ending-drafts.mjs prepared 12 pending full variants for two topics.
 Same 3 hooks/body, separate ending/platform IDs and full-script hashes; TikTok
