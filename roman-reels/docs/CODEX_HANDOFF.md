@@ -3,6 +3,16 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Apify requested for reference analysis. Read-only account access verified by successful
+GitHub Actions run 38040963236, automation/roman-reels-v1; no Actor started.
+APIFY_TOKEN absent locally, GitHub secrets cannot be read/listed by current integration,
+but Actions can use the existing secret. No Apify connector found in plugin search.
+Official Instagram Reel Scraper offers transcript/video add-ons; existing one-Reel
+collector disables them and cannot provide content analysis. Concrete pending budget
+plan: research/apify-reference-probe-plan.json, 30 metadata candidates + 2 transcripts,
+sum of four run caps <= $1. Budget not approved; staged collector not yet implemented.
+Public reach remains unavailable; transcript does not constitute montage inspection.
+
 LATEST live review layout simplified at explicit owner request. Sole visible tab
 is `Темы и хуки` (323200067), A:G: topic, topic decision, hook, hook decision,
 reference analysis, metrics, URL. One topic = 3 rows; B/D accept Утверждено or
