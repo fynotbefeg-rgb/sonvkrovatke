@@ -1,10 +1,10 @@
-// AI Montage Director v1 for Roman Factory Job 1.0.0.
+// AI Montage Director v1.1 for Roman Factory Job 1.0.0.
 // Pure, deterministic TypeScript: no React/Remotion/CLI imports, no model calls, no randomness.
 // Erasable syntax only, so Codex can import it with `node --experimental-strip-types`.
 // "AI" here means fixed editorial rules over real word timings, not language understanding.
 
 export const SUPPORTED_SCHEMA_VERSION = "1.0.0";
-export const DIRECTOR_VERSION = "director-v1";
+export const DIRECTOR_VERSION = "director-v1.1";
 
 export type Word = { text: string; start: number; end: number };
 export type SafeZone = { top: number; right: number; bottom: number; left: number };
@@ -66,7 +66,7 @@ const PREPOSITIONS = new Set([
 ]);
 const FUNCTION_WORDS = new Set([...PREPOSITIONS, "и", "а", "но", "или", "не", "ни", "что", "как", "я", "ты"]);
 const CONJUNCTIONS = new Set(["и", "или"]);
-// Tool names worth a typographic chip. No logos: visualAssets is empty in P1.
+// Spoken tool names: typographic chip by default, explicit local image when supplied.
 const TOOL_NAMES = new Set([
   "claude", "chatgpt", "gpt", "gemini", "telegram", "whatsapp", "manychat", "heygen", "instagram",
   "notion", "excel", "canva", "midjourney", "perplexity", "youtube", "tiktok",
@@ -202,7 +202,7 @@ export const frameTime = (frame: number, fps: number) => frame / fps;
 
 // ---------- semantic accents ----------
 
-type Candidate = { type: EventType; wordStart: number; wordEnd: number; hold: number; priority: number };
+type Candidate = { type: EventType; wordStart: number; wordEnd: number; hold: number; priority: number; assetId?: string };
 
 function sentences(words: Word[]): Array<[number, number]> {
   const result: Array<[number, number]> = [];
@@ -308,12 +308,27 @@ function ctaCandidates(words: Word[], duration: number): Candidate[] {
   return found;
 }
 
-function toolCandidates(words: Word[]): Candidate[] {
+function toolCandidates(words: Word[], assets: VisualAsset[]): Candidate[] {
   const found: Candidate[] = [];
   words.forEach((word, i) => {
-    if (TOOL_NAMES.has(lower(word.text))) found.push({ type: "keyword", wordStart: i, wordEnd: i, hold: 1.0, priority: 4 });
+    const name = lower(word.text);
+    if (!TOOL_NAMES.has(name)) return;
+    // Explicit opt-in asset convention; no download, invented screenshot or fuzzy match.
+    const asset = assets.find((a) => a.id === `tool-${name}`);
+    if (asset) {
+      assertInterfaceAsset(asset);
+      found.push({ type: "interface", wordStart: i, wordEnd: i, hold: 2.8, priority: 4, assetId: asset.id });
+    } else {
+      found.push({ type: "keyword", wordStart: i, wordEnd: i, hold: 1.0, priority: 4 });
+    }
   });
   return found;
+}
+
+function assertInterfaceAsset(asset: VisualAsset): void {
+  if (asset.type !== "image" || !/\.(?:png|jpe?g|webp|svg)$/i.test(asset.localPath)) {
+    fail(`Asset ${asset.id}: interface requires a local image`);
+  }
 }
 
 /** Text shown by a number/keyword/card event: the spoken words themselves, never new copy. */
@@ -354,7 +369,7 @@ export function buildMontagePlan(job: FactoryJob): MontagePlan {
 
   // Accents: priority first, then time; greedy acceptance without overlaps in the top band.
   const candidates = [
-    ...numberCandidates(words), ...listCandidates(words), ...ctaCandidates(words, duration), ...toolCandidates(words),
+    ...numberCandidates(words), ...listCandidates(words), ...ctaCandidates(words, duration), ...toolCandidates(words, job.visualAssets ?? []),
   ].sort((a, b) => a.priority - b.priority || a.wordStart - b.wordStart);
   const budget = Math.max(1, Math.floor(duration / RULES.accentSecondsPerItem));
   const accepted: Array<Candidate & { start: number; end: number }> = [];
@@ -386,6 +401,7 @@ export function buildMontagePlan(job: FactoryJob): MontagePlan {
       start: accent.start, end: accent.end, wordStart: accent.wordStart, wordEnd: accent.wordEnd,
       animation: accent.type === "diagram" ? "slide" : "pop", position: "top",
       layer: RULES.layers.accent, transition: "fade", respectSafeZone: true,
+      ...(accent.assetId ? { assetId: accent.assetId } : {}),
     });
   }
 
@@ -406,7 +422,7 @@ export function buildMontagePlan(job: FactoryJob): MontagePlan {
 }
 
 const EVENT_TYPES = new Set<string>(["caption", "card", "keyword", "number", "zoom", "b_roll", "split_screen", "diagram", "interface"]);
-const RENDERED_TYPES = new Set<string>(["caption", "card", "keyword", "number", "zoom", "diagram"]);
+const RENDERED_TYPES = new Set<string>(["caption", "card", "keyword", "number", "zoom", "diagram", "interface"]);
 
 /** Checks a plan against the job: word anchors, duration, assets, overlaps. Used before rendering too. */
 export function validateMontagePlan(job: FactoryJob, plan: MontagePlan): void {
@@ -424,6 +440,10 @@ export function validateMontagePlan(job: FactoryJob, plan: MontagePlan): void {
     if (!EVENT_TYPES.has(event.type)) fail(`${where}: unknown type`);
     if ((event.type === "b_roll" || event.type === "interface") && !event.assetId) fail(`${where}: assetId required`);
     if (event.assetId !== undefined && !assetIds.has(event.assetId)) fail(`${where}: unknown assetId`);
+    if (event.type === "interface") {
+      assertInterfaceAsset(job.visualAssets!.find((a) => a.id === event.assetId)!);
+      if (event.position !== "top") fail(`${where}: interface must stay in the top safe band`);
+    }
     if (!RENDERED_TYPES.has(event.type)) fail(`${where}: type ${event.type} is not supported by RomanFactoryV1 yet`);
     if (event.respectSafeZone !== true) fail(`${where}: must respect safe zone`);
     if (!isFiniteNumber(event.start) || !isFiniteNumber(event.end) || event.start < 0 || event.end <= event.start) {

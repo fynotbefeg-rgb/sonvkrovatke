@@ -1,0 +1,11 @@
+{
+  "strategy": "copy_original_aac_full_timeline",
+  "decodedAudioHash": "SHA256=9ecf4a26b8fc7d95deed515d48424fa3797e5f21e8a02981d19eff4885337bf9",
+  "sourceSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+  "audioClock": {
+    "start": 0.0,
+    "duration": 40.24,
+    "sampleRate": 48000
+  },
+  "productionReady": false
+}

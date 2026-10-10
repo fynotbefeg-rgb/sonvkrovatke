@@ -1,14 +1,14 @@
 import { loadFont } from "@remotion/fonts";
 import React from "react";
 import {
-  AbsoluteFill, CalculateMetadataFunction, Easing, OffthreadVideo, interpolate, staticFile,
+  AbsoluteFill, CalculateMetadataFunction, Easing, Img, OffthreadVideo, interpolate, staticFile,
   useCurrentFrame, useVideoConfig,
 } from "remotion";
 import {
   activeWordIndex, assertJob, buildMontagePlan, displayWord, eventLabel, frameTime, listItemLabel, listItemRanges,
   safeZoneOf, validateMontagePlan,
 } from "./director.ts";
-import type { FactoryJob, MontageEvent, MontagePlan, SafeZone, Word } from "./director.ts";
+import type { FactoryJob, MontageEvent, MontagePlan, SafeZone, VisualAsset, Word } from "./director.ts";
 import { captionFontSize, CAPTION_LINE_HEIGHT, conservativeLayout } from "./layout.ts";
 import { FADES, fadeKeyframes } from "./timing.ts";
 
@@ -122,9 +122,19 @@ const TopBand: React.FC<{ zone: SafeZone; width: number; children: React.ReactNo
   }}>{children}</div>
 );
 
-const Accent: React.FC<{ event: MontageEvent; words: Word[]; t: number; zone: SafeZone; width: number }> = ({ event, words, t, zone, width }) => {
+const Accent: React.FC<{ event: MontageEvent; words: Word[]; assets: VisualAsset[]; t: number; zone: SafeZone; width: number }> = ({ event, words, assets, t, zone, width }) => {
   const k = envelope(event, t, FADES.accent.in, FADES.accent.out);
   const pop = interpolate(t, [event.start, event.start + 0.18, event.start + 0.3], [0.7, 1.06, 1], { ...clamp, easing: EASE });
+  if (event.type === "interface") {
+    const asset = assets.find((a) => a.id === event.assetId)!; // validated in prepare()
+    return (
+      <TopBand zone={zone} width={width} style={{ opacity: k, transform: `translateY(${(1 - k) * -18}px)` }}>
+        <Img src={staticFile(asset.localPath)} style={{
+          width: "100%", height: conservativeLayout.topBandHeight, objectFit: "contain",
+        }} />
+      </TopBand>
+    );
+  }
   if (event.type === "diagram") {
     const items = listItemRanges(words, event.wordStart, event.wordEnd);
     return (
@@ -199,7 +209,7 @@ export const RomanFactoryV1: React.FC<FactoryProps> = (props) => {
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <ZoomedSource job={job} zooms={zooms} t={t} />
-      {accents.map((e) => <Accent key={e.id} event={e} words={words} t={t} zone={zone} width={width} />)}
+      {accents.map((e) => <Accent key={e.id} event={e} words={words} assets={job.visualAssets ?? []} t={t} zone={zone} width={width} />)}
       {captions.map((e) => <Caption key={e.id} event={e} words={words} t={t} zone={zone} width={width} height={height} />)}
     </AbsoluteFill>
   );

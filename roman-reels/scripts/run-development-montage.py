@@ -13,6 +13,16 @@ PV = ROOT / "pv"
 DIRECTOR = PV / "src/factory/director.ts"
 COMPOSITION_ID = "RomanFactoryV1"
 
+
+def check_visual_assets(assets):
+    """Verify supplied local assets instead of silently dropping them at render time."""
+    for asset in assets:
+        path = public_source(asset["localPath"])
+        if asset["type"] != "image" or path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp", ".svg"}:
+            raise ValueError("Development interface assets must be local images")
+        if not asset.get("rightsReference", "").strip():
+            raise ValueError("Visual asset rights reference is required")
+
 spec = importlib.util.spec_from_file_location("contract", Path(__file__).with_name("validate-factory-job.py"))
 contract = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(contract)
@@ -31,6 +41,7 @@ def check_input(job):
             raise ValueError("Source metadata mismatch")
     if not DIRECTOR.is_file():
         raise ValueError("Claude Director not delivered: expected pv/src/factory/director.ts")
+    check_visual_assets(job.get("visualAssets", []))
 
 
 def run(job, output_directory, browser_executable=None):
@@ -38,7 +49,7 @@ def run(job, output_directory, browser_executable=None):
     if not (PV / "node_modules/@remotion/cli/package.json").is_file():
         raise ValueError("Install locked Remotion dependencies with npm ci first")
     source = job["sourceVideo"]
-    job = {**job, "visualAssets": [], "renderSettings": {
+    job = {**job, "visualAssets": job.get("visualAssets", []), "renderSettings": {
         "width": 1080, "height": 1920, "fps": source["fps"], "codec": "h264", "audioCodec": "aac",
         "safeZone": {"top": 200, "right": 120, "bottom": 320, "left": 100}}}
     bridge = """import {pathToFileURL} from 'node:url';

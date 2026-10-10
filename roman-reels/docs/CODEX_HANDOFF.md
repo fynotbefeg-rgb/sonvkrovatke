@@ -3,6 +3,17 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+LATEST montage extension: Codex added opt-in word-anchored local interface images
+to Claude's existing Director/RomanFactoryV1, without a schema migration.
+Original business illustration (client message / draft reply) is explicitly marked demo,
+not a Claude screenshot. Wrapper now preserves/checks visualAssets. All 27 TS tests,
+27 Python checks and tsc pass. One full h1 development render passed QC (1080x1920,
+25fps, 40.24s); original AAC PCM hash and audio clock preserved. h2/h3 plans unchanged
+without assets, but not rerendered. Evidence/control frames in research/business-montage-v1.
+Preview is in the test folder; Roman viewer permission not inherited. External Dan Martell
+videos remain unviewed (YouTube fetch/network limitations), so no exact montage comparison
+is claimed. See BUSINESS_MONTAGE_V1.md. Main, script text and approvals untouched.
+
 LATEST: PR #6 merged into feature/codex-pipeline after independent re-review of Claude f45e50a.
 Merge e1a7c31. C1 short-event blocker resolved by timing.ts helper used for accents/zoom.
 tsc, 14 Director + 7 timing tests and 24 Python pipeline tests pass locally. No GitHub check-runs
