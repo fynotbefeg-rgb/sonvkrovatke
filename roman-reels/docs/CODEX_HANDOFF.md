@@ -1,6 +1,32 @@
 # Codex handoff — Roman Reels automation
 Updated: 2026-10-10
 
+## Authoritative specification 3.0 — start here
+
+Latest user specification supersedes conflicting role/approval/branch suggestions below.
+Codex owns pipeline integration; Claude Code owns AI Montage Director and Remotion.
+Approvals remain in existing Google Sheets; Telegram is the production start control, not a substitute identity receipt.
+Windows is temporarily unavailable and is not the whole factory server. No HeyGen API.
+Current HeyGen terms were checked: permission for the proposed UI workflow is not established;
+real browser automation is gated pending a permissible basis. Manual MP4 intake/cloud work can continue.
+
+Current audit baseline: `f3a4bfd` on `automation/roman-reels-v1`.
+Documentation/candidate-contract work is isolated on `feature/codex-pipeline`, PR target automation;
+Claude uses `feature/claude-montage` from the latest integration base. Never change main.
+No production migration or paid generation was performed by this audit.
+
+- [AUDIT_V3.md](AUDIT_V3.md): evidence, Actions runs, real MP4 and 8 existing TypeScript errors.
+- [CLAUDE_TASKS.md](CLAUDE_TASKS.md) / [CODEX_TASKS.md](CODEX_TASKS.md): ownership and acceptance tests.
+- [INTEGRATION_CONTRACT.md](INTEGRATION_CONTRACT.md): proposed schema 1.0.0, exact legacy hash preservation;
+  offline validator and six synthetic tests, not a deployed production gate.
+- [HEYGEN_BROWSER_AUTOMATION.md](HEYGEN_BROWSER_AUTOMATION.md) / [WINDOWS_SETUP.md](WINDOWS_SETUP.md): future worker and preparation.
+- [ROADMAP.md](ROADMAP.md): first one-MP4 development montage, no publication or forged approval.
+
+Validation: all 45 existing offline tests pass; Remotion bundle succeeds; tsc has 8 pre-existing errors.
+`pv/public/ai/body1.mp4` passes full FFmpeg decode and has actual 1080×1920 video/AAC audio.
+Real transcription/Director/generalized render/QC have not been delivered. Next step is owner review of
+candidate contract and P1 before integrating substantial architecture changes.
+
 ## Codex continuation — 2026-10-10
 - New manual/Windows queue CI verified: registered run `38019089716` on `6fecade` SUCCESS, only production-queue-tests job ran, 12 queue + 8 intake tests on Node22 passed. Claude/Google/Apify/Remotion jobs skipped. No live bot, credit-consuming generation or approval mutations performed. User's bot existence/public username question remains pending.
 - User says no person can access Windows laptop now. Continue development **without laptop** and swap manual avatar upload to Windows UI provider later. Implemented SQLite production queue + transport-independent Telegram start controller: authenticated-server approvals injection, frozen short tickets, authorized private chat, atomic multi-version start/dedup callbacks, persistent production_key independent of provider, waiting-only provider switch. **No real Telegram transport, bot deployment, worker lease, HeyGen execution, download/render or Google approval writes.** All returned jobs blocked from render/generation. Twelve new tests + eight intake tests pass locally; registered workflow has isolated offline test_production_queue mode for Node22. Runtime DB excluded from Git. See AVATAR_PROVIDERS.md for strict hosting/storage/transport boundaries. Asked whether bot already exists, requesting only public username, never token.
