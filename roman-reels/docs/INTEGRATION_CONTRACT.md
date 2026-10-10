@@ -52,6 +52,13 @@ intake job_key дополнительно включает Drive file ID и MD5 
 один цельный MP4 на reelId; assembly provenance и точный bodyStart сохраняются в sidecar.
 Все timestamps относятся к собранному MP4; хеши/approval трёх полных сценариев остаются отдельными.
 
+Opt-in development source-set v2 поддерживает 3 hooks + body + 2 platform endings
+и шесть вариантов. Factory job v1 не меняется: topicId имеет суффикс instagram/tiktok;
+reelId остаётся R-<topicId>-hN. До Director выполняется сборка и перенос **реальных**
+таймингов всех трёх частей, включая окончание. Assembly provenance/textHash/platform
+хранятся в sidecar. См. [INCOMING_SIX_PARTS.md](INCOMING_SIX_PARTS.md).
+Это development adapter, не миграция live approval/production.
+
 На первом этапе монтаж не меняет скорость/порядок речи: source-time = output-time.
 Слова идут по времени без перекрытия; события могут перекрываться по разным слоям;
 wordStart/wordEnd — включительные индексы. Событие покрывает связанные слова и не выходит за duration.

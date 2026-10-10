@@ -1,0 +1,46 @@
+name: Roman Reels — six-part source tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [automation/roman-reels-v1, feature/codex-pipeline]
+    paths:
+      - 'roman-reels/scripts/**'
+      - 'roman-reels/schemas/**'
+      - 'roman-reels/research/platform-ending-drafts-v2.json'
+      - '.github/workflows/roman-source-set-tests.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: roman-source-set-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install media and validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r roman-reels/schemas/requirements.txt
+      - name: Offline checks with synthetic MP4s, no service credentials
+        run: |
+          python roman-reels/scripts/platform-source-set.test.py
+          python roman-reels/scripts/source-set.test.py
+          python roman-reels/scripts/assembled-jobs.test.py
+          python roman-reels/scripts/factory-contract.test.py
+          python roman-reels/scripts/factory-media.test.py
+          node --test roman-reels/scripts/platform-ending-drafts.test.mjs
+          node --test roman-reels/scripts/shared-body-drafts.test.mjs

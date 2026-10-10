@@ -1,5 +1,6 @@
-"""Assemble h1+body, h2+body, h3+body as real development MP4s. No production writes."""
+"""Assemble development sources: legacy 3 variants or 6 platform-ending variants."""
 import argparse
+import hashlib
 from datetime import datetime, timezone
 import json
 import math
@@ -10,6 +11,7 @@ from jsonschema import Draft202012Validator
 from factory_media import PUBLIC, public_source, probe, decode, sha256, technical_qc
 
 SCHEMA = Path(__file__).resolve().parents[1] / "schemas/source-set-v1.schema.json"
+SCHEMA_V2 = SCHEMA.with_name("source-set-v2.schema.json")
 FPS = 25
 
 
@@ -38,6 +40,97 @@ def verify(plan):
     return result[0], sorted(result[1:], key=lambda h: h["hookNumber"])
 
 
+def text_hash(text):
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def verify_platform_plan(plan):
+    schema = json.loads(SCHEMA_V2.read_text())
+    Draft202012Validator.check_schema(schema)
+    if not Draft202012Validator(schema).is_valid(plan):
+        raise ValueError("Invalid development source-set v2")
+    if {h["hookNumber"] for h in plan["hooks"]} != {1, 2, 3}:
+        raise ValueError("Hooks 1, 2, 3 must each appear once")
+    if {e["platform"] for e in plan["endings"]} != {"instagram", "tiktok"}:
+        raise ValueError("Distinct Instagram and TikTok endings required")
+    entries = [plan["body"], *sorted(plan["hooks"], key=lambda h: h["hookNumber"]),
+               *sorted(plan["endings"], key=lambda e: e["platform"])]
+    paths, checksums, result = set(), set(), []
+    for entry in entries:
+        if text_hash(entry["text"]) != entry["textHash"]:
+            raise ValueError("Part text changed; prepare a new recording/version binding")
+        path = public_source(entry["localPath"])
+        if path in paths or entry["sha256"] in checksums:
+            raise ValueError("Six distinct source files required; duplicate path or bytes")
+        if sha256(path) != entry["sha256"]:
+            raise ValueError("Source part checksum mismatch")
+        paths.add(path)
+        checksums.add(entry["sha256"])
+        metadata = probe(path)
+        decode(path)
+        frames = math.ceil(metadata["duration"] * FPS)
+        result.append({**entry, "path": path, "metadata": metadata,
+                       "frames": frames, "normalizedDuration": frames / FPS})
+    for part in result:
+        if sha256(part["path"]) != part["sha256"]:
+            raise ValueError("Source changed during set verification")
+    return result[0], result[1:4], result[4:]
+
+
+def assemble_platform_plan(plan, output_directory):
+    body, hooks, endings = verify_platform_plan(plan)
+    out = Path(output_directory).resolve()
+    out.mkdir(parents=True, exist_ok=False)
+    evidence = {"assemblyVersion": "2.0.0", "mode": "development", "topicId": plan["topicId"],
+                "scriptVersion": plan["scriptVersion"], "productionReady": False,
+                "createdAt": datetime.now(timezone.utc).isoformat(),
+                "complete": False, "variants": []}
+    manifest_path = out / "assembly.json"
+    def save():
+        manifest_path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    save()
+    for ending in endings:
+        for hook in hooks:
+            parts = [hook, body, ending]
+            for part in parts:
+                if sha256(part["path"]) != part["sha256"]:
+                    raise ValueError("Source part changed during assembly")
+            reel_id = f"R-{plan['topicId']}-{ending['platform']}-h{hook['hookNumber']}"
+            pending = out / f"{reel_id}.partial.mp4"
+            concatenate(hook, body, pending, ending=ending)
+            duration = sum(p["normalizedDuration"] for p in parts)
+            qc = technical_qc(pending, duration, FPS)
+            (out / f"{reel_id}-technical-qc.json").write_text(json.dumps(qc, indent=2) + "\n")
+            if not qc["technicalPassed"]:
+                raise ValueError("Assembled source failed technical QC")
+            for part in parts:
+                if sha256(part["path"]) != part["sha256"]:
+                    raise ValueError("Source part changed during assembly")
+            output = out / f"{reel_id}.mp4"
+            pending.rename(output)
+            timeline, cursor = [], 0
+            for role, part in zip(["hook", "body", "ending"], parts):
+                end = cursor + part["normalizedDuration"]
+                timeline.append({"role": role, "localPath": part["localPath"], "sha256": part["sha256"],
+                    "text": part["text"], "textHash": part["textHash"],
+                    "originalDuration": part["metadata"]["duration"],
+                    "timelineStart": cursor, "timelineEnd": end})
+                cursor = end
+            evidence["variants"].append({"reelId": reel_id, "platform": ending["platform"],
+                "hookNumber": hook["hookNumber"], "outputFile": output.name,
+                "sha256": qc["outputSha256"], "duration": duration,
+                "bodyStart": timeline[1]["timelineStart"], "endingStart": timeline[2]["timelineStart"],
+                "technicalQc": qc, "parts": timeline})
+            save()
+            print(f"Assembled {reel_id}: {duration:.3f}s; development source only.", flush=True)
+    for part in [body, *hooks, *endings]:
+        if sha256(part["path"]) != part["sha256"]:
+            raise ValueError("Source changed before assembly completion")
+    evidence["complete"] = True
+    save()
+    return evidence
+
+
 def concatenate(hook, body, output, ending=None):
     parts = [hook, body] + ([ending] if ending is not None else [])
     filters = []
@@ -61,6 +154,8 @@ def concatenate(hook, body, output, ending=None):
 
 
 def assemble(plan, output_directory):
+    if plan.get("assemblyVersion") == "2.0.0":
+        return assemble_platform_plan(plan, output_directory)
     body, hooks = verify(plan)  # Verify the whole set before writing anything.
     out = Path(output_directory).resolve()
     out.mkdir(parents=True, exist_ok=False)  # No overwriting a previous run.

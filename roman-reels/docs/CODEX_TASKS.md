@@ -5,6 +5,13 @@ Codex отвечает за весь конвейер; Claude — Director и в
 
 ## Актуальный следующий этап — 2026-10-10
 
+Development intake шести MP4, platform assembly и ending speech adapter проверены:
+INCOMING_SIX_PARTS.md. Drive incoming создана/прочитана, но Actions credential,
+download/watch, authenticated full-text approvals и постоянный production ledger
+ещё не подключены. Следующая интеграция — привязка реальных Drive ID/скачанных
+байтов к шести recording receipts и безопасный production gate; не включать
+автоматическую обработку pending_approval текстов. Роман пока утверждает комплект.
+
 Владелец запросил поиск тем и передачу в производство без ручного копирования.
 Конкретный план для согласования: AUTONOMOUS_PRODUCTION_FLOW.md. Сначала связать
 решения простой таблицы с черновиками Gemini, утверждением точной общей основы

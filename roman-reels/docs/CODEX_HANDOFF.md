@@ -3,6 +3,24 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+LATEST: six-part DEVELOPMENT intake/assembly implemented, INCOMING_SIX_PARTS.md.
+Native Drive incoming created/verified: 1Qs3YJQB9Hr8H7B0Fa7MWlwsQ0LLGBPoQ inside
+existing assets folder; empty, not connected to Actions/rclone/watchers yet.
+New source-set-v2.schema.json is opt-in; v1 unchanged. Incoming receipt binds
+topic/revision/exact text hashes and MP4 checksums; complete six-part media decode
+and unique path/bytes checks precede assembly. Three hooks + shared body + two
+platform endings produce six QC-checked development sources, never overwrite.
+prepare-assembled-jobs supports both formats; v2 requires both real ending speech
+artifacts and offsets their words/segments after body. Factory contract v1 stays
+unchanged (platform suffix in topicId); approval remains pending, provenance sidecar.
+Two exact recording layouts prepared, incoming-recording-layouts-v2.json.
+Synthetic fixtures are not Roman recordings or speech verification; no new final
+montage render, live production, Google approval, Telegram or HeyGen launch.
+Source assembly and downstream contract jobs verified locally: 10 platform intake,
+5 legacy assembly, 4 legacy job, 6 contract and 10 media Python tests; both JS
+ending/shared-body suites pass. Evidence: research/six-part-intake-test-report.json.
+Earlier "v1 only" notes are historical; full production integration remains absent.
+
 Owner reports Roman approved platform endings (chat: Утвердил). Recorded all
 four exact ending texts/hashes in research/platform-endings-approval-record.json;
 scope is endings ONLY, source is owner relay, not authenticated bot identity.
