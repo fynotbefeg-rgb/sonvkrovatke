@@ -108,6 +108,11 @@ jobs:
         run: |
           read -r -a selected_urls <<< "$RESEARCH_URLS"
           node roman-reels/scripts/apify-reference-research.mjs "$RESEARCH_STAGE" "$RUNNER_TEMP/reference-research" "${selected_urls[@]}"
+      - name: Report verified public details and run status
+        if: always()
+        env:
+          RESEARCH_DIRECTORY: ${{ runner.temp }}/reference-research
+        run: node roman-reels/scripts/report-apify-research.mjs
       - name: Preserve run journals, research and selected media
         if: always()
         uses: actions/upload-artifact@v4
