@@ -11,6 +11,11 @@ on:
         description: 'Existing generation run to read; inspect_saved does not call Gemini'
         type: string
         default: ''
+      research_focus:
+        description: 'Research brief to use; both produce pending drafts only'
+        type: choice
+        default: seo
+        options: [seo, mcp_site]
       allow_generation:
         description: 'Explicit permission for Gemini generation; billing/free tier must be agreed separately'
         type: boolean
@@ -37,6 +42,7 @@ jobs:
         if: inputs.mode == 'prepare_research' || inputs.mode == 'generate_research'
         env:
           MODE: ${{ inputs.mode }}
+          RESEARCH_FOCUS: ${{ inputs.research_focus }}
           ROMAN_GEMINI_ALLOW_GENERATE: ${{ inputs.allow_generation }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -47,7 +53,12 @@ jobs:
             generate_research) action=generate ;;
             *) echo 'Invalid mode'; exit 2 ;;
           esac
-          node roman-reels/scripts/run-researched-gemini.mjs "$action" roman-reels/research/gemini-revision-seo/brief-v2.json "$RUNNER_TEMP/drafts.json"
+          case "$RESEARCH_FOCUS" in
+            seo) brief=roman-reels/research/gemini-revision-seo/brief-v2.json ;;
+            mcp_site) brief=roman-reels/research/mcp-site-check/brief-revision3.json ;;
+            *) echo 'Invalid research focus'; exit 2 ;;
+          esac
+          node roman-reels/scripts/run-researched-gemini.mjs "$action" "$brief" "$RUNNER_TEMP/drafts.json"
       - name: Read existing generated draft without a new model call
         if: inputs.mode == 'inspect_saved'
         env:

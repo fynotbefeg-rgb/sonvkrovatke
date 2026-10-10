@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-10-10T15:23:43.177Z",
+  "synthetic": true,
+  "realClientSiteTested": false,
+  "mcpPackage": "@playwright/mcp",
+  "mcpVersion": "0.0.83",
+  "browserSandbox": false,
+  "inputSha256": "6003b7b1e8f8ee69a1951fedeb7c1669b4bbceb0622f0acb94db75c771667262",
+  "method": "Actual MCP stdio tools; programmatic driver, not a connected Claude session",
+  "candidates": [
+    {
+      "fixture": "broken",
+      "button": "Оставить заявку",
+      "destination": "/missing-lead",
+      "httpStatus": 404,
+      "snapshotFile": "broken-after.txt",
+      "screenshotFile": "broken-after.png"
+    }
+  ],
+  "findings": [
+    {
+      "fixture": "broken",
+      "button": "Оставить заявку",
+      "destination": "/missing-lead",
+      "httpStatus": 404,
+      "snapshotFile": "broken-after.txt",
+      "screenshotFile": "broken-after.png"
+    },
+    {
+      "fixture": "fixed",
+      "button": "Оставить заявку",
+      "destination": "/contact",
+      "httpStatus": 200,
+      "snapshotFile": "fixed-after.txt",
+      "screenshotFile": "fixed-after.png"
+    }
+  ],
+  "calls": [
+    "browser_navigate",
+    "browser_take_screenshot",
+    "browser_click",
+    "browser_take_screenshot",
+    "browser_navigate",
+    "browser_take_screenshot",
+    "browser_click",
+    "browser_take_screenshot"
+  ],
+  "generationCalls": 0,
+  "limits": [
+    "Учебный сайт с намеренно сломанной ссылкой.",
+    "Claude Code здесь не запускался; его конфигурация проверена только по официальной документации.",
+    "Проверка не измеряет потерянные заявки, продажи или SEO-позиции.",
+    "Установка MCP сама по себе не создаёт ежедневное расписание."
+  ]
+}

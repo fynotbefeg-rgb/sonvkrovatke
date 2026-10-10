@@ -7,9 +7,9 @@ if(data.productionReady!==false||data.editorialReviewRequired!==true||data.items
  throw Error('Expected three pending research-backed drafts');
 validateManifest(data);
 const source=data.source_sets[0];
-if(source.body_revision!==2||source.status!=='pending_approval'||source.body_text_hash!==createHash('sha256').update(source.body_text).digest('hex'))throw Error('Invalid body snapshot');
+if(!Number.isSafeInteger(source.body_revision)||source.body_revision<2||source.status!=='pending_approval'||source.body_text_hash!==createHash('sha256').update(source.body_text).digest('hex'))throw Error('Invalid body snapshot');
 for(const item of data.items){
- if(item.status!=='pending_approval'||item.script_revision!==2||item.topic_id!==source.topic_id||item.script_hash!==scriptHash(item)||
+ if(item.status!=='pending_approval'||item.script_revision!==source.body_revision||item.topic_id!==source.topic_id||item.script_hash!==scriptHash(item)||
     item.script_text!==item.hook_text+'\n\n'+source.body_text)throw Error('Invalid pending review item');
 }
 // No raw transport response, headers, environment, or credential values.

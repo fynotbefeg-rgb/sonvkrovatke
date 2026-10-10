@@ -21,6 +21,13 @@
       "bodyTextHash": "5292073fc8083a8d5451ceadbcbff097e3ddc70e0f5e8c11b6b9b16e0da973a9",
       "status": "needs_revision",
       "reason": "Общий и слишком простой текст о соцсетях; очевидные советы об общении с ИИ."
+    },
+    {
+      "topicId": "ai-seo-audit",
+      "scriptVersion": 2,
+      "bodyTextHash": "9db0861199d6f4c40c0fb6f65ae9ba642ecc3c12553657ff4f8a188acfeee299",
+      "status": "needs_revision",
+      "reason": "По переданному замечанию Романа информация слишком общая; нужен узкий процесс автоматизации и настройки MCP."
     }
   ]
 }
