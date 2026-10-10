@@ -38,18 +38,21 @@ def verify(plan):
     return result[0], sorted(result[1:], key=lambda h: h["hookNumber"])
 
 
-def concatenate(hook, body, output):
+def concatenate(hook, body, output, ending=None):
+    parts = [hook, body] + ([ending] if ending is not None else [])
     filters = []
-    for i, part in enumerate([hook, body]):
+    for i, part in enumerate(parts):
         filters.append(f"[{i}:v:0]scale=1080:1920:force_original_aspect_ratio=increase,"
                        f"crop=1080:1920,setsar=1,fps={FPS},format=yuv420p,"
                        f"tpad=stop_mode=clone:stop_duration=0.04,trim=end_frame={part['frames']},"
                        f"setpts=PTS-STARTPTS[v{i}]")
         filters.append(f"[{i}:a:0]aresample=48000,aformat=channel_layouts=stereo,apad,"
                        f"atrim=duration={part['normalizedDuration']},asetpts=PTS-STARTPTS[a{i}]")
-    filters.append("[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]")
+    filters.append("".join(f"[v{i}][a{i}]" for i in range(len(parts))) +
+                   f"concat=n={len(parts)}:v=1:a=1[v][a]")
+    inputs = [arg for part in parts for arg in ["-i", str(part["path"])]]
     subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-xerror", "-n",
-        "-i", str(hook["path"]), "-i", str(body["path"]), "-filter_complex_threads", "1",
+        *inputs, "-filter_complex_threads", "1",
         "-filter_complex", ";".join(filters), "-map", "[v]", "-map", "[a]",
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-threads", "2",
         "-c:a", "aac", "-b:a", "192k", "-r", str(FPS), "-fps_mode", "cfr",

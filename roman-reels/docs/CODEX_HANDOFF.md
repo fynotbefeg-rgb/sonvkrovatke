@@ -3,6 +3,16 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
+Owner requests Instagram/TikTok-specific endings. Opt-in editorial builder
+platform-ending-drafts.mjs prepared 12 pending full variants for two topics.
+Same 3 hooks/body, separate ending/platform IDs and full-script hashes; TikTok
+CTA requests DM keyword, never comments. Official ManyChat docs checked; no
+Roman account capability or live automation verified. PLATFORM_ENDINGS.md.
+FFmpeg concatenate supports optional third part; real media order/QC test passes.
+6 ending + 3 shared-body + 5 source-set tests pass. Media source-set v1 and speech
+adapter remain unchanged; full platform-ending render integration not completed.
+Sheet C/B/D preserved, D5:D10 still blank at last read. No HeyGen/messages launched.
+
 B5/B8 now read as Утверждено. After primary-source checks, Codex prepared
 6 editorial hooks in C5:C10 and 2 shared-body drafts in
 research/approved-topics-drafts-v1.json (not Gemini API-generated).

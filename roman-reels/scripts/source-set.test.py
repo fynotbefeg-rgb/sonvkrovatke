@@ -76,6 +76,23 @@ class SourceSetTests(unittest.TestCase):
                 assembler.assemble(bad, out)
             self.assertFalse(out.exists())
 
+    def test_optional_ending_follows_hook_and_body_with_real_media(self):
+        with self.source_root():
+            body, hooks = assembler.verify(self.plan)
+        output = self.root / 'with-ending.mp4'
+        assembler.concatenate(hooks[0], body, output, ending=hooks[2])
+        duration = sum(p['normalizedDuration'] for p in [hooks[0], body, hooks[2]])
+        self.assertTrue(media.technical_qc(output, duration, 25)['technicalPassed'])
+        for time, channel in [(0.04, 'red'), (0.20, 'blue'), (0.36, 'yellow')]:
+            frame = subprocess.check_output(['ffmpeg','-v','error','-ss',str(time),
+                '-i',str(output),'-frames:v','1','-vf','scale=1:1','-pix_fmt','rgb24','-f','rawvideo','-'],timeout=30)
+            r, g, b = frame
+            if channel == 'red': self.assertGreater(r, max(g,b)+50)
+            elif channel == 'blue': self.assertGreater(b, max(r,g)+50)
+            else:
+                self.assertGreater(r,b+50)
+                self.assertGreater(g,b+50)
+
     def test_changed_bytes_and_duplicate_paths_are_rejected(self):
         for change in [lambda p: p["body"].update(sha256="0" * 64),
                        lambda p: p["hooks"][2].update(localPath="h1.mp4", sha256=p["hooks"][0]["sha256"])]:
