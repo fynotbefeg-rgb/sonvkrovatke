@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 
 import factory_media as media
+from preserve_source_audio import preserve, decoded_audio_hash
 
 spec = importlib.util.spec_from_file_location("development", Path(__file__).with_name("prepare-development-job.py"))
 development = importlib.util.module_from_spec(spec)
@@ -112,6 +113,38 @@ class MediaTests(unittest.TestCase):
         for text in ["10", "unknown-tool", "!"]:
             with self.assertRaises(ValueError):
                 alignment.label(text)
+
+    def test_remux_restores_original_audio_after_encoder_delay(self):
+        delayed = Path(self.tmp.name) / "delayed.mp4"
+        output = Path(self.tmp.name) / "preserved.mp4"
+        subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(self.video),
+            "-c:v", "copy", "-af", "adelay=43:all=1", "-c:a", "aac", str(delayed)],
+            capture_output=True, check=True, timeout=30)
+        self.assertNotEqual(decoded_audio_hash(delayed), decoded_audio_hash(self.video))
+        report = preserve(self.video, delayed, output, media.sha256(self.video))
+        self.assertEqual(decoded_audio_hash(output), decoded_audio_hash(self.video))
+        self.assertTrue(media.technical_qc(output, 0.4, 25)["technicalPassed"])
+        self.assertFalse(report["productionReady"])
+        before = media.sha256(output)
+        with self.assertRaises(FileExistsError):
+            preserve(self.video, delayed, output, media.sha256(self.video))
+        self.assertEqual(before, media.sha256(output))
+
+    def test_audio_preservation_rejects_changed_source_before_writing(self):
+        output = Path(self.tmp.name) / "bad-audio-must-not-exist.mp4"
+        with self.assertRaises(ValueError):
+            preserve(self.video, self.video, output, "0" * 64)
+        self.assertFalse(output.exists())
+
+    def test_audio_preservation_rejects_changed_video_timeline(self):
+        longer = Path(self.tmp.name) / "longer.mp4"
+        output = Path(self.tmp.name) / "changed-timeline-must-not-exist.mp4"
+        subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(self.video),
+            "-vf", "setpts=2*PTS", "-c:v", "libx264", "-preset", "ultrafast", "-c:a", "copy", str(longer)],
+            capture_output=True, check=True, timeout=30)
+        with self.assertRaises(ValueError):
+            preserve(self.video, longer, output, media.sha256(self.video))
+        self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

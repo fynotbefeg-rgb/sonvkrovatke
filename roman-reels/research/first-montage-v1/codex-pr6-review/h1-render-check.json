@@ -1,0 +1,81 @@
+{
+  "reviewedClaudeHead": "9eff02d38e41c32e7664ac200cd64723a89ea325",
+  "variant": "h1",
+  "mode": "development",
+  "independentlyRendered": true,
+  "rawOutputSha256": "2bea6bf0168f5ea871f2df8b107320f1bee13f412bde7991af5a404ab43161e7",
+  "correctedOutputSha256": "0087b4c6ffbb226335ebf81100edd57e620322be21f9bc8e5b744552bdbde6bc",
+  "audioPreservation": {
+    "strategy": "copy_original_aac_full_timeline",
+    "decodedAudioHash": "SHA256=9ecf4a26b8fc7d95deed515d48424fa3797e5f21e8a02981d19eff4885337bf9",
+    "sourceSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+    "audioClock": {
+      "start": 0.0,
+      "duration": 40.24,
+      "sampleRate": 48000
+    },
+    "productionReady": false
+  },
+  "technicalQc": {
+    "technicalPassed": true,
+    "technicalChecks": {
+      "decode": true,
+      "resolution": true,
+      "audio": true,
+      "duration": true,
+      "fps": true,
+      "codecs": true
+    },
+    "outputSha256": "0087b4c6ffbb226335ebf81100edd57e620322be21f9bc8e5b744552bdbde6bc",
+    "metadata": {
+      "duration": 40.24,
+      "width": 1080,
+      "height": 1920,
+      "fps": 25.0,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "audioChannels": 2
+    },
+    "productionReady": false,
+    "remainingChecks": [
+      "trusted_current_approval",
+      "transcript_match",
+      "montage_plan",
+      "visual_assets",
+      "subtitle_layout",
+      "visual_review"
+    ]
+  },
+  "audioSampleChecks": [
+    {
+      "sourcePosition": 1,
+      "rawDelaySeconds": 0.042625,
+      "rawCorrelationAtBestLag": 0.974116,
+      "correctedZeroLagCorrelation": 1.0
+    },
+    {
+      "sourcePosition": 10,
+      "rawDelaySeconds": 0.042625,
+      "rawCorrelationAtBestLag": 0.971465,
+      "correctedZeroLagCorrelation": 1.0
+    },
+    {
+      "sourcePosition": 25,
+      "rawDelaySeconds": 0.042625,
+      "rawCorrelationAtBestLag": 0.992042,
+      "correctedZeroLagCorrelation": 1.0
+    },
+    {
+      "sourcePosition": 35,
+      "rawDelaySeconds": 0.042625,
+      "rawCorrelationAtBestLag": 0.983546,
+      "correctedZeroLagCorrelation": 1.0
+    }
+  ],
+  "productionReady": false,
+  "limits": [
+    "h2 and h3 not independently rendered by Codex",
+    "C1 short-event animation bug remains in PR",
+    "No live approval or publication"
+  ]
+}
