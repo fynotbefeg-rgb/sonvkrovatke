@@ -1,0 +1,30 @@
+{
+  "fixtureVersion": "1.0.0",
+  "synthetic": true,
+  "status": "fixtures_prepared",
+  "workflowTested": false,
+  "modelCalled": false,
+  "topicApproved": false,
+  "scriptApproved": false,
+  "productionReady": false,
+  "sha256": {
+    "lead/input.json": "94a17c87f47cc9c4ae6f65dffceb35d35f6deee0982699b3dbe3ce9e806b83bf",
+    "invoices/input.json": "3aeb7bc591d17de4aa9bf98773dd435dc543fca1499a741ab0f3af097bdaf90d",
+    "proposal/input.json": "4d15ea1feb6c89cf744e937235e10fd58874f0af31bc4ce77c718769ce33faf4",
+    "proposal/price-book.json": "89a4ba58e4e05b912089f90b25e8e22c299c120be2f14fb2acfb9149caeb3d23",
+    "proposal/template.md": "a823bc816cb784f9d79fb5dd13daf9b03343f9e88a92369bb40d8e322d5312eb",
+    "expected-results.json": "5f8fca1b42b0acbfdf3dd5bf4cf1c20ab063c58fbbdf80d1b01fdca5535824d9",
+    "lead/request.eml": "c9c46ac890bf4c7f62ea211da0af0efe860dfc753ae1e9385237064bd1819138",
+    "invoices/invoice-001.pdf": "c82a5c6c8dba5fec33af030418e69300375f85d561f2cfb0ade682b371633dad",
+    "invoices/invoice-002.pdf": "b4a96af51bea25ff0f8e31a144491d5c06bcd3732c30e08fcb1ae23e71b2c678",
+    "invoices/invoice-001-replay.pdf": "c82a5c6c8dba5fec33af030418e69300375f85d561f2cfb0ade682b371633dad"
+  },
+  "duplicateOf": {
+    "invoices/invoice-001-replay.pdf": "invoices/invoice-001.pdf"
+  },
+  "limitations": [
+    "Expected values are an oracle, not model results.",
+    "Text-layer PDFs; no OCR/scanned-document test.",
+    "No n8n, Gmail, CRM, Gemini or Google Slides integration executed."
+  ]
+}

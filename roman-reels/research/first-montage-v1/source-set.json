@@ -1,0 +1,26 @@
+{
+  "assemblyVersion": "1.0.0",
+  "mode": "development",
+  "topicId": "ai-shared-body-fixture",
+  "body": {
+    "localPath": "ai/body1.mp4",
+    "sha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e"
+  },
+  "hooks": [
+    {
+      "hookNumber": 1,
+      "localPath": "ai/h1.mp4",
+      "sha256": "8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd"
+    },
+    {
+      "hookNumber": 2,
+      "localPath": "ai/h2.mp4",
+      "sha256": "5ab06283c1f28c3d01da9ee2ac2720a66d4fcc4697f2ef28da36cacf4a43ca2e"
+    },
+    {
+      "hookNumber": 3,
+      "localPath": "ai/h3.mp4",
+      "sha256": "e378029223e4f50e96bc3a82384023b8cc1880b3090518960557d83727a3dce6"
+    }
+  ]
+}

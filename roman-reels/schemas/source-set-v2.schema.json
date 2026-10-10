@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Roman development source set v2: three hooks, one body, two endings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assemblyVersion",
+    "mode",
+    "topicId",
+    "scriptVersion",
+    "body",
+    "hooks",
+    "endings"
+  ],
+  "properties": {
+    "assemblyVersion": {
+      "const": "2.0.0"
+    },
+    "mode": {
+      "const": "development"
+    },
+    "topicId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "scriptVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "body": {
+      "$ref": "#/$defs/part"
+    },
+    "hooks": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "localPath",
+          "sha256",
+          "text",
+          "textHash",
+          "hookNumber"
+        ],
+        "properties": {
+          "localPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "textHash": {
+            "$ref": "#/$defs/hash"
+          },
+          "hookNumber": {
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      }
+    },
+    "endings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "localPath",
+          "sha256",
+          "text",
+          "textHash",
+          "platform"
+        ],
+        "properties": {
+          "localPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "textHash": {
+            "$ref": "#/$defs/hash"
+          },
+          "platform": {
+            "enum": [
+              "instagram",
+              "tiktok"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localPath",
+        "sha256",
+        "text",
+        "textHash"
+      ],
+      "properties": {
+        "localPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "textHash": {
+          "$ref": "#/$defs/hash"
+        }
+      }
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

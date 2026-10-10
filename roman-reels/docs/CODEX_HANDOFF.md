@@ -1,6 +1,209 @@
 # Codex handoff — Roman Reels automation
 Updated: 2026-10-10
 
+## Authoritative specification 3.0 — start here
+
+LATEST Drive intake: DRIVE_AUTOMATIC_INTAKE.md. Existing GDRIVE_SA_JSON reader
+confirmed incoming access on Actions; writer granted only to user-owned state JSON
+1hOa9obXHrlj-BKQw9vTfHYoUJ6gp5EYP under assets/_pipeline-state. No new secrets.
+New bounded scan downloads by ID, verifies Drive MD5/metadata, receipt revision/text
+hashes/SHA/decode and persists source-set handoffs. No render/generation performed.
+API returned no ETag; ONLY serialized Actions writer plus journal content-hash
+readback guard, not a distributed CAS. Do not allow Windows to write this ledger.
+Transient retries capped at 3; leases persist; revoked/missing full approvals block
+ready handoff. renderAllowed=false always. Fixed two-topic editorial registry remains.
+Real isolated six-MP4+receipt fixture downloaded/validated; synthetic approval forbidden.
+Default branch is main. Draft PR #7 contains only a three-hour schedule dispatcher,
+feature/roman-intake-scheduler, 9da0b6a. No main changes/merge/schedule enabled.
+OWNER PERMISSION needed for that one file because of explicit main restriction.
+See research/drive-intake-integration-report.json for repeat and CI evidence.
+
+LATEST: six-part DEVELOPMENT intake/assembly implemented, INCOMING_SIX_PARTS.md.
+Native Drive incoming created/verified: 1Qs3YJQB9Hr8H7B0Fa7MWlwsQ0LLGBPoQ inside
+existing assets folder; empty, not connected to Actions/rclone/watchers yet.
+New source-set-v2.schema.json is opt-in; v1 unchanged. Incoming receipt binds
+topic/revision/exact text hashes and MP4 checksums; complete six-part media decode
+and unique path/bytes checks precede assembly. Three hooks + shared body + two
+platform endings produce six QC-checked development sources, never overwrite.
+prepare-assembled-jobs supports both formats; v2 requires both real ending speech
+artifacts and offsets their words/segments after body. Factory contract v1 stays
+unchanged (platform suffix in topicId); approval remains pending, provenance sidecar.
+Two exact recording layouts prepared, incoming-recording-layouts-v2.json.
+Synthetic fixtures are not Roman recordings or speech verification; no new final
+montage render, live production, Google approval, Telegram or HeyGen launch.
+Source assembly and downstream contract jobs verified locally: 10 platform intake,
+5 legacy assembly, 4 legacy job, 6 contract and 10 media Python tests; both JS
+ending/shared-body suites pass. Evidence: research/six-part-intake-test-report.json.
+Earlier "v1 only" notes are historical; full production integration remains absent.
+
+Owner reports Roman approved platform endings (chat: Утвердил). Recorded all
+four exact ending texts/hashes in research/platform-endings-approval-record.json;
+scope is endings ONLY, source is owner relay, not authenticated bot identity.
+Complete review pack ROMAN_RECORDING_TEXTS.md prepared with both bodies, six hooks
+and approved endings. Live D5:D10 still blank at 12:01 UTC; no full-script approval
+reported. Do not request voice recording until hooks/shared bodies are approved.
+Existing full draft statuses and productionReady=false preserved. No paid calls.
+
+Owner requests Instagram/TikTok-specific endings. Opt-in editorial builder
+platform-ending-drafts.mjs prepared 12 pending full variants for two topics.
+Same 3 hooks/body, separate ending/platform IDs and full-script hashes; TikTok
+CTA requests DM keyword, never comments. Official ManyChat docs checked; no
+Roman account capability or live automation verified. PLATFORM_ENDINGS.md.
+FFmpeg concatenate supports optional third part; real media order/QC test passes.
+6 ending + 3 shared-body + 5 source-set tests pass. Media source-set v1 and speech
+adapter remain unchanged; full platform-ending render integration not completed.
+Sheet C/B/D preserved, D5:D10 still blank at last read. No HeyGen/messages launched.
+
+B5/B8 now read as Утверждено. After primary-source checks, Codex prepared
+6 editorial hooks in C5:C10 and 2 shared-body drafts in
+research/approved-topics-drafts-v1.json (not Gemini API-generated).
+B decisions preserved; D decisions still blank; no canonical approval changes.
+sharedBodyDrafts validates both sets and body hashes; full variants 128–136 words.
+See SELECTED_TOPICS_RESEARCH.md for methods/sources and remaining research limits.
+Live sheet-change automation is not wired; this was explicit one-shot completion.
+
+Owner supplied Roman's voice-message screen recording; local CPU ASR completed
+without paid APIs. Roman wants deep research of the selected business problem,
+current alternatives, costs and practitioner examples BEFORE script generation.
+Interest in two new themes is not exact-script approval. Owner separately says
+Roman records his own voice for now; require three audio hooks + shared audio body
+and verify allowed own-audio/avatar workflow in HeyGen before implementation.
+See ROMAN_EDITORIAL_REQUIREMENTS.md. No synthetic voice or real HeyGen launched.
+
+Owner requests autonomous reference discovery and handoff to Windows HeyGen,
+then Claude's montage runtime. Reviewable integration proposal recorded in
+AUTONOMOUS_PRODUCTION_FLOW.md and CODEX_TASKS.md. Weekly Apify cap $1,
+monthly cap $5 APPROVED by owner 2026-10-10. Recurring scheduling and durable
+budget guard are not yet deployed.
+Existing $1 permission was one probe only. Four parts per topic -> three reels.
+Simple Sheet gates/Telegram transport/durable cloud ledger remain disconnected;
+HeyGen UI has policy_permission_required and Windows remains unavailable.
+
+Apify requested for reference analysis. Read-only account access verified by successful
+GitHub Actions run 38040963236, automation/roman-reels-v1; no Actor started.
+APIFY_TOKEN absent locally, GitHub secrets cannot be read/listed by current integration,
+but Actions can use the existing secret. No Apify connector found in plugin search.
+Owner explicitly approved up to $1 including transcript and video. Bounded staged
+collector implemented in scripts/apify-reference-research.mjs: two profile runs
+at $0.10 each, then up to two selected Reel runs at $0.40 each. Metadata contains
+no media add-ons; detail stage enables transcripts and downloaded videos.
+Nine regression tests pass, including ambiguous POST/no retry and cap verification.
+Manual opt-in Actions job on feature/codex-pipeline only; do not rerun paid stages
+in a fresh workspace under this budget. Two references verified: speech and MP4 obtained, 20 frames inspected each.
+See APIFY_REFERENCE_ANALYSIS.md and research/apify-reference-results.json.
+Live simple Sheet A5:G10 now contains two topics, analysis, counters and links;
+owner broadened topic 3 (A8/E8) to YouTube + Instagram + Telegram. Reference
+remains YouTube-only; cross-platform content adaptation is our proposed angle.
+B5/B8 blank and hook fields blank. No decisions or production status changed.
+Metadata feed included collaborations owned by other accounts; initial strict check
+failed after both paid runs. Read-only recovery preserved results, collector now
+excludes mismatched owners. No paid stages repeated.
+Public reach remains unavailable; transcript does not constitute montage inspection.
+
+LATEST live review layout simplified at explicit owner request. Sole visible tab
+is `Темы и хуки` (323200067), A:G: topic, topic decision, hook, hook decision,
+reference analysis, metrics, URL. One topic = 3 rows; B/D accept Утверждено or
+Не утверждено. Canonical texts/decisions unchanged; all old tabs preserved hidden.
+Rows 2–4 existing rejected pilot, rows 5–7 SEO reference, rows 8–10 cross-platform topic.
+No hook generation or production launch. NEW VIEW DECISIONS NOT YET CONNECTED
+to Apps Script: do not treat hook approval as full-script approval. See SIMPLE_ROMAN_REVIEW.md.
+
+New editorial requirement from Roman: select topics FIRST, each backed by analysis
+and an external successful example; generate shared body + 3 hooks only for selected
+topics. Topic selection is separate from exact-script approval and video launch.
+Target fields/gates and implementation limits: TOPIC_SELECTION_WORKFLOW.md.
+Owner approved creation of the topic tab. Live Sheets now has `Темы и примеры`
+as the first tab, sheetId 128557826: 4 preliminary themes in A4:L7, decisions D,
+comments E, reference verification K, planning month L. All unselected/unviewed;
+source dates/limitations included. Existing scenario decisions were read before/after
+as all three `На доработку` (supersedes older pending descriptions).
+Runtime topic gates remain unimplemented; no approvals or scenario texts changed.
+
+LATEST montage extension: Codex added opt-in word-anchored local interface images
+to Claude's existing Director/RomanFactoryV1, without a schema migration.
+Original business illustration (client message / draft reply) is explicitly marked demo,
+not a Claude screenshot. Wrapper now preserves/checks visualAssets. All 27 TS tests,
+27 Python checks and tsc pass. One full h1 development render passed QC (1080x1920,
+25fps, 40.24s); original AAC PCM hash and audio clock preserved. h2/h3 plans unchanged
+without assets, but not rerendered. Evidence/control frames in research/business-montage-v1.
+Preview is in the test folder; Roman viewer permission not inherited. External Dan Martell
+videos remain unviewed (YouTube fetch/network limitations), so no exact montage comparison
+is claimed. See BUSINESS_MONTAGE_V1.md. Main, script text and approvals untouched.
+
+LATEST: PR #6 merged into feature/codex-pipeline after independent re-review of Claude f45e50a.
+Merge e1a7c31. C1 short-event blocker resolved by timing.ts helper used for accents/zoom.
+tsc, 14 Director + 7 timing tests and 24 Python pipeline tests pass locally. No GitHub check-runs
+exist for this SHA. Original AAC preservation retained. Main/approvals unchanged.
+Details and remaining speech/visual review limits: CODEX_PR6_REVIEW.md.
+Director/RomanFactoryV1 are integrated development components, not a production factory.
+
+Initial PR #6 review, superseded above: Claude HEAD 9eff02d delivered Director/RomanFactoryV1 and 3 claimed renders.
+Codex independently verified tsc, 14 Director tests, existing 21 Python checks, and full h1 render/QC.
+Review found blocker C1: fixed envelope fade times become non-monotonic for short trimmed accents,
+e.g. adjacent Claude/Gemini terms. C1 is now fixed; original reproduction: CODEX_PR6_REVIEW.md.
+Codex fixed P1 source-audio preservation in the development wrapper: original AAC stream copy,
+full decoded PCM hash + audio clock verification, no re-encoding; 10 media tests pass.
+Actual h1 Remotion delay measured 42.625ms; corrected full h1 PCM/clock matches source exactly.
+Evidence in research/first-montage-v1/codex-pr6-review; no production, Google write or paid call.
+
+Live Google Sheet review layout updated at owner's request: first tab `3 хука + основа`
+shows one shared body and three hook/status links. Test rows 2–4 removed from working `Сценарии`,
+with a full hidden archive retained. Canonical pilot rows now 2–4, full texts remain literal F values;
+technical columns hidden, existing G approval dropdown unchanged. Verified readback preserves texts
+and decisions: knowledge-price h1/h2 pending, h3 redo. These are real pilot drafts, not approved scripts.
+No component-level approval migration or messages/generation performed. See SHEETS_SHARED_BODY_REVIEW.md.
+
+Latest user requirement: 3 separate hooks + ONE shared body. Implemented development FFmpeg source
+assembly (assemble-source-set.py), source-set schema, local rr/incoming (video ignored by Git),
+3 real assembled/QC-passed sources, and future Gemini common-body drafts builder. No paid Gemini run.
+See SHARED_BODY_ASSEMBLY.md. Four assembly tests + three draft tests pass. Production and Drive
+4-part intake are NOT wired; no approval bypass. Director receives assembled full video + verified timings.
+
+Next completed step: real local hook ASR (14/18/10 words) combined with verified 81-word body cache.
+`prepare-assembled-jobs.py` verifies original/output SHA, actual media, assembly geometry, intervals,
+and produces three pending development contract jobs (95/99/91 words). Evidence and jobs live in
+`research/first-montage-v1/assembled-jobs/`; see SHARED_BODY_ASSEMBLY.md for repeatable commands.
+`check-assembly-audio.py` verified 18 decoded audio windows at exact part offsets (all >0.9997).
+These are cached part timings with offsets, NOT a new ASR/forced alignment of assembled audio.
+Four new assembled-job integration tests plus 7 media, 6 contract, 2 Claude packet tests pass.
+Claude P1 task names the three complete inputs. Director/composition have since been delivered.
+No production approval, paid request, upload or Sheets write was performed by this speech stage.
+
+Owner agreed contract v1 and P1 after PR #5, 2026-10-10. New Codex work on feature/codex-pipeline:
+81 real ASR words; zero-duration preposition blocked two raw attempts; one 23-word segment was
+acoustically realigned by local Russian Wav2Vec2 CTC, no interpolation. Development job and source
+technical QC pass. Precise benchmark/versions/limitations: FIRST_MONTAGE_P1.md.
+Director and generalized Remotion are now integrated via PR #6; runner still blocks when missing.
+Historical first-stage checks: seven media, six contract and two Claude packet tests passed.
+prepare-claude-job now reads CLAUDE_P1_EXECUTION.md. No actual Claude run, upload, Sheets mutations,
+HeyGen execution or paid model calls. GitHub variables read is 403; configured OAuth is unverified.
+Cloud Claude access subsequently confirmed by the owner; PR #6 delivered and merged. No Windows setup required now.
+
+Latest user specification supersedes conflicting role/approval/branch suggestions below.
+Codex owns pipeline integration; Claude Code owns AI Montage Director and Remotion.
+Approvals remain in existing Google Sheets; Telegram is the production start control, not a substitute identity receipt.
+Windows is temporarily unavailable and is not the whole factory server. No HeyGen API.
+Current HeyGen terms were checked: permission for the proposed UI workflow is not established;
+real browser automation is gated pending a permissible basis. Manual MP4 intake/cloud work can continue.
+
+Current audit baseline: `f3a4bfd` on `automation/roman-reels-v1`.
+Documentation/candidate-contract work is isolated on `feature/codex-pipeline`, PR target automation;
+Claude uses `feature/claude-montage` from the latest integration base. Never change main.
+No production migration or paid generation was performed by this audit.
+
+- [AUDIT_V3.md](AUDIT_V3.md): evidence, Actions runs, real MP4 and 8 existing TypeScript errors.
+- [CLAUDE_TASKS.md](CLAUDE_TASKS.md) / [CODEX_TASKS.md](CODEX_TASKS.md): ownership and acceptance tests.
+- [INTEGRATION_CONTRACT.md](INTEGRATION_CONTRACT.md): proposed schema 1.0.0, exact legacy hash preservation;
+  offline validator and six synthetic tests, not a deployed production gate.
+- [HEYGEN_BROWSER_AUTOMATION.md](HEYGEN_BROWSER_AUTOMATION.md) / [WINDOWS_SETUP.md](WINDOWS_SETUP.md): future worker and preparation.
+- [ROADMAP.md](ROADMAP.md): first one-MP4 development montage, no publication or forged approval.
+
+Validation: all 45 existing offline tests pass; Remotion bundle succeeds; tsc has 8 pre-existing errors.
+`pv/public/ai/body1.mp4` passes full FFmpeg decode and has actual 1080×1920 video/AAC audio.
+Real speech data and source technical QC are now delivered (see FIRST_MONTAGE_P1.md).
+Director/generalized render/full output QC are still not delivered. Owner agreed contract v1 and P1;
+next dependency is an authorized Claude Code connection, not another architecture approval.
+
 ## Codex continuation — 2026-10-10
 - New manual/Windows queue CI verified: registered run `38019089716` on `6fecade` SUCCESS, only production-queue-tests job ran, 12 queue + 8 intake tests on Node22 passed. Claude/Google/Apify/Remotion jobs skipped. No live bot, credit-consuming generation or approval mutations performed. User's bot existence/public username question remains pending.
 - User says no person can access Windows laptop now. Continue development **without laptop** and swap manual avatar upload to Windows UI provider later. Implemented SQLite production queue + transport-independent Telegram start controller: authenticated-server approvals injection, frozen short tickets, authorized private chat, atomic multi-version start/dedup callbacks, persistent production_key independent of provider, waiting-only provider switch. **No real Telegram transport, bot deployment, worker lease, HeyGen execution, download/render or Google approval writes.** All returned jobs blocked from render/generation. Twelve new tests + eight intake tests pass locally; registered workflow has isolated offline test_production_queue mode for Node22. Runtime DB excluded from Git. See AVATAR_PROVIDERS.md for strict hosting/storage/transport boundaries. Asked whether bot already exists, requesting only public username, never token.
@@ -78,3 +281,266 @@ Tool responsibilities follow [PROJECT_ROLES.md](PROJECT_ROLES.md). Claude Code d
 - Apps Script web app has an externally reachable URL; shared secret must be validated server-side.
 - GitHub branch has diverged from `main`; avoid broad merges.
 - Existing draft smoke test generates scripts; it is not evidence of complete 90-video production.
+
+## 2026-10-10: расписание и замечания Романа
+
+С разрешения владельца PR #7 слит в main: только dispatcher, merge
+534f9cc39403a292d3bc563dd1a3639df004a251. Первый запуск dispatcher
+38059552695 и child intake 38059561816 успешны. Проверка Drive каждые
+3 часа; рендер/платные API не подключены, cron ещё не наблюдался.
+
+Обе основы revision 1 отклонены по переданному скриншоту Telegram.
+Это Codex editorial drafts, не Gemini-generation. Новые критерии и
+история источников: ROMAN_REVISION_BRIEF.md. Реализован точный редакционный
+запрет в intake; старые body/fullscript не продвигаются даже при наличии
+старых approval records. Исходные версии сохранены; Google topic/hook
+choices и owner-relayed ending approval не изменены. Google Doc для
+Романа помечен «На доработке». Новых фактических демо/основ пока нет.
+
+Проверка запрета на коде a09a127: локально 50 Python-тестов (intake 15)
+и две JS-проверки прошли. Реальный Actions intake 38059814561 — success,
+awaiting_script_revision, downloaded=0, stateSequence=16. Новые записи
+утверждений и генерация видео не выполнялись. Доказательства сохранены
+в research/drive-intake-integration-report.json.
+
+## Gemini revision 2 — подготовка
+
+Добавлен исследовательский запрос для одной SEO-темы: явное учебное демо,
+источники, замечания Романа, сравнение способов. Три строки Search Console
+обработаны локально, CRM CTR=1%, не кейс клиента и не доказанный эффект ИИ.
+Существующий legacy generator сохранён; отдельный researched runner создаёт
+pending revision 2, без отправки в Sheets/Drive и без inherited approvals.
+В зарегистрированном roman-gemini-smoke.yml default prepare_research только
+проверяет доступ GET и сохраняет запрос; генерация требует allow_generation.
+Ограничение: max 1 POST, 4096 output tokens, no retry/fallback; стоимость неизвестна.
+Исследование и настоящий текст ещё требуют редакционной проверки.
+См. GEMINI_RESEARCH_REVISIONS.md. Не запускать legacy smoke для revision 2.
+
+Проверка prepare_research на 83ddad9: Actions 38060761370 success.
+Существующий ключ работает, gemini-2.5-flash-lite доступна; generationCalls=0.
+Точный запрос сохранён в артефакте, Sheets/утверждения не менялись.
+5 сценариев исследовательского теста и 2 существующих JS-файла прошли;
+оба workflow YAML проверены. Тариф/бесплатный лимит неизвестны; нужен
+согласованный один generation POST перед generate_research.
+
+## Первая реальная Gemini revision-2 попытка
+
+Владелец согласовал ровно один запрос. Actions 38060874104, 0c99aac:
+generateContent gemini-2.5-flash-lite — HTTP 404, новая речь отсутствует,
+без retry и без Sheets. Каталог не гарантирует генерацию. Ответ с причиной
+не сохранён прежним runner; не объявлять модель снятой/ключ неверным.
+Добавлена редактированная диагностика errors и always-upload артефактов.
+Read-only 38061024656: GET detail для 2.5-flash-lite/3-flash-preview=200,
+оба есть в каталоге. Следующий кандидат — ранее работавший в проекте
+gemini-3-flash-preview, предел 4096, 1 POST, no fallback. Нужна новая
+одноразовая авторизация; не выполнять второй запрос без неё.
+
+## Gemini SEO revision 2 — получена и проверена
+
+Владелец разрешил любое количество запросов Gemini для продолжения задачи:
+не спрашивать отдельное разрешение перед каждым повтором. Предел одного
+POST/запуск и журнал сохраняются; это не разрешение на HeyGen/публикацию.
+
+Gemini 3 Flash generation 38061905345 success, первая речь сохранена
+generated-v2.json и отклонена редакционно: приписала фильтр ИИ и не дала
+конкретного нового заголовка. Исправленный brief: 38062146804 success;
+generated-v2-iteration2.json сохранён отдельно. Codex исправил хук с
+недоказанной причинностью, «нет кликов» и выдуманный личный опыт Романа;
+reviewed-v2.json — Gemini-author/Codex-editor. Учебный пример, не кейс.
+Фильтр выполнен скриптом, предложение заголовка действительно в ответе ИИ.
+
+Подготовлены 6 полных pending вариантов revision 2 с прежними окончаниями,
+132–136 слов; incoming.expectations подтверждает 6 частей/revision 2.
+platform-packet-revision2.json — ещё НЕ активный источник intake; обе старые
+revision 1 остаются заблокированы. Не наследовать owner-relayed approval
+отдельных окончаний как утверждение полной новой речи.
+
+Google Doc 1q-Cr0jeYe6beBq5vTDSOnAnEP-7kX-pZJqdMOq_l094 обновлён: SEO v2
+на проверке, соцсети v1 на доработке. Readback подтвердил основу/3 хука
+и оба исходных окончания. Предыдущий текст сохранён в Git и
+ROMAN_RECORDING_TEXTS_V1_ARCHIVE.md. Sheets/утверждения/рендер не менялись.
+
+Артефакт не скачивался напрямую в Codex (storage 403), поэтому добавлен
+read-only inspect_saved: GitHub runner читает известный успешный артефакт
+и выводит только проверенный pending snapshot без ключа/транспортных заголовков.
+Read runs 38062035176/38062202779 success; новых модельных вызовов там нет.
+5 research-test сценариев, 2 existing JS files прошли. Actual cost unknown,
+usageMetadata успешных вызовов: 3716 + 3758 токенов.
+Следующий этап: Роман проверяет SEO v2; после утверждения зафиксировать
+точные 6 полных текстов через authenticated approval flow и активировать v2
+в scanner. Соцсети нужно отдельно переработать; не объявлять их готовыми.
+
+
+## 2026-10-10 — новая узкая тема MCP, revision 3 (pending)
+
+Этот раздел заменяет предыдущий следующий шаг «Роман проверяет SEO v2».
+Роман попросил узкую автоматизацию вместо доступной всем общей информации.
+SEO revision 2 помечена на доработку с её точным хешем; выбор темы/хуков в
+Sheets не изменён. Предложено новое направление: проверка назначения кнопки
+заявки через Playwright MCP. Тема и речь требуют нового утверждения.
+
+Официальные Microsoft/Claude MCP документы проверены. Реально установлен
+@playwright/mcp@0.0.83 и Chromium Headless Shell в isolated scratch.
+run-mcp-site-demo.mjs вызывает настоящие MCP browser tools через SDK: свой
+учебный localhost сайт, клик по CTA, 404 → исправление ссылки → 200.
+Скриншоты и report в research/mcp-site-check/evidence. Это программный
+исполнитель, НЕ живая Claude Code сессия, НЕ кейс клиента/SEO/CRM тест.
+В контейнере sandbox браузера недоступен; явный opt-in no-sandbox использован
+только для собственного учебного localhost примера. Не переносить это
+как настройку Windows по умолчанию. Установка MCP не создаёт расписание.
+
+Gemini generation 38063671108 success, read-only inspector 38063753133 success.
+generated-revision3.json сохранён; reviewed-revision3.json прозрачно отмечает
+Gemini-author/Codex-editor. Редакция упростила речь и убрала смешение реального
+программного теста с предложенным использованием в Claude. 6 новых pending
+полных вариантов, 133–135 слов; contract/expectations: revision3, 6 частей.
+Старые окончания сохранены, но полный новый текст утверждение не наследует.
+
+Google Doc обновлён и проверен readback. ROMAN_RECORDING_TEXTS.md текущий v3;
+ROMAN_RECORDING_TEXTS_V2_ARCHIVE.md сохраняет старую v2. Соцсети v1 на доработке.
+6 research-test сценариев и existing shared-body/platform-ending test files
+прошли. Реальный MCP paired smoke прошёл. Главные границы: Windows/Claude
+сессия не проверены, реального клиента нет, scheduler сайта не реализован.
+Новый packet не активирован в intake; main/Sheets/утверждения/рендер не менялись.
+Следующий шаг: Роман оценивает новую узкую тему и точную речь; до этого голос
+не записывать и новую версию в производство не отправлять.
+
+
+## 2026-10-10 — фокус исследования и очистка документа
+
+По указанию владельца искать популярные ролики о системах автоматизации
+бизнеса и задачах предпринимателей с ИИ в целом, не ограничиваться MCP.
+Порядок: внешний ролик → подтверждённые просмотры/лайки/комментарии с датой
+(охват только если доступен, не приравнивать к просмотрам) → анализ реального
+содержания и конкретного процесса → проверка технических утверждений →
+предложение темы Роману → Gemini: одна основа и три хука → утверждение речи.
+MCP — один из инструментов, а не единственное направление. Если нет доступа
+к содержанию/показателю, явно указывать пробел; не выдавать учебный пример
+за исследование популярного ролика. Текущий MCP v3 — pending предложение
+с учебной демонстрацией, не результат анализа подтверждённого viral ролика.
+
+Из Google Doc и текущего ROMAN_RECORDING_TEXTS.md удалён целиком неудачный
+раздел «Соцсети — версия 1, на доработке» и упоминания старых редакций в
+инструкциях. Текущий MCP v3, основа, 3 хука, окончания и статус pending
+сохранены. Старые версии остаются только в Git/архивах, не в документе Романа.
+Утверждения/Sheets/очередь/main не изменены.
+
+## 2026-10-10 — подборка следующих бизнес-автоматизаций
+
+BUSINESS_AUTOMATION_SHORTLIST.md и research/business-automation-shortlist-v1.json:
+5 предложений (заявка → карточка/черновик; PDF-счёт → поля/таблица;
+Telegram → баннер/правка; анкета → предложение; письма поддержки → очередь).
+4 внешних видео, НЕ 5 независимо проверенных viral Reels. Первые две темы
+используют один 8-часовой курс Nate Herk: SocialCounts показывает 1 937 830
+просмотров / 60 327 лайков / 1 785 комментариев у курса целиком. Эти показатели
+не суммировать по темам. У маркетинговой демонстрации сторонний разбор
+показывает 853 575 просмотров, лайки/комментарии неизвестны. Предложение
+и почтовый помощник — резерв: поисковые снимки 37 323/885 и 80 348/1 100,
+не подтверждённые популярные короткие ролики. Дата актуальности всех снимков
+неизвестна; observation 2026-10-10 не является датой счётчиков; охват неизвестен.
+
+Новые видео целиком не просмотрены: текстовые разборы/главы и технические
+страницы. Шаблоны сообщества n8n проверены по описанию, но не запущены;
+предлагаемые адаптации отделены от источников. Новых платных Apify/Gemini/
+image API запусков не было. В Google Doc добавлена отдельная вкладка
+«Следующие темы — выбор»; текущий MCP v3 сохраняется в первой вкладке.
+Следующий этап: Роман выбирает номера → усилить/проверить референс и свой
+узкий процесс → Gemini основа + 3 хука → отдельное утверждение точной речи.
+Не отправлять эту подборку или pending MCP в производство. Sheets, approvals,
+scanner, очередь и main не менялись.
+
+## 2026-10-10 — редакторские правила Gemini без новых генераций
+
+GEMINI_EDITORIAL_RULES.md (1.0.0) подключён к researchPrompt через
+editorial-rules.mjs: узкая задача бизнеса, вход/выход, инструменты и доступы,
+собственное доказательство результата, честная статистика/доступ к видео,
+стоимость/пределы, одна основа и три доказуемых хука. MCP не единственный
+инструмент. При нехватке фактов Gemini должен вернуть insufficient_evidence.
+
+researchedDrafts добавляет отдельный editorialReview: pending_review,
+восемь критериев pending, без проверяющего/решения. Ответ модели и metadata
+не могут сами утвердить этот чек-лист. Проверка смысла/фактов остаётся
+редакторской работой Codex; документ/чек-лист не заменяет production gate.
+prepare сохраняет версию и SHA-256 правил. Правила загружаются из одного
+файла; изменения этого файла включены в PR path-filter офлайн тестов.
+
+GEMINI_EDITORIAL_WORKFLOW.md описывает шаги после выбора темы и ограничения:
+выбор пока не проверяется автоматически, брифы с synthetic demo/revision>=2,
+legacy_smoke не подключён к новым правилам и способен писать в Sheets;
+GitHub selector пока только seo/mcp_site. Новую подборку нельзя передать
+генератору как готовый бриф. Исторические тексты/хеши не пересчитывались.
+
+Локально прошли 8 research-тестов, включая офлайн prepare обоих исторических
+брифов без ключа и запрет network; 3 shared-body и 6 platform-ending тестов.
+В запросы реального Gemini ничего не отправлялось. Новых платных запусков,
+правок Google Doc/Sheets/утверждений/очереди/main нет. Следующий шаг —
+выбор темы Романом; затем исследование/свой тест и только после этого речь.
+
+## 2026-10-10 — учебные данные до выбора темы
+
+research/business-automation-demo-v1: заявка JSON/EML, два PDF-счёта и
+побайтовый повтор первого, анкета/учебный прайс/Markdown-шаблон предложения,
+эталон expected-results.json, SHA-256 manifest и validation-report.json.
+Все данные вымышлены, email домены .example; реальные банковские реквизиты
+отсутствуют. Неизвестные бюджет/телефон остаются null. Суммы счетов
+23 990,50 RUB и 1 500,00 EUR; эталон предложения 17 500,00 RUB, не реальный
+прайс/оферта. Эталон не передавать модели как вход извлечения.
+
+build-business-demo-fixtures.py локально строит EML/PDF, проверяет Decimal
+арифметику, не перезаписывает отличающиеся файлы. ReportLab/DejaVuSans
+доступны в текущей среде; для повторения нужны эти зависимости. Проверены
+хеши, EML readback, суммы/валюты, идентичность повтора, поля шаблона,
+две одностраничные PDF через pypdf и визуально; повторная сборка идентична.
+Файлы имеют текстовый слой: OCR и плохие сканы не проверены.
+
+Это входы и ожидаемые значения, НЕ успешный бизнес-кейс: n8n/Gemini/CRM/
+Google Slides не запускались, готовое предложение не генерировалось.
+Выбор темы/текста Романом не получен, workflowTested/productionReady=false.
+Sheets/Drive/утверждения/текущая речь/очередь/main не менялись. Платных вызовов
+нет. Следующий шаг после выбора — тест выбранной связки на этих входах,
+сохранение настоящего результата и отдельная подготовка речи/трёх хуков.
+
+## 2026-10-10 — обратная связь Романа: расширить проверку сайта
+
+Роман считает MCP-направление полезным, но проверку одной кнопки слишком
+узкой. Просит исследовать актуальные способы проверки сайта и вариант
+одного запроса. Это обратная связь/интерес к теме, НЕ утверждение речи v3.
+MCP_SITE_AUDIT_RESEARCH.md фиксирует проверенные официальные документы:
+автозапуск MCP из включённого плагина ≠ установка Playwright по умолчанию;
+автоскачивание браузера ≠ подключение сервера; Claude in Chrome отдельно;
+CLI+skills и Test Agents planner/generator/healer — современные варианты.
+Healer может skip сломанную функцию: зелёный результат не доказывает её починку.
+
+research/mcp-site-audit-current/site-audit-prompt.md — будущий многосценарный
+эксперимент: карта покрытия, переходы, ресурсы, мобильный путь, форма/учебный
+приёмник, сохранённые тесты, доказательства и явные пробелы. Один промпт может
+задавать много действий после подготовки, но «100% сайта одним запросом»
+не подтверждено. Установка/новая сессия Claude/новый аудит не выполнялись;
+нового популярного видео именно этого формата нет. Старые речь/хеши/Sheets/
+approval/main сохранены. Дальше — свой многосценарный тест, затем новая речь
+Gemini и отдельное утверждение; не представлять старый один CTA как полный аудит.
+
+## 2026-10-10 — многосценарный учебный сайт: реальный browser smoke
+
+fixture-site.mjs и run-site-audit-demo.mjs: сохранённые девять сценариев,
+4 ожидаемые страницы, картинки, desktop/mobile меню, переполнение при 390px,
+пустая/неверная форма, получение заявки в локальном in-memory приёмнике,
+защита от повтора. В broken состоянии 1 PASS / 8 FAIL; fixed 9 PASS;
+BLOCKED нет. Тесты одинаковые; дефекты и исправления заложены Codex.
+DEMO_RESULT.md и evidence/audit-report.json +18 PNG сохраняют доказательства.
+Скриншоты показывают конечное состояние сценария; HTTP/получение — в JSON.
+
+Реальный Playwright core запуск с уже установленным alpha исполнителем,
+НЕ MCP-протокол, НЕ Claude/AI-поиск ошибок, НЕ доказательство «одним промптом».
+Default shell блокировал локальные сокеты; successful run потребовал
+network grant и explicit SITE_AUDIT_DEMO_NO_SANDBOX=true для собственного
+loopback сайта. Browser requests ограничены одним origin, live account нет.
+Не переносить no-sandbox в настоящую браузерную автоматизацию.
+
+Проверено различение broken/fixed, все evidence файлы присутствуют, визуально
+проверены mobile overflow/fixed form. PDF/сценарный/монтажный код не менялся.
+Платных вызовов/Claude/Gemini/Google правок/approval/main изменений нет.
+Ограничения: 4 страницы и 9 заданных сценариев, нет реального iPhone/CRM,
+постоянного receiver, полного SEO/security/accessibility/performance аудита.
+Следующий шаг — редакция темы на основании этих результатов или отдельный
+AI-driven эксперимент; никакой новый текст пока не утверждён.

@@ -1,0 +1,441 @@
+{
+  "checkedAt": "2026-10-10T20:24:39.318Z",
+  "synthetic": true,
+  "driver": "Saved, manually authored Playwright browser scenarios",
+  "playwrightVersion": "1.64.0-alpha-1790635538000",
+  "browserVersion": "155.0.8059.12",
+  "browserSandbox": false,
+  "modelCalls": 0,
+  "claudeSessionTested": false,
+  "mcpProtocolUsed": false,
+  "onePromptAuditTested": false,
+  "productionReady": false,
+  "inputHashes": {
+    "../research/mcp-site-audit-current/fixture-site.mjs": "b1634995bd7f958d06584d68f29a7f685558b4826470aa4667c4aca035bf1603",
+    "./run-site-audit-demo.mjs": "76282f25b526716502f48ce63df5149e267ba9f097a3eb809ea15aeb7bcf6c32"
+  },
+  "variants": [
+    {
+      "variant": "broken",
+      "checks": [
+        {
+          "id": "pages",
+          "expected": "Все четыре ожидаемые страницы доступны",
+          "status": "FAIL",
+          "observed": [
+            {
+              "route": "/",
+              "httpStatus": 200
+            },
+            {
+              "route": "/services",
+              "httpStatus": 200
+            },
+            {
+              "route": "/pricing",
+              "httpStatus": 404
+            },
+            {
+              "route": "/contact",
+              "httpStatus": 200
+            }
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-pages.png",
+          "consoleErrors": [],
+          "networkErrors": [
+            {
+              "path": "/missing-hero.svg",
+              "status": 404
+            },
+            {
+              "path": "/pricing",
+              "status": 404
+            }
+          ]
+        },
+        {
+          "id": "image",
+          "expected": "Иллюстрация главной страницы загружена",
+          "status": "FAIL",
+          "observed": {
+            "loaded": false,
+            "path": "/missing-hero.svg"
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-image.png",
+          "consoleErrors": [],
+          "networkErrors": [
+            {
+              "path": "/missing-hero.svg",
+              "status": 404
+            }
+          ]
+        },
+        {
+          "id": "desktop-navigation",
+          "expected": "По ссылке меню открываются услуги",
+          "status": "PASS",
+          "observed": {
+            "path": "/services",
+            "heading": "Услуги"
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-desktop-navigation.png",
+          "consoleErrors": [],
+          "networkErrors": [
+            {
+              "path": "/missing-hero.svg",
+              "status": 404
+            }
+          ]
+        },
+        {
+          "id": "mobile-menu",
+          "expected": "Мобильное меню раскрывается и позволяет открыть заявку",
+          "status": "FAIL",
+          "observed": {
+            "menuVisible": false,
+            "path": "/"
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "screenshot": "broken-mobile-menu.png",
+          "consoleErrors": [],
+          "networkErrors": [
+            {
+              "path": "/missing-hero.svg",
+              "status": 404
+            }
+          ]
+        },
+        {
+          "id": "mobile-layout",
+          "expected": "На главной нет горизонтального переполнения при ширине 390",
+          "status": "FAIL",
+          "observed": {
+            "viewport": 390,
+            "contentWidth": 696
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "screenshot": "broken-mobile-layout.png",
+          "consoleErrors": [],
+          "networkErrors": [
+            {
+              "path": "/missing-hero.svg",
+              "status": 404
+            }
+          ]
+        },
+        {
+          "id": "empty",
+          "expected": "Пустая форма не отправляется",
+          "status": "FAIL",
+          "observed": {
+            "browserValid": true,
+            "requestsToReceiver": 1
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-empty.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "invalid-email",
+          "expected": "Некорректный email не отправляется",
+          "status": "FAIL",
+          "observed": {
+            "browserValid": true,
+            "requestsToReceiver": 1
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-invalid-email.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "delivery",
+          "expected": "Заявка действительно появилась в учебном приёмнике",
+          "status": "FAIL",
+          "observed": {
+            "successNotice": "Учебная заявка принята",
+            "receiverRecords": []
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-delivery.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "duplicate",
+          "expected": "Повтор той же заявки не создаёт вторую запись",
+          "status": "FAIL",
+          "observed": {
+            "requestsToReceiver": 2,
+            "receiverRecords": [
+              {
+                "name": "Учебный клиент",
+                "email": "demo@fixture.example",
+                "caseId": "duplicate"
+              },
+              {
+                "name": "Учебный клиент",
+                "email": "demo@fixture.example",
+                "caseId": "duplicate"
+              }
+            ]
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "broken-duplicate.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        }
+      ],
+      "pass": 1,
+      "fail": 8,
+      "blocked": 0
+    },
+    {
+      "variant": "fixed",
+      "checks": [
+        {
+          "id": "pages",
+          "expected": "Все четыре ожидаемые страницы доступны",
+          "status": "PASS",
+          "observed": [
+            {
+              "route": "/",
+              "httpStatus": 200
+            },
+            {
+              "route": "/services",
+              "httpStatus": 200
+            },
+            {
+              "route": "/pricing",
+              "httpStatus": 200
+            },
+            {
+              "route": "/contact",
+              "httpStatus": 200
+            }
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-pages.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "image",
+          "expected": "Иллюстрация главной страницы загружена",
+          "status": "PASS",
+          "observed": {
+            "loaded": true,
+            "path": "/hero.svg"
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-image.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "desktop-navigation",
+          "expected": "По ссылке меню открываются услуги",
+          "status": "PASS",
+          "observed": {
+            "path": "/services",
+            "heading": "Услуги"
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-desktop-navigation.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "mobile-menu",
+          "expected": "Мобильное меню раскрывается и позволяет открыть заявку",
+          "status": "PASS",
+          "observed": {
+            "menuVisible": true,
+            "path": "/contact"
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "screenshot": "fixed-mobile-menu.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "mobile-layout",
+          "expected": "На главной нет горизонтального переполнения при ширине 390",
+          "status": "PASS",
+          "observed": {
+            "viewport": 390,
+            "contentWidth": 390
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "screenshot": "fixed-mobile-layout.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "empty",
+          "expected": "Пустая форма не отправляется",
+          "status": "PASS",
+          "observed": {
+            "browserValid": false,
+            "requestsToReceiver": 0
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-empty.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "invalid-email",
+          "expected": "Некорректный email не отправляется",
+          "status": "PASS",
+          "observed": {
+            "browserValid": false,
+            "requestsToReceiver": 0
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-invalid-email.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "delivery",
+          "expected": "Заявка действительно появилась в учебном приёмнике",
+          "status": "PASS",
+          "observed": {
+            "successNotice": "Учебная заявка принята",
+            "receiverRecords": [
+              {
+                "name": "Учебный клиент",
+                "email": "demo@fixture.example",
+                "caseId": "delivery"
+              }
+            ]
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-delivery.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        },
+        {
+          "id": "duplicate",
+          "expected": "Повтор той же заявки не создаёт вторую запись",
+          "status": "PASS",
+          "observed": {
+            "requestsToReceiver": 2,
+            "receiverRecords": [
+              {
+                "name": "Учебный клиент",
+                "email": "demo@fixture.example",
+                "caseId": "duplicate"
+              }
+            ]
+          },
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "screenshot": "fixed-duplicate.png",
+          "consoleErrors": [],
+          "networkErrors": []
+        }
+      ],
+      "pass": 9,
+      "fail": 0,
+      "blocked": 0
+    }
+  ],
+  "coverage": {
+    "expectedPages": [
+      "/",
+      "/services",
+      "/pricing",
+      "/contact"
+    ],
+    "savedScenarios": [
+      "pages",
+      "image",
+      "desktop-navigation",
+      "mobile-menu",
+      "mobile-layout",
+      "empty",
+      "invalid-email",
+      "delivery",
+      "duplicate"
+    ],
+    "notTested": [
+      "real CRM/email",
+      "live phone",
+      "SEO",
+      "security",
+      "performance",
+      "accessibility audit",
+      "Firefox/WebKit",
+      "authenticated roles",
+      "all possible states"
+    ]
+  },
+  "limitations": [
+    "Synthetic seeded site, not a client audit.",
+    "Known scenarios were authored by Codex; no autonomous discovery or model-generated tests.",
+    "Mobile viewport emulation, not an iPhone.",
+    "Receipt verified in an in-memory local receiver, not persistent external CRM.",
+    "No CI scheduler or Test Agents/healer run.",
+    "Disabled browser sandbox only if explicit local-demo opt-in; do not reuse for real sites."
+  ]
+}

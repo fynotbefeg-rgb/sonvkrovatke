@@ -1,0 +1,24 @@
+{
+  "checkedOn": "2026-10-10",
+  "synthetic": true,
+  "scope": "Fixture preparation and local file verification only",
+  "checks": {
+    "sha256Manifest": "passed",
+    "emailBodyAndMessageIdReadback": "passed",
+    "unknownPhoneAndBudgetRemainNull": "passed",
+    "twoSinglePagePdfsReadableByPypdf": "passed",
+    "twoPdfPagesVisuallyInspected": "passed",
+    "invoiceDecimalArithmeticAndCurrencies": "passed",
+    "replayedInvoiceByteIdentical": "passed",
+    "proposalServiceIdsAndFixedPriceTotal": "passed",
+    "proposalTemplatePlaceholders": "passed",
+    "secondBuildLeavesFixtureBytesUnchanged": "passed"
+  },
+  "businessWorkflowTested": false,
+  "ocrTested": false,
+  "geminiCalled": false,
+  "googleSlidesProposalGenerated": false,
+  "crmOrEmailConnected": false,
+  "scriptApproved": false,
+  "productionReady": false
+}

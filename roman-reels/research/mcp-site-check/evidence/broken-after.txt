@@ -1,0 +1,16 @@
+### Ran Playwright code
+```js
+await page.getByRole('link', { name: 'Оставить заявку' }).click();
+```
+### Page
+- Page URL: http://127.0.0.1:34421/missing-lead
+- Page Title: 404 — учебный сайт
+- HTTP status: 404 Not Found
+- Console: 1 errors, 0 warnings
+### Snapshot
+- [Snapshot](research/mcp-site-check/evidence/page-2026-10-10T15-23-42-345Z.yml)
+### Events
+- New console entries: research/mcp-site-check/evidence/console-2026-10-10T15-23-41-572Z.log#L1
+- generic [active] [ref=f1e1]:
+  - 'heading "404: Страница заявки не найдена" [level=1] [ref=f1e2]'
+  - paragraph [ref=f1e3]: Учебная ошибка, не сайт клиента.

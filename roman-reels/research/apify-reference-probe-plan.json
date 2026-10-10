@@ -1,0 +1,41 @@
+{
+  "status": "approved_up_to_1_usd_including_transcript_and_video",
+  "actor": "apify~instagram-reel-scraper",
+  "total_max_charge_usd": 1,
+  "stage1": {
+    "profiles": [
+      "theautomationguy.ai",
+      "zapier"
+    ],
+    "max_reels_per_profile": 15,
+    "max_runs": 2,
+    "max_charge_per_run_usd": 0.1,
+    "includeTranscript": false,
+    "includeDownloadedVideo": false,
+    "includeSharesCount": false
+  },
+  "stage2": {
+    "max_distinct_reel_urls": 2,
+    "selection": "Concrete AI business process, preferably >=100000 public views; if none qualifies, stop",
+    "max_runs": 2,
+    "max_charge_per_run_usd": 0.4,
+    "includeTranscript": true,
+    "includeDownloadedVideo": true,
+    "includeSharesCount": false
+  },
+  "rules": [
+    "Validate current PPE pricing model and applied maxTotalChargeUsd",
+    "Never retry run-creation POST after an ambiguous response",
+    "Persist run ID immediately, keep dataset identity for verification",
+    "No account upgrade, payment method changes or expanded scope",
+    "Record missing counters as unknown; public views are not reach",
+    "Transcript can support content analysis but not visual montage analysis",
+    "Approval received from owner; total four caps <= $1 including media add-ons",
+    "Do not rerun paid stages in a fresh Actions workspace under this approval"
+  ],
+  "pricing_source": "https://apify.com/apify/instagram-reel-scraper/pricing",
+  "input_source": "https://apify.com/apify/instagram-reel-scraper/input-schema",
+  "checked_at": "2026-10-10",
+  "access_check_run": "https://github.com/fynotbefeg-rgb/sonvkrovatke/actions/runs/38040963236",
+  "access_check_result": "success, no Actors started"
+}

@@ -2,6 +2,7 @@
 // Generates draft Reels scripts using Gemini REST API. Never approves or publishes.
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
+import {sharedBodyDrafts} from './shared-body-drafts.mjs';
 const key=process.env.GEMINI_API_KEY;
 if(!key){console.error('Missing GEMINI_API_KEY');process.exit(1);}
 const input=process.argv[2],output=process.argv[3];
@@ -20,8 +21,9 @@ const candidates=(preferred?[preferred]:['gemini-3-flash-preview','gemini-2.5-fl
 if(!candidates.length)throw Error('No preferred generateContent model listed. Available: '+supported.join(', '));
 console.log('Candidate models:',candidates.join(', '));
 const items=[];
+const sourceSets=[];
 for(const t of topics){
- const prompt=`Ты сценарист коротких вертикальных видео для Романа. Тема: ${t.topic}. Контекст бренда: ${t.context||'Не задан; не придумывай факты о Романе, продукте или результатах клиентов.'}. Подготовь ровно 3 разных хука и 3 полных сценария на русском языке, каждый 100–160 слов. Не выдумывай статистику, отзывы, медицинские обещания и личный опыт Романа. Ответ только JSON: {"versions":[{"hook_id":1,"hook_text":"...","script_text":"..."},{"hook_id":2,...},{"hook_id":3,...}]}. Каждый сценарий должен соответствовать своему хуку.`;
+ const prompt=`Ты сценарист коротких вертикальных видео для Романа. Тема: ${t.topic}. Контекст бренда: ${t.context||'Не задан; не придумывай факты о Романе, продукте или результатах клиентов.'}. Подготовь одну общую основу речи и ровно 3 разных хука на русском языке. Каждый хук должен естественно переходить в эту же основу без её изменения. Полный текст каждого ролика = хук + общая основа, суммарно 100–160 слов. Основа не содержит повторного хука. Не выдумывай статистику, отзывы, медицинские обещания и личный опыт Романа. Ответ только JSON: {"body_text":"общая основа","hooks":[{"hook_id":1,"hook_text":"..."},{"hook_id":2,"hook_text":"..."},{"hook_id":3,"hook_text":"..."}]}. Не генерируй три разных основы.`;
  let response,body;
  const errors=[];
  for(const model of candidates){
@@ -45,13 +47,11 @@ for(const t of topics){
  const raw=body.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('');
  if(!raw)throw Error(`Empty Gemini response for ${t.topic_id}`);
  const parsed=JSON.parse(raw);
- if(!Array.isArray(parsed.versions)||parsed.versions.length!==3)throw Error(`Expected 3 versions for ${t.topic_id}`);
- for(const v of parsed.versions){
-  if(![1,2,3].includes(v.hook_id)||typeof v.hook_text!=='string'||!v.hook_text.trim()||typeof v.script_text!=='string'||!v.script_text.trim())throw Error('Invalid Gemini version');
-  items.push({topic_id:t.topic_id,hook_id:v.hook_id,version_id:`R-${t.topic_id}-h${v.hook_id}`,script_revision:1,hook_text:v.hook_text,script_text:v.script_text,status:'pending_approval'});
- }
+ const result=sharedBodyDrafts(t.topic_id,parsed);
+ items.push(...result.items);
+ sourceSets.push(result.sourceSet);
  console.log(`Drafted: ${t.topic_id}`);
 }
 if(new Set(items.map(x=>x.version_id)).size!==items.length)throw Error('Duplicate version IDs');
-mkdirSync(dirname(output),{recursive:true});writeFileSync(output,JSON.stringify({items},null,2)+'\n');
+mkdirSync(dirname(output),{recursive:true});writeFileSync(output,JSON.stringify({items,source_sets:sourceSets},null,2)+'\n');
 console.log(`Wrote ${items.length} drafts to ${output}; nothing was approved or sent to HeyGen.`);

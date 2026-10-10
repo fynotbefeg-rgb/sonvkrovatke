@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="330" viewBox="0 0 860 330">
+  <rect x="3" y="3" width="854" height="324" rx="26" fill="#111111" stroke="#FFD400" stroke-width="6"/>
+  <g font-family="Arial, sans-serif">
+    <text x="32" y="43" fill="#FFD400" font-size="25" font-weight="700">ДЕМО · УСЛОВНЫЕ ДАННЫЕ · НЕ ИНТЕРФЕЙС CLAUDE</text>
+    <text x="32" y="91" fill="#b8b8b8" font-size="28">Сообщение клиента</text>
+    <text x="32" y="139" fill="white" font-size="39" font-weight="700">Когда можем созвониться?</text>
+    <path d="M32 167 H828" stroke="#555" stroke-width="2"/>
+    <text x="32" y="207" fill="#b8b8b8" font-size="28">Черновик ответа · проверить перед отправкой</text>
+    <text x="32" y="259" fill="#FFD400" font-size="38" font-weight="700">Предлагаю созвон в четверг.</text>
+    <text x="32" y="303" fill="white" font-size="31">Удобное время уточняет сотрудник.</text>
+  </g>
+</svg>

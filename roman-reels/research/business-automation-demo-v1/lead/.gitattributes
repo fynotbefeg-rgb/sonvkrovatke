@@ -1,0 +1,2 @@
+# Preserve RFC-style CRLF email bytes so fixture hashes match after checkout.
+request.eml -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

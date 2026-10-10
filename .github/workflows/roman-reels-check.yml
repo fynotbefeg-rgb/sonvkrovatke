@@ -6,6 +6,37 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      drive_intake_self_test:
+        description: 'When scanning: only the isolated synthetic six-file fixture, never approve/render'
+        type: boolean
+        default: false
+      run_drive_intake:
+        description: 'Bounded incoming scan and durable state; no render or avatar generation'
+        type: boolean
+        default: false
+      check_drive_intake_access:
+        description: 'Read-only incoming access check using existing Drive OAuth; no generation'
+        type: boolean
+        default: false
+      inspect_saved_apify:
+        description: 'Inspect media from saved run 38041968344; no Actors or service calls'
+        type: boolean
+        default: false
+      read_saved_apify:
+        description: 'Read existing research run 38041724125 only; no Actor creation'
+        type: boolean
+        default: false
+      apify_reference_research:
+        description: 'Approved $1 probe: metadata or selected transcript/video (feature branch only)'
+        type: boolean
+        default: false
+      apify_reference_stage:
+        type: choice
+        options: [metadata, details]
+        default: metadata
+      apify_reference_urls:
+        description: 'For details: 1–2 selected Instagram Reel URLs separated by spaces'
+        default: ''
       test_production_queue:
         description: "Offline-проверки Telegram-кнопки и смены ручного/Windows этапа, без сервисов"
         required: false
@@ -47,12 +78,133 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: roman-reels-check-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  drive-intake:
+    if: inputs.run_drive_intake && !inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: roman-drive-intake-single-writer-v1
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install media, validation and Drive transport
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r roman-reels/schemas/requirements.txt -r roman-reels/scripts/drive-intake-requirements.txt
+      - name: Discover, validate and persist source sets without production
+        env:
+          ROMAN_INTAKE_SINGLE_WRITER: 'true'
+          ROMAN_INTAKE_SELF_TEST: ${{ inputs.drive_intake_self_test }}
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: python roman-reels/scripts/run-drive-intake.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: roman-drive-intake-report
+          path: ${{ runner.temp }}/drive-intake-report.json
+          retention-days: 7
+          if-no-files-found: ignore
+  drive-intake-access:
+    if: inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install rclone
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rclone
+      - name: Verify existing Drive credential without exposing it
+        env:
+          RCLONE_CONFIG_CONTENT: ${{ secrets.RCLONE_CONFIG }}
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: |
+          python -m pip install google-auth==2.43.0 requests==2.32.5
+          python roman-reels/scripts/check-drive-intake-access.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: roman-drive-intake-access
+          path: ${{ runner.temp }}/drive-intake-access.json
+          retention-days: 7
+  inspect-saved-apify:
+    if: inputs.inspect_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: roman-apify-reference-details
+          run-id: 38041968344
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: saved-media
+      - name: Install media inspection tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Inspect downloaded files without service credentials
+        run: python roman-reels/scripts/inspect-apify-media.py
+  read-saved-apify:
+    if: inputs.read_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: roman-apify-reference-metadata
+          run-id: 38041724125
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: saved-research
+      - name: Read existing datasets only
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: node roman-reels/scripts/read-saved-apify.mjs
+  reference-research:
+    if: inputs.apify_reference_research && github.ref == 'refs/heads/feature/codex-pipeline'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Budget and identity tests
+        run: node --test roman-reels/scripts/apify-reference-research.test.mjs
+      - name: Bounded research (owner approved aggregate $1)
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          APIFY_RESEARCH_APPROVED: 'true'
+          RESEARCH_STAGE: ${{ inputs.apify_reference_stage }}
+          RESEARCH_URLS: ${{ inputs.apify_reference_urls }}
+        run: |
+          read -r -a selected_urls <<< "$RESEARCH_URLS"
+          node roman-reels/scripts/apify-reference-research.mjs "$RESEARCH_STAGE" "$RUNNER_TEMP/reference-research" "${selected_urls[@]}"
+      - name: Report verified public details and run status
+        if: always()
+        env:
+          RESEARCH_DIRECTORY: ${{ runner.temp }}/reference-research
+        run: node roman-reels/scripts/report-apify-research.mjs
+      - name: Preserve run journals, research and selected media
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-apify-reference-${{ inputs.apify_reference_stage }}
+          path: ${{ runner.temp }}/reference-research/
+          if-no-files-found: ignore
+          retention-days: 3
   production-queue-tests:
     if: inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1'
     runs-on: ubuntu-latest
@@ -139,7 +291,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
+    if: ${{ !inputs.run_drive_intake && !inputs.check_drive_intake_access && !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:

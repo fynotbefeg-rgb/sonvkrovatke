@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Roman source set: 3 hooks + shared body, development v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["assemblyVersion", "mode", "topicId", "body", "hooks"],
+  "properties": {
+    "assemblyVersion": {"const": "1.0.0"}, "mode": {"const": "development"},
+    "topicId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$"},
+    "body": {"$ref": "#/$defs/part"},
+    "hooks": {"type": "array", "minItems": 3, "maxItems": 3,
+      "items": {"type": "object", "additionalProperties": false,
+        "required": ["hookNumber", "localPath", "sha256"],
+        "properties": {"hookNumber": {"enum": [1, 2, 3]},
+          "localPath": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}}}
+  },
+  "$defs": {"part": {"type": "object", "additionalProperties": false,
+    "required": ["localPath", "sha256"],
+    "properties": {"localPath": {"type": "string", "minLength": 1},
+      "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}}}
+}

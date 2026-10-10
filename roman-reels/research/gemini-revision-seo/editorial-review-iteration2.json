@@ -1,0 +1,41 @@
+{
+  "reviewStatus": "ready_for_Roman_review_not_approved",
+  "author": "Gemini",
+  "editor": "Codex",
+  "generationRun": "38062146804",
+  "artifact": "reviewed-v2.json",
+  "originalArtifact": "generated-v2-iteration2.json",
+  "changes": [
+    "Hook 1 asks what to check, not which title is proven to block clicks",
+    "Hook 2 says few clicks, not no clicks",
+    "Removed invented first-person Roman experience"
+  ],
+  "checks": [
+    {
+      "claim": "1200 impressions and 12 clicks produce CTR 1%",
+      "result": "verified against synthetic demo"
+    },
+    {
+      "claim": "4.8 is average position, not every impression in top 10",
+      "result": "explicitly qualified in speech"
+    },
+    {
+      "claim": "AI proposed a specific new title",
+      "result": "proposal actually appears in Gemini response; no outcome claimed"
+    },
+    {
+      "claim": "Page /crm-setup and query are different fields",
+      "result": "correct in script"
+    },
+    {
+      "claim": "Filtering done by script",
+      "result": "matches actual executed local demo"
+    },
+    {
+      "claim": "Client performance improvement",
+      "result": "not claimed; synthetic data disclosed"
+    }
+  ],
+  "approvalStatus": "pending_approval",
+  "productionReady": false
+}

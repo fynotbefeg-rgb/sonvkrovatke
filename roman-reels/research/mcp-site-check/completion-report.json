@@ -1,0 +1,26 @@
+{
+  "status": "pending_roman_topic_and_script_review",
+  "generationRun": 38063671108,
+  "inspectionRun": 38063753133,
+  "generationModel": "gemini-3-flash-preview",
+  "originalPreserved": "generated-revision3.json",
+  "reviewed": "reviewed-revision3.json",
+  "editor": "Codex",
+  "actualCostUsd": null,
+  "documentId": "1q-Cr0jeYe6beBq5vTDSOnAnEP-7kX-pZJqdMOq_l094",
+  "documentReadbackVerified": true,
+  "checks": [
+    "Actual MCP demo: broken destination 404, repaired destination 200, screenshots saved",
+    "research/shared-body/platform-ending JS tests passed",
+    "incoming.expectations: revision 3, six parts",
+    "All six full pending scripts 133–135 words"
+  ],
+  "limits": [
+    "Synthetic site only; no real customer site",
+    "Programmatic MCP driver, not a live Claude Code session",
+    "Windows setup untested",
+    "No scheduled site checking implemented",
+    "New proposed topic and speech not approved; active intake not switched",
+    "No HeyGen, render, Sheets approval or main changes"
+  ]
+}
