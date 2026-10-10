@@ -1,0 +1,76 @@
+name: Roman — Claude Code task runner
+on:
+  workflow_call:
+    inputs:
+      enabled:
+        type: boolean
+        default: false
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN:
+        required: false
+permissions:
+  contents: read
+jobs:
+  task:
+    if: github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Require one-time activation and subscription credential
+        env:
+          ENABLED: ${{ inputs.enabled }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          test "$ENABLED" = 'true' || { echo '::error::Set ROMAN_CLAUDE_ENABLED=true only after approving subscription usage.'; exit 1; }
+          test -n "$CLAUDE_CODE_OAUTH_TOKEN" || { echo '::error::Missing CLAUDE_CODE_OAUTH_TOKEN. Never paste it in chat.'; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare fixed task without AI calls
+        run: |
+          node roman-reels/scripts/prepare-claude-job.test.mjs
+          node roman-reels/scripts/prepare-claude-job.mjs "$RUNNER_TEMP/roman-claude"
+      - name: Install pinned Claude Code CLI
+        run: npm install --global @anthropic-ai/claude-code@2.1.296 --ignore-scripts
+      - name: Claude writes local montage proposal (no shell or external tools)
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          claude --restricted --safe-mode --print \
+            --tools 'Read,Edit,Write,Glob,Grep' \
+            --allowedTools 'Read,Edit,Write,Glob,Grep' \
+            --disallowedTools 'Bash,WebFetch,WebSearch,mcp__*' \
+            --settings '{"disableAllHooks":true}' \
+            --strict-mcp-config --mcp-config '{"mcpServers":{}}' \
+            --max-turns 20 --output-format json \
+            < "$RUNNER_TEMP/roman-claude/prompt.txt" \
+            > "$RUNNER_TEMP/roman-claude/result.json"
+      - name: Validate proposal scope and save patch for Codex
+        run: |
+          node -e 'const r=require(process.env.RUNNER_TEMP+"/roman-claude/result.json"); if(r.is_error || r.subtype!=="success") process.exit(1);'
+          git status --porcelain --untracked-files=all -z > "$RUNNER_TEMP/roman-claude/status.bin"
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          const paths = readFileSync(process.env.RUNNER_TEMP+'/roman-claude/status.bin','utf8').split('\0').filter(Boolean);
+          for (const entry of paths) {
+            const path = entry.slice(3);
+            if (!/^(roman-reels\/pv\/src\/|roman-reels\/docs\/)/.test(path) || /^[RCD]/.test(entry.trimStart())) {
+              throw Error('Proposal touches an unsupported path or removes/renames existing content');
+            }
+          }
+          JS
+          git add --intent-to-add -- roman-reels/pv/src roman-reels/docs
+          git diff --binary -- roman-reels/pv/src roman-reels/docs > "$RUNNER_TEMP/roman-claude/proposal.patch"
+          git diff --check
+          test -s "$RUNNER_TEMP/roman-claude/proposal.patch" || { echo '::error::No code proposal produced'; exit 1; }
+      - name: Preserve proposal without applying it to the repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: roman-claude-proposal-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/roman-claude/proposal.patch
+            ${{ runner.temp }}/roman-claude/job.json
+          retention-days: 3

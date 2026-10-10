@@ -3,6 +3,7 @@
 ## Автоматизация без HeyGen API
 
 [Роли инструментов](docs/PROJECT_ROLES.md) и [первое конкретное задание Claude Code](docs/CLAUDE_CODE_TASK_01.md).
+[Передача задания без копирования через GitHub Actions](docs/CLAUDE_CODE_AUTOMATION.md) подготовлена, но требует единовременной OAuth-настройки и активации.
 
 Первый сценарий с тремя хуками для проверки: [REVIEW.md](research/roman-pilot-review/REVIEW.md). Подготовка точного пакета и текущие ограничения утверждения: [SCRIPT_REVIEW.md](docs/SCRIPT_REVIEW.md).
 
