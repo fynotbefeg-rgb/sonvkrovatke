@@ -77,10 +77,13 @@ export async function collect(stage, urls, {token, approved = false, directory,
     if (!/^[A-Za-z0-9]+$/.test(run.defaultDatasetId ?? '')) throw Error('Invalid dataset ID');
     const items = await request(`datasets/${run.defaultDatasetId}/items?clean=true&format=json&limit=16`);
     if (!Array.isArray(items) || items.length > (stage === 'metadata' ? 15 : 1)) throw Error('Unexpected dataset size');
-    const valid = items.filter(item => item.shortCode && !item.error);
+    const rawValid = items.filter(item => item.shortCode && !item.error);
+    // Profile feeds can include collaborations owned by a different account.
+    // Exclude those, preserving verified own-account results without repeating a paid run.
+    const valid = stage === 'metadata' ? rawValid.filter(item=>item.ownerUsername?.toLowerCase()===plan.profile) : rawValid;
     if (stage === 'details' && (valid.length !== 1 || valid[0].shortCode !== reelPlan(plan.url).shortcode)) throw Error('Detail Reel identity mismatch');
-    if (stage === 'metadata' && valid.some(item=>item.ownerUsername?.toLowerCase()!==plan.profile)) throw Error('Profile identity mismatch');
     const result = {runId, datasetId:run.defaultDatasetId, cap:plan.cap, usageTotalUsd:run.usageTotalUsd ?? null,
+      excludedOwnerMismatch:rawValid.length-valid.length,
       items:valid.map(item=>sanitize(item,stage==='details'))};
     save(`result-${index}.json`, result); all.push(result);
     if (stage === 'details' && typeof valid[0].downloadedVideo === 'string') {

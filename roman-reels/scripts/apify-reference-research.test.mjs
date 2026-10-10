@@ -51,3 +51,20 @@ test('one POST, preserved identity and rerun blocked',()=>fixture('success'));
 test('ambiguous creation is never retried',()=>fixture('ambiguous'));
 test('unapplied budget cap aborts',()=>fixture('badcap'));
 test('wrong Reel identity cannot reach result',()=>fixture('mismatch'));
+test('profile collaborations excluded without destroying verified results or repeating creation',async()=>{
+ const directory=mkdtempSync(join(tmpdir(),'apify-owners-'));let posts=0;
+ try {
+  const fetchImpl=async(p,o={})=>{
+   if(p.endsWith('/acts/apify~instagram-reel-scraper'))return {ok:true,json:async()=>({data:{pricingInfos:[{startedAt:'2026-01-01',pricingModel:'PAY_PER_EVENT'}]}})};
+   if(o.method==='POST'){
+    posts++;const profile=JSON.parse(o.body).username[0];
+    return {ok:true,json:async()=>({data:{id:`run${posts}`,status:'SUCCEEDED',options:{maxTotalChargeUsd:.1},defaultDatasetId:profile==='zapier'?'zapier':'first'}})};
+   }
+   const owner=p.includes('/datasets/zapier/')?'zapier':'theautomationguy.ai';
+   return {ok:true,json:async()=>[{shortCode:'Own',ownerUsername:owner},{shortCode:'Collab',ownerUsername:'other'}]};
+  };
+  const results=await collect('metadata',[],{token:'test',approved:true,directory,fetchImpl});
+  assert.equal(posts,2);
+  for(const result of results){assert.equal(result.excludedOwnerMismatch,1);assert.equal(result.items.length,1);assert.equal(result.items[0].shortcode,'Own');}
+ }finally{rmSync(directory,{recursive:true,force:true});}
+});

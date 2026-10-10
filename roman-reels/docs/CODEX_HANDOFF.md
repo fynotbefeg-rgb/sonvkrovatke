@@ -13,7 +13,13 @@ at $0.10 each, then up to two selected Reel runs at $0.40 each. Metadata contain
 no media add-ons; detail stage enables transcripts and downloaded videos.
 Eight regression tests pass, including ambiguous POST/no retry and cap verification.
 Manual opt-in Actions job on feature/codex-pipeline only; do not rerun paid stages
-in a fresh workspace under this budget. Results pending; no reference yet verified.
+in a fresh workspace under this budget. Two references verified: speech and MP4 obtained, 20 frames inspected each.
+See APIFY_REFERENCE_ANALYSIS.md and research/apify-reference-results.json.
+Live simple Sheet A5:G10 now contains two topics, analysis, counters and links;
+B5/B8 blank and hook fields blank. No decisions or production status changed.
+Metadata feed included collaborations owned by other accounts; initial strict check
+failed after both paid runs. Read-only recovery preserved results, collector now
+excludes mismatched owners. No paid stages repeated.
 Public reach remains unavailable; transcript does not constitute montage inspection.
 
 LATEST live review layout simplified at explicit owner request. Sole visible tab
