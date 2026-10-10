@@ -34,8 +34,9 @@ No production migration or paid generation was performed by this audit.
 
 Validation: all 45 existing offline tests pass; Remotion bundle succeeds; tsc has 8 pre-existing errors.
 `pv/public/ai/body1.mp4` passes full FFmpeg decode and has actual 1080×1920 video/AAC audio.
-Real transcription/Director/generalized render/QC have not been delivered. Next step is owner review of
-candidate contract and P1 before integrating substantial architecture changes.
+Real speech data and source technical QC are now delivered (see FIRST_MONTAGE_P1.md).
+Director/generalized render/full output QC are still not delivered. Owner agreed contract v1 and P1;
+next dependency is an authorized Claude Code connection, not another architecture approval.
 
 ## Codex continuation — 2026-10-10
 - New manual/Windows queue CI verified: registered run `38019089716` on `6fecade` SUCCESS, only production-queue-tests job ran, 12 queue + 8 intake tests on Node22 passed. Claude/Google/Apify/Remotion jobs skipped. No live bot, credit-consuming generation or approval mutations performed. User's bot existence/public username question remains pending.
