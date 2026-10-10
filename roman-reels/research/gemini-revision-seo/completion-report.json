@@ -1,0 +1,48 @@
+{
+  "recordedAt": "2026-10-10",
+  "authorization": "Owner allows repeated Gemini requests for this task; do not request permission for each retry",
+  "successfulGenerationRuns": [
+    {
+      "runId": "38061905345",
+      "model": "gemini-3-flash-preview",
+      "totalTokenCount": 3716,
+      "editorialResult": "needs_revision"
+    },
+    {
+      "runId": "38062146804",
+      "model": "gemini-3-flash-preview",
+      "totalTokenCount": 3758,
+      "editorialResult": "reviewed_with_Codex_edits"
+    }
+  ],
+  "artifactReviewRuns": [
+    "38062035176",
+    "38062202779"
+  ],
+  "actualCostUsd": null,
+  "reviewedArtifact": "reviewed-v2.json",
+  "platformPacket": "platform-packet-revision2.json",
+  "allSixFullScriptsPending": true,
+  "documentId": "1q-Cr0jeYe6beBq5vTDSOnAnEP-7kX-pZJqdMOq_l094",
+  "documentReadbackVerified": true,
+  "sourceAndEndingsMatched": true,
+  "socialsRevision1StillNeedsRevision": true,
+  "sheetsModified": false,
+  "incomingActiveRevisionChanged": false,
+  "productionReady": false,
+  "validation": {
+    "researchTestScenarios": 5,
+    "existingJavascriptTestFiles": 2,
+    "platformVariantCount": 6,
+    "fullScriptWordCounts": [
+      132,
+      134,
+      135,
+      133,
+      135,
+      136
+    ],
+    "incomingExpectationsRevision": 2,
+    "incomingPartCount": 6
+  }
+}
