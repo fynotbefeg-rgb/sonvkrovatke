@@ -1,5 +1,10 @@
 # Codex handoff — Roman Reels automation
-Updated: 2026-10-09
+Updated: 2026-10-10
+
+## Codex continuation — 2026-10-10
+- User clarified tool responsibilities: Claude Code writes Remotion/templates/Actions; Codex reviews/refines/tests. Recorded in `PROJECT_ROLES.md`. No direct connection to user's Claude Code session; do not claim a saved task was delivered or started.
+- Rechecked `Сценарии!C5:D7,G5:K7`: all three knowledge-price pilots revision1 remain pending with empty H-J and waiting production state. Registered workflow read-only run `38017266712` on `19a11eb` SUCCESS, strict approved queue0. No drafts resent, no external paid services/render/approval writes. Need Roman's real decision; do not approve on his behalf.
+- Prepared concrete Claude Code task `CLAUDE_CODE_TASK_01.md`: isolated full-MP4 Remotion component, validated local props/fresh word timing boundaries, caption display, preserving old compositions, offline checks, no paid calls/production gate changes. Scope allows independent development while pilot remains pending. User must pass the one-message task to their Claude Code; then Codex reviews actual resulting commit.
 
 ## Codex continuation — 2026-10-09
 - User pasted additive RomanApproval.gs, reported renaming old doPost to legacyDoPost. Screenshot of setupRomanApproval log shows Connected: Сценарии, Approval edit trigger ready, Execution completed. User reported updating EXISTING deployment. Added send_pilot_drafts=false mode to registered check workflow; strict queue export now validates complete manifests (empty queue does not prove receipt enforcement). Ran `37988021113` on `a0cec9f`: SUCCESS, only google-queue executed, strict queue0 and 3 pending drafts imported without Gemini/Apify/HeyGen/Remotion. Connector readback verified exact A5:K7 against pilot JSON, all three pending with empty H-J and strict G dropdown preserved. Existing test rows2–4 unchanged. **Next: Roman personally reviews F5 and chooses G5 using allowlisted Google account; verify H-J receipt and authenticated queue, then revocation. Real editor identity and full queue shape remain unverified.** Do not approve on Roman's behalf or render yet.
@@ -23,6 +28,8 @@ Updated: 2026-10-09
 
 ## Mission
 Build a reliable pipeline for **90 vertical Reels per month** for Roman. Desired only human action: Roman approves scripts. User works mainly from iPhone and prefers concise Russian, one action at a time. No Windows laptop required for current development. Do not claim full automation while HeyGen API is unavailable.
+
+Tool responsibilities follow [PROJECT_ROLES.md](PROJECT_ROLES.md). Claude Code develops montage/Actions; Codex verifies, refines and tests those changes. Both use the automation branch and must check origin before writing.
 
 ## Repo and safety
 - GitHub: https://github.com/fynotbefeg-rgb/sonvkrovatke

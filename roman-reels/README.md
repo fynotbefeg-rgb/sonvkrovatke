@@ -2,6 +2,8 @@
 
 ## Автоматизация без HeyGen API
 
+[Роли инструментов](docs/PROJECT_ROLES.md) и [первое конкретное задание Claude Code](docs/CLAUDE_CODE_TASK_01.md).
+
 Первый сценарий с тремя хуками для проверки: [REVIEW.md](research/roman-pilot-review/REVIEW.md). Подготовка точного пакета и текущие ограничения утверждения: [SCRIPT_REVIEW.md](docs/SCRIPT_REVIEW.md).
 
 Текущий проверенный статус, формат приёма MP4 и ручной dry run: [MANUAL_HEYGEN_INTAKE.md](docs/MANUAL_HEYGEN_INTAKE.md).
