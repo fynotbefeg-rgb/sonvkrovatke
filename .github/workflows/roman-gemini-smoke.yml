@@ -6,13 +6,18 @@ on:
         description: 'Offline preview by default; generation requires single-call authorization'
         type: choice
         default: prepare_research
-        options: [prepare_research, generate_research, legacy_smoke]
+        options: [prepare_research, generate_research, legacy_smoke, inspect_saved]
+      source_run:
+        description: 'Existing generation run to read; inspect_saved does not call Gemini'
+        type: string
+        default: ''
       allow_generation:
         description: 'Explicit permission for Gemini generation; billing/free tier must be agreed separately'
         type: boolean
         default: false
 permissions:
   contents: read
+  actions: read
 jobs:
   generate:
     if: github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/automation/roman-reels-v1'
@@ -24,12 +29,12 @@ jobs:
         with:
           node-version: '22'
       - name: Check existing Gemini access (model catalogue GET only)
-        if: inputs.mode != 'legacy_smoke'
+        if: inputs.mode == 'prepare_research' || inputs.mode == 'generate_research'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node roman-reels/scripts/check-gemini-access.mjs "$RUNNER_TEMP/gemini-access.json"
       - name: Research-backed request preview or authorized generation
-        if: inputs.mode != 'legacy_smoke'
+        if: inputs.mode == 'prepare_research' || inputs.mode == 'generate_research'
         env:
           MODE: ${{ inputs.mode }}
           ROMAN_GEMINI_ALLOW_GENERATE: ${{ inputs.allow_generation }}
@@ -43,6 +48,19 @@ jobs:
             *) echo 'Invalid mode'; exit 2 ;;
           esac
           node roman-reels/scripts/run-researched-gemini.mjs "$action" roman-reels/research/gemini-revision-seo/brief-v2.json "$RUNNER_TEMP/drafts.json"
+      - name: Read existing generated draft without a new model call
+        if: inputs.mode == 'inspect_saved'
+        env:
+          SOURCE_RUN: ${{ inputs.source_run }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN" =~ ^[0-9]+$ ]] || { echo 'Invalid run ID'; exit 2; }
+          gh run view "$SOURCE_RUN" --repo "$REPOSITORY" --json conclusion,workflowName,headBranch > "$RUNNER_TEMP/source-run.json"
+          node -e 'const d=require(process.argv[1]); if(d.conclusion!=="success" || d.workflowName!=="Roman Reels — Gemini draft smoke test" || d.headBranch!=="feature/codex-pipeline") process.exit(1)' "$RUNNER_TEMP/source-run.json"
+          gh run download "$SOURCE_RUN" --repo "$REPOSITORY" --name roman-gemini-test-drafts --dir "$RUNNER_TEMP/saved-draft"
+          node roman-reels/scripts/read-gemini-review.mjs "$RUNNER_TEMP/saved-draft/drafts.json"
       - name: Generate legacy smoke topic (explicit authorization)
         if: inputs.mode == 'legacy_smoke' && inputs.allow_generation
         env:
