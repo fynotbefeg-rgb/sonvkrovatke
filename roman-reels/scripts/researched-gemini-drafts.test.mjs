@@ -59,3 +59,12 @@ test('CLI refuses unapproved calls and makes exactly one generation POST without
   assert.equal(diagnostic.retryAttempted,false);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+test('MCP brief produces revision 3 and carries real protocol evidence without claiming a Claude session',()=>{
+ const mcp=JSON.parse(readFileSync(new URL('../research/mcp-site-check/brief-revision3.json',import.meta.url)));
+ const prompt=researchPrompt(mcp);assert.ok(prompt.includes('browser_click'));assert.ok(prompt.includes(mcp.installationCommand));
+ assert.equal(mcp.demo.findings[0].httpStatus,404);assert.equal(mcp.demo.findings[1].httpStatus,200);
+ const response=answer();response.evidence_ids=['playwright-mcp'];
+ const result=researchedDrafts(mcp,response);assert.equal(result.source_sets[0].body_revision,3);
+ assert.ok(result.items.every(i=>i.script_revision===3&&i.status==='pending_approval'));
+});
