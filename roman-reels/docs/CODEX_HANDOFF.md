@@ -519,3 +519,28 @@ research/mcp-site-audit-current/site-audit-prompt.md — будущий мног
 нового популярного видео именно этого формата нет. Старые речь/хеши/Sheets/
 approval/main сохранены. Дальше — свой многосценарный тест, затем новая речь
 Gemini и отдельное утверждение; не представлять старый один CTA как полный аудит.
+
+## 2026-10-10 — многосценарный учебный сайт: реальный browser smoke
+
+fixture-site.mjs и run-site-audit-demo.mjs: сохранённые девять сценариев,
+4 ожидаемые страницы, картинки, desktop/mobile меню, переполнение при 390px,
+пустая/неверная форма, получение заявки в локальном in-memory приёмнике,
+защита от повтора. В broken состоянии 1 PASS / 8 FAIL; fixed 9 PASS;
+BLOCKED нет. Тесты одинаковые; дефекты и исправления заложены Codex.
+DEMO_RESULT.md и evidence/audit-report.json +18 PNG сохраняют доказательства.
+Скриншоты показывают конечное состояние сценария; HTTP/получение — в JSON.
+
+Реальный Playwright core запуск с уже установленным alpha исполнителем,
+НЕ MCP-протокол, НЕ Claude/AI-поиск ошибок, НЕ доказательство «одним промптом».
+Default shell блокировал локальные сокеты; successful run потребовал
+network grant и explicit SITE_AUDIT_DEMO_NO_SANDBOX=true для собственного
+loopback сайта. Browser requests ограничены одним origin, live account нет.
+Не переносить no-sandbox в настоящую браузерную автоматизацию.
+
+Проверено различение broken/fixed, все evidence файлы присутствуют, визуально
+проверены mobile overflow/fixed form. PDF/сценарный/монтажный код не менялся.
+Платных вызовов/Claude/Gemini/Google правок/approval/main изменений нет.
+Ограничения: 4 страницы и 9 заданных сценариев, нет реального iPhone/CRM,
+постоянного receiver, полного SEO/security/accessibility/performance аудита.
+Следующий шаг — редакция темы на основании этих результатов или отдельный
+AI-driven эксперимент; никакой новый текст пока не утверждён.
