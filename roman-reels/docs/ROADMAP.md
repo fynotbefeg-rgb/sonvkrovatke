@@ -22,7 +22,11 @@
 три assembled jobs по 95/99/91 слову с проверенным сдвигом основы. 18 звуковых окон прошли
 проверку совпадения, ошибочное смещение основы на 100 мс не прошло. Текст ещё требует speech review.
 Контракт/source QC проходят; CLI для подготовки задания не утверждает сценарии.
-Director/Remotion Claude ещё не доставлены; нового смонтированного MP4 нет.
+Director/RomanFactoryV1 Claude интегрированы через PR #6 (merge e1a7c31).
+Короткие envelope-границы исправлены, tsc и 21 TS/24 Python tests проходят.
+Development рендеры выполнены; Codex независимо проверил h1 и устранение AAC задержки.
+Speech/visual review и актуальное production approval ещё нужны. После C1 Codex не повторял
+полный рендер; h1 проверен Claude, h2/h3 покрыты timing tests, но не перерендерены.
 
 1. Codex: `pv/public/ai/body1.mp4` как development fixture; источник уже прошёл ffprobe/decode.
    Получить свежие реальные слова/сегменты CPU-транскрипцией, сопоставить с услышанным текстом,

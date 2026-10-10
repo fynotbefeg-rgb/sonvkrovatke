@@ -4,6 +4,27 @@
 Base PR: `feature/codex-pipeline`; `main` не изменён.
 Код Claude проверяется в отдельном detached worktree `/workspace/roman-review-6`.
 
+## Повторная проверка: C1 устранено, PR объединён
+
+Claude HEAD `f45e50ae85b70b1689c6b1c171983349e38d315a` независимо проверен Codex.
+`timing.ts` сжимает fade до 80% длительности события; composition использует helper
+для акцентов и zoom. Для floating-point collapse безопасно показывает без fade.
+План Director, слова и тайминги не менялись; исходная audio-preservation правка сохранена.
+
+Пройдено: tsc, 14 Director tests, 7 timing regression tests (исходный C1 repro
+и все события трёх реальных заданий), Python 6 contract + 10 media + 4 assembled + 4 source-set.
+GitHub check-runs у этого SHA нет; перечислены реальные локальные проверки, не CI.
+PR #6 объединён в `feature/codex-pipeline`, merge commit `e1a7c310bb59d8d8fddbbdb2834d8d95116f918c`.
+Слияние подтверждено GitHub API и локальным fast-forward. `main` и approvals не менялись.
+
+После C1 полного повторного рендера Codex не запускал: поправлена только envelope-функция,
+её реальные вызовы interpolate проверены регрессионными тестами, Director планы не менялись.
+Обновлённый полный h1/zero-delay render подтверждён evidence Claude; прежний независимый h1
+Codex с исправленным звуком сохранён. h2/h3 ещё не перерендерены после C1.
+Художественная оценка, speech review и production approval остаются незавершёнными.
+
+Ниже — первоначальное замечание и проверки до исправления, сохранённые как история.
+
 ## Блокирующее замечание C1: короткие акценты ломают рендер
 
 `pv/src/factory/RomanFactoryV1.tsx`, envelope (строки 65–67) использует фиксированные
@@ -24,7 +45,7 @@ Remotion: `inputRange must be strictly monotonically increasing`.
 Вынести pure timing helper; добавить тесты короткого акцента, двух соседних терминов,
 короткого zoom и события у конца видео, включая вызов Remotion interpolate.
 Повторить 14 Director tests, tsc и контрольный development render.
-До исправления C1 PR не сливать.
+Первоначальное требование: до исправления C1 PR не сливать. Выполнено при повторной проверке выше.
 
 ## Звук — исправление конвейера Codex
 

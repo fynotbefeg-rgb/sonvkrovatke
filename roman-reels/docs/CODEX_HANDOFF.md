@@ -3,13 +3,17 @@ Updated: 2026-10-10
 
 ## Authoritative specification 3.0 — start here
 
-Claude answered PR #6 review: C1 fixed (`pv/src/factory/timing.ts` fadeKeyframes, 7 regression tests incl. Remotion
-interpolate; 14 Director tests; tsc 0). Merged 6652bb9 audio preservation; control h1 render passed QC with source-identical PCM.
+LATEST: PR #6 merged into feature/codex-pipeline after independent re-review of Claude f45e50a.
+Merge e1a7c31. C1 short-event blocker resolved by timing.ts helper used for accents/zoom.
+tsc, 14 Director + 7 timing tests and 24 Python pipeline tests pass locally. No GitHub check-runs
+exist for this SHA. Original AAC preservation retained. Main/approvals unchanged.
+Details and remaining speech/visual review limits: CODEX_PR6_REVIEW.md.
+Director/RomanFactoryV1 are integrated development components, not a production factory.
 
-Claude delivered PR #6, HEAD 9eff02d, with Director/RomanFactoryV1 and 3 claimed renders.
+Initial PR #6 review, superseded above: Claude HEAD 9eff02d delivered Director/RomanFactoryV1 and 3 claimed renders.
 Codex independently verified tsc, 14 Director tests, existing 21 Python checks, and full h1 render/QC.
 Review found blocker C1: fixed envelope fade times become non-monotonic for short trimmed accents,
-e.g. adjacent Claude/Gemini terms. PR remains unmerged; exact reproduction/fix task: CODEX_PR6_REVIEW.md.
+e.g. adjacent Claude/Gemini terms. C1 is now fixed; original reproduction: CODEX_PR6_REVIEW.md.
 Codex fixed P1 source-audio preservation in the development wrapper: original AAC stream copy,
 full decoded PCM hash + audio clock verification, no re-encoding; 10 media tests pass.
 Actual h1 Remotion delay measured 42.625ms; corrected full h1 PCM/clock matches source exactly.
@@ -35,18 +39,18 @@ and produces three pending development contract jobs (95/99/91 words). Evidence 
 `check-assembly-audio.py` verified 18 decoded audio windows at exact part offsets (all >0.9997).
 These are cached part timings with offsets, NOT a new ASR/forced alignment of assembled audio.
 Four new assembled-job integration tests plus 7 media, 6 contract, 2 Claude packet tests pass.
-Claude P1 task now names the three complete inputs. Director/composition still absent; no final render,
-production approval, paid request, upload or Sheets write was performed.
+Claude P1 task names the three complete inputs. Director/composition have since been delivered.
+No production approval, paid request, upload or Sheets write was performed by this speech stage.
 
 Owner agreed contract v1 and P1 after PR #5, 2026-10-10. New Codex work on feature/codex-pipeline:
 81 real ASR words; zero-duration preposition blocked two raw attempts; one 23-word segment was
 acoustically realigned by local Russian Wav2Vec2 CTC, no interpolation. Development job and source
 technical QC pass. Precise benchmark/versions/limitations: FIRST_MONTAGE_P1.md.
-Director and generalized Remotion are still NOT delivered; development runner stops before render
-when missing. Seven new media tests, six contract tests and two updated Claude packet tests pass.
+Director and generalized Remotion are now integrated via PR #6; runner still blocks when missing.
+Historical first-stage checks: seven media, six contract and two Claude packet tests passed.
 prepare-claude-job now reads CLAUDE_P1_EXECUTION.md. No actual Claude run, upload, Sheets mutations,
 HeyGen execution or paid model calls. GitHub variables read is 403; configured OAuth is unverified.
-Await clarification whether cloud Claude is connected. No Windows setup required now.
+Cloud Claude access subsequently confirmed by the owner; PR #6 delivered and merged. No Windows setup required now.
 
 Latest user specification supersedes conflicting role/approval/branch suggestions below.
 Codex owns pipeline integration; Claude Code owns AI Montage Director and Remotion.
