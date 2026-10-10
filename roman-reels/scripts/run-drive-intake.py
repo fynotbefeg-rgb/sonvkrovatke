@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from drive_intake import Journal, scan
+from drive_intake import Journal, scan, self_test_packet
 from drive_intake_client import DriveClient, DriveError
 from drive_intake_store import DriveStore
 
@@ -37,8 +37,10 @@ if __name__ == "__main__":
         conditional = store.verify_conditionals()
         journal = Journal(store)
         packets = json.loads((SCRIPT_DIR.parent / "research/platform-ending-drafts-v2.json").read_text())
+        synthetic = os.environ.get("ROMAN_INTAKE_SELF_TEST") == "true"
+        if synthetic: packets = [self_test_packet(packets[0])]
         report = scan(client, journal, INCOMING, packets, current_approvals)
-        report.update(stateSequence=journal.state["sequence"], durableState=True,
+        report.update(stateSequence=journal.state["sequence"], durableState=True, syntheticFixtures=synthetic,
                       writerProtection="etag_conditional" if conditional else "serialized_actions_with_content_hash_checks")
         Path(os.environ.get("RUNNER_TEMP", "/tmp"), "drive-intake-report.json").write_text(json.dumps(report, indent=2)+"\n")
         print(json.dumps(report))

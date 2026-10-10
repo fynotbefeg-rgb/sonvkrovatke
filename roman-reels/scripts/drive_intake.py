@@ -23,6 +23,21 @@ FOLDER = "application/vnd.google-apps.folder"
 LEASE_SECONDS = 1800
 MAX_SET_BYTES = 1024 * 1024 * 1024
 MAX_RECEIPT_BYTES = 65536
+SELF_TEST_TOPIC = "intake-self-test-20261010"
+
+
+def self_test_packet(packet):
+    packet = copy.deepcopy(packet)
+    packet["sourceSet"]["topic_id"] = SELF_TEST_TOPIC
+    packet["syntheticFixtures"] = True
+    for item in packet["items"]:
+        item["topic_id"] = f"{SELF_TEST_TOPIC}-{item['platform']}"
+        item["root_topic_id"] = SELF_TEST_TOPIC
+        item["version_id"] = f"R-{item['topic_id']}-h{item['hook_id']}"
+        job = {"reelId": item["version_id"], "scriptVersion": item["script_revision"],
+               "hookText": item["hook_text"], "scriptText": item["script_text"]}
+        item["script_hash"] = incoming.contract.legacy_hash(job)
+    return packet
 
 
 def require(ok, message):
@@ -173,11 +188,12 @@ def scan(client, journal, incoming_id, packets, approval_loader, now=None):
             source_info = {name: stable(file) for name, file in sorted(by_name.items())}
             key = digest([slot, source_info, [i["script_hash"] for i in packet["items"]]])
             token, job = journal.claim(key, slot, {"topicId": topic, "scriptVersion": version,
-                "sourceFiles": source_info, "scriptHashes": [i["script_hash"] for i in packet["items"]]}, now)
+                "sourceFiles": source_info, "scriptHashes": [i["script_hash"] for i in packet["items"]],
+                "syntheticFixtures": packet.get("syntheticFixtures") is True}, now)
             if token is None:
                 if job["status"] in {"awaiting_approval", "source_set_ready"}:
                     # Revocation is checked even for an unchanged already validated set.
-                    current = approvals_match(packet, approval_loader())
+                    current = not packet.get("syntheticFixtures") and approvals_match(packet, approval_loader())
                     job["status"] = "source_set_ready" if current else "awaiting_approval"
                     job["renderAllowed"] = False
                     job["nextStage"] = "assemble_then_verify_speech" if current else "wait_for_exact_full_script_approval"
@@ -199,7 +215,7 @@ def scan(client, journal, incoming_id, packets, approval_loader, now=None):
             for name, file in by_name.items():
                 current, _ = client.metadata(file["id"])
                 require(stable(current) == stable(file), "Source changed during set validation")
-            allowed = approvals_match(packet, approval_loader())
+            allowed = not packet.get("syntheticFixtures") and approvals_match(packet, approval_loader())
             status = "source_set_ready" if allowed else "awaiting_approval"
             # This is a durable source-set handoff, not an authorized render job.
             journal.finish(key, token, status, downloadValidated=True,

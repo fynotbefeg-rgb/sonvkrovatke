@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      drive_intake_self_test:
+        description: 'When scanning: only the isolated synthetic six-file fixture, never approve/render'
+        type: boolean
+        default: false
       run_drive_intake:
         description: 'Bounded incoming scan and durable state; no render or avatar generation'
         type: boolean
@@ -101,6 +105,7 @@ jobs:
       - name: Discover, validate and persist source sets without production
         env:
           ROMAN_INTAKE_SINGLE_WRITER: 'true'
+          ROMAN_INTAKE_SELF_TEST: ${{ inputs.drive_intake_self_test }}
           GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
           ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
