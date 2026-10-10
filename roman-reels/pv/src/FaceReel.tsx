@@ -106,8 +106,6 @@ const Insert: React.FC<{ ins: Ins; p: number }> = ({ ins, p }) => {
   );
 };
 
-const winP = (t: number, a: number, b: number) =>
-  interpolate(t, [a, a + 0.25, b - 0.2, b], [0, 1, 1, 0], { ...clamp, easing: Easing.inOut(Easing.cubic) });
 
 const Captions: React.FC<{ words: W[]; t: number; y: number }> = ({ words, t, y }) => {
   const { fps } = useVideoConfig();
@@ -133,7 +131,6 @@ export const FaceReel: React.FC<Version> = ({ hook, hookDur, plate, hookIns }) =
   const t = f / FPS;
   const inBody = t >= hookDur;
   const lt = inBody ? t - hookDur : t;
-  const ins = inBody ? BODY_INS : hookIns;
   const words = (WORDS as unknown as Record<string, W[]>)[inBody ? "body" : hook];
   // вставки в общем времени, соседние (пауза < 3 с) склеены в группы — лицо не прыгает
   const list = [...hookIns.map((x) => ({ x, a: x.from, b: x.to })), ...BODY_INS.map((x) => ({ x, a: x.from + hookDur, b: x.to + hookDur }))].sort((m, n) => m.a - n.a);

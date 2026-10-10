@@ -1,0 +1,48 @@
+{
+  "artifactVersion": "1.0.0",
+  "mode": "development",
+  "productionReady": false,
+  "review": "CODEX_PR6_REVIEW.md C1 (codex-pipeline 6652bb9)",
+  "fix": "pv/src/factory/timing.ts fadeKeyframes: fades scale to the event length (fadeIn+fadeOut <= 80%), strictly increasing keyframes or null for sub-frame events; Director plans unchanged",
+  "tests": {
+    "timing.test.ts": "7/7 pass; with the old fixed fades 5/7 fail",
+    "director.test.ts": "14/14 pass",
+    "tsc": "0 errors",
+    "codexPython": {
+      "factory-contract": 6,
+      "factory-media": 10,
+      "assembled-jobs": 4,
+      "source-set": 4
+    }
+  },
+  "compositionCheck": "RomanFactoryV1 stills, frames 23/24/26/27/29, synthetic test props on the h1 source with Codex example words Claude [1,1.1] Gemini [1.11,1.2]: rendered without error, fade in/out visible; not a deliverable",
+  "controlRender": {
+    "reelId": "R-ai-shared-body-fixture-h1",
+    "command": "python roman-reels/scripts/run-development-montage.py <rebuilt h1 job> --out <new dir>",
+    "technicalPassed": true,
+    "outputMetadata": {
+      "duration": 40.24,
+      "width": 1080,
+      "height": 1920,
+      "fps": 25.0,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "audioChannels": 2
+    },
+    "outputSha256": "29aa3ca6d33ddd4a6c2210d2e37fdbf0707d489674e488436cc4bcd8e07491c0",
+    "audioPreservation": {
+      "strategy": "copy_original_aac_full_timeline",
+      "decodedAudioHash": "SHA256=184bf284d2acd5aa7e952f701466119a804e5663619406bf22287f50e5fb9aa7",
+      "sourceSha256": "96bd0ad4390e6389eec31bf2016a9367a50a1a22f2289f96b457419eec0d5b8f",
+      "audioClock": {
+        "start": 0.0,
+        "duration": 40.24,
+        "sampleRate": 48000
+      },
+      "productionReady": false
+    },
+    "audioCheckByClaude": "decoded 16 kHz mono PCM of output identical to source (array_equal); FFT xcorr lag 0, corr 1.0 at 2/10/20/30 s",
+    "planEqualsCommittedPlan": true
+  },
+  "notRerendered": "h2/h3 not re-rendered after this fix; their plans are unchanged and covered by timing tests"
+}
