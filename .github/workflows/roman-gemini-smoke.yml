@@ -12,7 +12,7 @@ on:
         type: string
         default: ''
       research_focus:
-        description: 'Pending research drafts; mcp_site now uses expanded website revision 4'
+        description: 'Pending research drafts; mcp_site now uses technical/SEO website revision 5'
         type: choice
         default: seo
         options: [seo, mcp_site]
@@ -55,7 +55,7 @@ jobs:
           esac
           case "$RESEARCH_FOCUS" in
             seo) brief=roman-reels/research/gemini-revision-seo/brief-v2.json ;;
-            mcp_site) brief=roman-reels/research/mcp-site-audit-current/brief-revision4.json ;;
+            mcp_site) brief=roman-reels/research/site-technical-seo/brief-revision5.json ;;
             *) echo 'Invalid research focus'; exit 2 ;;
           esac
           node roman-reels/scripts/run-researched-gemini.mjs "$action" "$brief" "$RUNNER_TEMP/drafts.json"
