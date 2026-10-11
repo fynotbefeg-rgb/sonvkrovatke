@@ -747,3 +747,7 @@ SEO_LOCAL_MODEL_PROBE.md and research/site-technical-seo/local-model-probe-2026-
 ## 2026-10-11 — grounded SEO probe v2 and deterministic evidence presentation
 
 SEO_GROUNDED_PROBE_V2.md records 3 new actual local Qwen 1.5B inference calls: 3/3 supplied statuses followed, but only 1/3 explanations passes narrow factual review. This is adherence to explicit checker statuses, not independent detection. Unsupported indexing guarantee and all-pages index advice keep candidate blocked. No paid API, Windows, factory Gemini or live Google changes. New build-seo-evidence-report.mjs renders ONLY the known synthetic two-state scanner report with escaped observations, bounded fixed advice and explicit scope/unknowns. 3 meaningful renderer tests added to existing offline CI. This renderer is not a deployed autonomous site auditor; SEO v6 and Roman approvals remain untouched.
+
+## 2026-10-11 — owner reports Windows laptop available
+
+Windows is available per owner, not yet verified by this cloud session. No direct Windows/desktop connector is present. WINDOWS_FIRST_CHECK.md provides the minimal Claude handoff: fetch existing clone without working-tree changes, read current docs with git show, inspect sanitized hardware/tool versions, confirm actual session MCP tools and navigate example.com through MCP only. No installs/login/HeyGen generation. WINDOWS_SETUP.md status updated without claiming setup completed. Await real local report before selecting compute/browser profile or running real HeyGen.
