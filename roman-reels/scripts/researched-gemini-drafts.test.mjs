@@ -76,7 +76,7 @@ test('offline previews package the editorial policy for both briefs without cred
   const stub=join(dir,'offline.mjs');
   writeFileSync(stub,"globalThis.fetch=()=>{throw Error('Unexpected network in offline preview')};");
   const runner=fileURLToPath(new URL('./run-researched-gemini.mjs',import.meta.url));
-  const inputs=[briefPath,fileURLToPath(new URL('../research/mcp-site-check/brief-revision3.json',import.meta.url))];
+  const inputs=[briefPath,fileURLToPath(new URL('../research/mcp-site-check/brief-revision3.json',import.meta.url)),fileURLToPath(new URL('../research/mcp-site-audit-current/brief-revision4.json',import.meta.url))];
   for(const [i,input] of inputs.entries()){
    const output=join(dir,`preview-${i}.json`);
    const env={...process.env};delete env.GEMINI_API_KEY;env.ROMAN_GEMINI_ALLOW_GENERATE='false';
