@@ -78,3 +78,14 @@ Codex формирует source/слова/права/статусы; Claude с�
 `python roman-reels/scripts/validate-factory-job.py <job.json>`.
 Offline тесты: `python roman-reels/scripts/factory-contract.test.py`.
 Node требуется только для legacy hash; validator не скачивает модели и не обращается к сети.
+
+## 2026-10-11 — optional shared review packet v1
+
+Подготовлен отдельный shared-review-v1.schema.json и Apps Script SharedReview.gs
+(выключен, не развёрнут). Пакет включает точную тему, одну основу, три хука и
+ноль/два окончания. Четырёхстрочный вид сохраняет A:G; допуск требует серверных
+квитанций темы, основы и конкретного хука. Выход сохраняет существующие
+version_id/script_revision/script_text/script_hash; shared_review — дополнительная
+проверяемая provenance, не новая семантика хеша. См. SHARED_REVIEW_BRIDGE.md.
+Canonical legacy receipt для managed темы не может обойти отзыв в новом виде.
+Это совместимое дополнение, не изменение live контракта или утверждения.

@@ -680,3 +680,24 @@ Google Doc 17wCWwvu_i5ruKoopLA8ZW1Q7Bw6rVbGIuzfTQiI6oa4 создан и проч
 обратно: ссылка/дата/цифры/ограничения сохранены. Старый сценарий v6, live
 таблица, approvals, main и production не менялись. Новый успешный свежий
 SEO-референс остаётся нерешённым. Старый пример можно оценить только по формату.
+
+## 2026-10-11 — shared review bridge подготовлен без live deployment
+
+SharedReview.gs + обновлённые Code.gs/RomanApproval.gs связывают authenticated
+Google edit receipts темы/основы/трёх хуков с legacy queue/scriptHash. Опция
+ROMAN_SHARED_REVIEW_ENABLED выключена по умолчанию. Предлагаемый блок A:G
+содержит четыре строки (основа + три хука), append-only/history preserved.
+Основу/тему требуется утвердить отдельно; body reject блокирует все варианты,
+hook reject только его. Изменение точного текста/revision/identity блокирует
+старые кнопки. Managed темы не обходят bridge старым canonical receipt даже
+после выключения опции. Отдельные CTA отображаются в блоке основы.
+prepare-shared-review.mjs проверяет реальные pending v6/платформенные full scripts;
+JSON Schema shared-review-v1 проверена с v6 локально. v6 не зарегистрирована,
+editorialReview остаётся pending. Новый offline CI workflow не использует секреты.
+48 локальных проверок (25 shared+legacy, 3 prepare, 12 queue, 8 intake) прошли.
+SHARED_REVIEW_BRIDGE.md — контракт, предлагаемый вид и безопасный deployment.
+Live Apps Script API/clasp credentials в этом окружении не подключены; Drive
+access/webhook token не дают source/deployment доступа. GitHub secret-list 403,
+значения не читались. Не просить владельца менять код вручную на iPhone:
+нужна авторизованная сессия установки с backup и реальным e.user тестом.
+Live таблица, approvals, источник v6, intake, Telegram/HeyGen и main не изменены.

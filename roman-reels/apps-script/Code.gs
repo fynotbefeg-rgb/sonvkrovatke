@@ -81,6 +81,9 @@ function romanRevokeRow_(sheet, rowNumber, versionId, decision) {
 // Installable edit trigger. e.user is the editor; the trigger owner's identity
 // must never be used as a fallback. If Google hides the editor, approval fails closed.
 function onRomanApprovalEdit(e) {
+  if (typeof RomanSharedReview !== 'undefined' && RomanSharedReview.handles(e)) {
+    return RomanSharedReview.edit(e, romanApprovers_(), romanLock_);
+  }
   if (!e || !e.range || !e.source || e.source.getId() !== SPREADSHEET_ID || e.range.getSheet().getName() !== 'Сценарии') return;
   const firstRow = Math.max(2, e.range.getRow());
   const lastRow = e.range.getLastRow();
@@ -138,7 +141,12 @@ function romanQueue_() {
   return queue;
 }
 
-function getApprovedProductionQueue() { return romanLock_(romanQueue_); }
+function getApprovedProductionQueue() {
+  return romanLock_(function() {
+    const legacy = romanQueue_();
+    return typeof RomanSharedReview !== 'undefined' ? RomanSharedReview.queue(legacy, romanApprovers_()) : legacy;
+  });
+}
 function getProductionQueueResponse() { return {ok: true, items: getApprovedProductionQueue()}; }
 
 function checkProductionSafety() {
@@ -195,6 +203,10 @@ function doPost(e) {
     const body = JSON.parse(e.postData.contents);
     const token = PropertiesService.getScriptProperties().getProperty('ROMAN_REELS_WEBHOOK_TOKEN');
     if (!token || !body || typeof body.token !== 'string' || body.token !== token) return romanJson_({ok: false, error: 'Unauthorized'});
+    if (body.action === 'add_shared_review') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.register(body.packet, romanLock_));
+    }
     if (body.action === 'get_production_queue') return romanJson_(getProductionQueueResponse());
     if (body.action && body.action !== 'add_drafts') return romanJson_({ok: false, error: 'Unknown action'});
     return romanJson_(romanAddDrafts_(body.items));
