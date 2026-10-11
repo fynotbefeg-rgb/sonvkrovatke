@@ -751,3 +751,9 @@ SEO_GROUNDED_PROBE_V2.md records 3 new actual local Qwen 1.5B inference calls: 3
 ## 2026-10-11 — owner reports Windows laptop available
 
 Windows is available per owner, not yet verified by this cloud session. No direct Windows/desktop connector is present. WINDOWS_FIRST_CHECK.md provides the minimal Claude handoff: fetch existing clone without working-tree changes, read current docs with git show, inspect sanitized hardware/tool versions, confirm actual session MCP tools and navigate example.com through MCP only. No installs/login/HeyGen generation. WINDOWS_SETUP.md status updated without claiming setup completed. Await real local report before selecting compute/browser profile or running real HeyGen.
+
+## Windows local report received, 2026-10-11
+
+Owner relayed successful actual MCP Example Domain navigation/evaluation on Windows; see WINDOWS_READINESS_REPORT.md for sanitized specs and limits. Local branch still 2d2bc38, 23 behind dbbc5bb at that fetch, untracked snapshots retained. Node was not found in PATH despite earlier separate Node runtime/MCP launcher report: verify executable before installing. Prepared WINDOWS_NODE_AND_SEO_CHECK.md authorizes guarded ff-only update, existing runtime discovery/conditional official portable Node, then own loopback SEO observations through actual MCP. New serve-seo-fixture.mjs reuses unchanged owned fixture, no npm/model/API dependency. Python/FFmpeg deferred until needed. Not executed on Windows by cloud Codex; no HeyGen, live Google, approvals or paid model calls.
+
+Cloud smoke for the new fixture launcher passed: both states bound to 127.0.0.1, main HTTP 200, broken meta noindex/soft-404 200 versus fixed without noindex/404. Invalid mode rejected before startup; both owned child servers shut down. This is Linux/Node verification, not Windows MCP execution.
