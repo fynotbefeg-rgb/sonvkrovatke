@@ -1,0 +1,30 @@
+{
+  "status": "pending_roman_exact_script_review",
+  "scriptRevision": 4,
+  "generationRun": 38124045149,
+  "inspectionRun": 38124126884,
+  "generationCalls": 1,
+  "model": "gemini-3-flash-preview",
+  "actualCostUsd": null,
+  "originalGeminiSnapshot": "generated-revision4.json",
+  "snapshotMethod": "Bounded artifact readback through GitHub runner; not raw provider transport",
+  "reviewed": "reviewed-revision4.json",
+  "editor": "Codex",
+  "documentId": "1q-Cr0jeYe6beBq5vTDSOnAnEP-7kX-pZJqdMOq_l094",
+  "documentReadbackVerified": true,
+  "otherDocumentTabsPreserved": true,
+  "parts": 6,
+  "platformVariants": 6,
+  "fullWordCounts": [136, 136, 135, 137, 137, 136],
+  "allApprovalHashesChanged": true,
+  "productionReady": false,
+  "activeIntakeChanged": false,
+  "sheetsApprovalsChanged": false,
+  "limits": [
+    "Four synthetic pages and nine manually authored browser checks; not complete website coverage",
+    "No AI-driven discovery, connected Claude audit or one-prompt result claimed",
+    "Local in-memory receiver and mobile viewport, not real CRM or iPhone",
+    "No verified popular external reference for this expanded angle",
+    "Exact revision 4 awaits Roman approval; recordings and production not started"
+  ]
+}
