@@ -1,0 +1,21 @@
+{
+  "synthetic": true,
+  "cases": [
+    {
+      "id": "noindex",
+      "verdict": "issue",
+      "mustExplain": "noindex conflicts with intendedIndexable; suggested removal followed by fresh checks, not proof of Google status."
+    },
+    {
+      "id": "fixed",
+      "verdict": "pass",
+      "mustExplain": "Only supplied HTTP/meta directive check passes; actual Google indexing remains unknown."
+    },
+    {
+      "id": "unknown-indexing",
+      "verdict": "unknown",
+      "mustExplain": "No data establishes current Google indexing or traffic change."
+    }
+  ],
+  "automaticVerdictMatchIsNotSemanticReview": true
+}

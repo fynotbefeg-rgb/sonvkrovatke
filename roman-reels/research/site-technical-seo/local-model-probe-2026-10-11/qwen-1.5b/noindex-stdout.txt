@@ -1,0 +1,15 @@
+]
+```json
+{
+  "id": "noindex",
+  "verdict": "pass",
+  "evidence": [
+    "The website's meta tag 'noindex' is present in the HTML header.",
+    "The 'noindex' tag is explicitly set to 'noindex' and not 'nofollow'."
+  ],
+  "explanation": "The website's meta tag 'noindex' is correctly implemented, indicating that the website is not intended to be indexed by search engines.",
+  "suggestedFix": "Remove the 'noindex' tag from the HTML header to allow the website to be indexed."
+}
+``` [end of text]
+
+

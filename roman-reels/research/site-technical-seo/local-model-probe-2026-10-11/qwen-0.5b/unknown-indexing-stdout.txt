@@ -1,0 +1,21 @@
+
+{
+  "id": "unknown-indexing",
+  "verdict": "pass",
+  "evidence": [
+    {
+      "source": "searchConsoleData",
+      "type": "organicTraffic",
+      "value": "organicTrafficIncrease"
+    },
+    {
+      "source": "trafficData",
+      "type": "organicTraffic",
+      "value": "organicTrafficIncrease"
+    }
+  ],
+  "explanation": "The site was indexed by Google, and its organic traffic increased.",
+  "suggestedFix": "Check the search console for more detailed information about the organic traffic increase."
+} [end of text]
+
+

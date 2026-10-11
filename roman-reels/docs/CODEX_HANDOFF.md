@@ -739,3 +739,7 @@ CONTENT_REQUIREMENTS.md records evolving content acceptance rules and sources. G
 ## 2026-10-11 — free SEO route dependency research
 
 SEO_FREE_WORKFLOW_RESEARCH.md separates MCP/tool licenses from model costs. Official Gemini pricing lists a free tier; project eligibility/quotas and model workflow remain untested. Claude cost docs returned 403; no tariff claim inferred. Ollama MIT does not certify model license or hardware readiness. Existing deterministic local SEO fixture rerun: broken 1 pass/9 fail, fixed 10 pass, zero model calls. Evidence in site-technical-seo/free-route-fixture-2026-10-11; not Claude/AI execution or autonomous repair. Full free workflow and fresh popular reference remain blockers. No live Sheets, approvals, Docs, Windows changes or paid calls.
+
+## 2026-10-11 — actual local-model SEO interpretation probe
+
+SEO_LOCAL_MODEL_PROBE.md and research/site-technical-seo/local-model-probe-2026-10-11 contain 6 real CPU inference calls, exact prompts, stdout/stderr, versions/hashes, fixture binding and reviewer assessment. Qwen2.5 0.5B and 1.5B official GGUF candidates (Apache 2.0) via llama.cpp b11558 (MIT) both rejected for factual errors with this prompt. Verdict-only matches 1/3 and 2/3 do not confer semantic readiness. No browser-control or complete SEO/model workflow claim, no Windows test, no paid API calls, no live Google edits or approval. No migration of factory Gemini. Next bounded candidate: evidence-bound interpretation with explicit known/unknown rules and independent validation, not a claim that all local models fail.

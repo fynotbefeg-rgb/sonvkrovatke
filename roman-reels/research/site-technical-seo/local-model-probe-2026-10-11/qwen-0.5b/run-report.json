@@ -1,0 +1,87 @@
+{
+  "checkedAt": "2026-10-11T18:19:57.796711+00:00",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "synthetic": true,
+  "remoteModelCalls": 0,
+  "productionReady": false,
+  "fullSeoAudit": false,
+  "modelSha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "results": [
+    {
+      "id": "noindex",
+      "exitCode": 0,
+      "seconds": 7.104,
+      "command": [
+        "/workspace/scratch/roman-local-seo/engine/llama-b11558/llama-completion",
+        "-m",
+        "/workspace/scratch/roman-local-seo/qwen.gguf",
+        "-f",
+        "/workspace/scratch/roman-local-seo/probe-results/noindex-prompt.txt",
+        "-n",
+        "256",
+        "-c",
+        "2048",
+        "-t",
+        "2",
+        "--temp",
+        "0",
+        "--seed",
+        "42",
+        "--no-conversation",
+        "--no-display-prompt"
+      ],
+      "output": "\n{\n  \"id\": \"noindex\",\n  \"verdict\": \"pass\",\n  \"evidence\": [\n    {\n      \"field\": \"httpStatus\",\n      \"value\": 200\n    },\n    {\n      \"field\": \"metaRobots\",\n      \"value\": \"noindex\"\n    },\n    {\n      \"field\": \"intendedIndexable\",\n      \"value\": true\n    },\n    {\n      \"field\": \"searchConsoleData\",\n      \"value\": null\n    }\n  ],\n  \"explanation\": \"The website is not indexed by search engines due to the 'noindex' directive.\",\n  \"suggestedFix\": \"Remove the 'noindex' directive from the website's metadata to allow it to be indexed by search engines.\"\n} [end of text]\n\n\n"
+    },
+    {
+      "id": "fixed",
+      "exitCode": 0,
+      "seconds": 7.826,
+      "command": [
+        "/workspace/scratch/roman-local-seo/engine/llama-b11558/llama-completion",
+        "-m",
+        "/workspace/scratch/roman-local-seo/qwen.gguf",
+        "-f",
+        "/workspace/scratch/roman-local-seo/probe-results/fixed-prompt.txt",
+        "-n",
+        "256",
+        "-c",
+        "2048",
+        "-t",
+        "2",
+        "--temp",
+        "0",
+        "--seed",
+        "42",
+        "--no-conversation",
+        "--no-display-prompt"
+      ],
+      "output": "\n{\n  \"id\": \"fixed\",\n  \"verdict\": \"pass\",\n  \"evidence\": [\n    {\n      \"field\": \"input\",\n      \"value\": {\n        \"path\": \"/\",\n        \"httpStatus\": 200,\n        \"metaRobots\": \"index,follow\",\n        \"intendedIndexable\": true,\n        \"searchConsoleData\": null\n      }\n    }\n  ],\n  \"explanation\": \"The input is valid and the HTTP status code is 200, indicating a successful request. The intended indexable status is true, meaning the website is indexed by search engines. The search console data is null, which is typical for a valid website.\",\n  \"suggestedFix\": \"The website is now indexed by search engines.\"\n} [end of text]\n\n\n"
+    },
+    {
+      "id": "unknown-indexing",
+      "exitCode": 0,
+      "seconds": 6.068,
+      "command": [
+        "/workspace/scratch/roman-local-seo/engine/llama-b11558/llama-completion",
+        "-m",
+        "/workspace/scratch/roman-local-seo/qwen.gguf",
+        "-f",
+        "/workspace/scratch/roman-local-seo/probe-results/unknown-indexing-prompt.txt",
+        "-n",
+        "256",
+        "-c",
+        "2048",
+        "-t",
+        "2",
+        "--temp",
+        "0",
+        "--seed",
+        "42",
+        "--no-conversation",
+        "--no-display-prompt"
+      ],
+      "output": "\n{\n  \"id\": \"unknown-indexing\",\n  \"verdict\": \"pass\",\n  \"evidence\": [\n    {\n      \"source\": \"searchConsoleData\",\n      \"type\": \"organicTraffic\",\n      \"value\": \"organicTrafficIncrease\"\n    },\n    {\n      \"source\": \"trafficData\",\n      \"type\": \"organicTraffic\",\n      \"value\": \"organicTrafficIncrease\"\n    }\n  ],\n  \"explanation\": \"The site was indexed by Google, and its organic traffic increased.\",\n  \"suggestedFix\": \"Check the search console for more detailed information about the organic traffic increase.\"\n} [end of text]\n\n\n"
+    }
+  ]
+}
