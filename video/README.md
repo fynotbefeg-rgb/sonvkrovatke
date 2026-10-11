@@ -38,4 +38,18 @@ npm run render -- Day05   # только один
 npm run render -- --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
 ```
 
+## Загрузка на Google Диск
+
+Рендеры уходят в папку на Google Диске, ID которой задан в `GDRIVE_FOLDER_ID`; подпапки повторяют `renders/` (`week1/day01.mp4` и т. д.).
+
+```bash
+npm run upload                          # всё из renders/
+npm run upload -- renders/week1/day05.mp4
+npm run render -- Day05 --upload --browser-executable=...   # отрендерить и сразу загрузить
+```
+
+Файл, который уже лежит на Диске с тем же MD5, пропускается; изменённый заменяется новой версией по той же ссылке. Большие файлы грузятся частями и после обрыва связи продолжают с места остановки.
+
+В облачной сессии Claude Code токен выдаётся через секрет «Google Drive», ничего настраивать не нужно. В другом месте задайте `GDRIVE_CLIENT_ID`, `GDRIVE_CLIENT_SECRET` и `GDRIVE_REFRESH_TOKEN`.
+
 Шрифты Literata и Golos Text (кириллица и латиница) лежат локально в `public/fonts`, поэтому интернет для рендера не нужен.
