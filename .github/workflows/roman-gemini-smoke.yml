@@ -15,7 +15,7 @@ on:
         description: 'Pending research drafts; mcp_site now uses technical/SEO website revision 5'
         type: choice
         default: seo
-        options: [seo, mcp_site]
+        options: [seo, mcp_site, seo_checklist]
       allow_generation:
         description: 'Explicit permission for Gemini generation; billing/free tier must be agreed separately'
         type: boolean
@@ -56,6 +56,7 @@ jobs:
           case "$RESEARCH_FOCUS" in
             seo) brief=roman-reels/research/gemini-revision-seo/brief-v2.json ;;
             mcp_site) brief=roman-reels/research/site-technical-seo/brief-revision5.json ;;
+            seo_checklist) brief=roman-reels/research/site-technical-seo/brief-revision6.json ;;
             *) echo 'Invalid research focus'; exit 2 ;;
           esac
           node roman-reels/scripts/run-researched-gemini.mjs "$action" "$brief" "$RUNNER_TEMP/drafts.json"
