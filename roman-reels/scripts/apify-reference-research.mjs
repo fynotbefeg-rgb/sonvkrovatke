@@ -5,7 +5,7 @@ import {reelPlan} from './apify-one-reel.mjs';
 
 export const PROFILES = ['theautomationguy.ai', 'zapier'];
 export function plans(stage, urls = []) {
-  if (stage === 'metadata' && urls.length === 0) return PROFILES.map(profile => ({
+  if (['metadata', 'cooper_metadata'].includes(stage) && urls.length === 0) return (stage === 'cooper_metadata' ? ['cooper.simson'] : PROFILES).map(profile => ({
     cap: 0.1, profile, input: {username: [profile], resultsLimit: 15,
       includeSharesCount: false, includeTranscript: false, includeDownloadedVideo: false},
   }));
@@ -34,7 +34,7 @@ export function sanitize(item, details) {
 export async function collect(stage, urls, {token, approved = false, directory,
   fetchImpl = fetch, sleep = ms => new Promise(resolve => setTimeout(resolve, ms))} = {}) {
   const selected = plans(stage, urls);
-  if (!approved) throw Error('Explicit $1 research budget approval required');
+  if (!approved) throw Error('Explicit research budget approval required');
   if (typeof token !== 'string' || !token.trim() || /[\r\n]/.test(token)) throw Error('Missing APIFY_TOKEN');
   mkdirSync(directory, {recursive: true});
   const save = (name, value) => writeFileSync(join(directory, name), JSON.stringify(value, null, 2) + '\n', {mode: 0o600});
@@ -76,11 +76,11 @@ export async function collect(stage, urls, {token, approved = false, directory,
     if (run.status !== 'SUCCEEDED') throw Error('Run did not succeed; inspect journal, no automatic retry');
     if (!/^[A-Za-z0-9]+$/.test(run.defaultDatasetId ?? '')) throw Error('Invalid dataset ID');
     const items = await request(`datasets/${run.defaultDatasetId}/items?clean=true&format=json&limit=16`);
-    if (!Array.isArray(items) || items.length > (stage === 'metadata' ? 15 : 1)) throw Error('Unexpected dataset size');
+    if (!Array.isArray(items) || items.length > (stage !== 'details' ? 15 : 1)) throw Error('Unexpected dataset size');
     const rawValid = items.filter(item => item.shortCode && !item.error);
     // Profile feeds can include collaborations owned by a different account.
     // Exclude those, preserving verified own-account results without repeating a paid run.
-    const valid = stage === 'metadata' ? rawValid.filter(item=>item.ownerUsername?.toLowerCase()===plan.profile) : rawValid;
+    const valid = stage !== 'details' ? rawValid.filter(item=>item.ownerUsername?.toLowerCase()===plan.profile) : rawValid;
     if (stage === 'details' && (valid.length !== 1 || valid[0].shortCode !== reelPlan(plan.url).shortcode)) throw Error('Detail Reel identity mismatch');
     const result = {runId, datasetId:run.defaultDatasetId, cap:plan.cap, usageTotalUsd:run.usageTotalUsd ?? null,
       excludedOwnerMismatch:rawValid.length-valid.length,

@@ -68,3 +68,13 @@ test('profile collaborations excluded without destroying verified results or rep
   for(const result of results){assert.equal(result.excludedOwnerMismatch,1);assert.equal(result.items.length,1);assert.equal(result.items[0].shortcode,'Own');}
  }finally{rmSync(directory,{recursive:true,force:true});}
 });
+
+test('Cooper approval allows only 15 metadata items and one $0.40 selected detail',()=>{
+ const m=plans('cooper_metadata');
+ assert.equal(m.length,1);assert.equal(m[0].profile,'cooper.simson');
+ assert.deepEqual(m[0].input.username,['cooper.simson']);
+ assert.equal(m[0].input.resultsLimit,15);
+ assert.equal(m[0].cap+plans('details',[url])[0].cap,.5);
+ assert.equal(m[0].input.includeTranscript,false);
+ assert.throws(()=>plans('cooper_metadata',[url]));
+});

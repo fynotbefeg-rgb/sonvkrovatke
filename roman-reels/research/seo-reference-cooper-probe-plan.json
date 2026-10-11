@@ -1,5 +1,5 @@
 {
-  "status": "awaiting_new_budget_approval",
+  "status": "approved_metadata_pending",
   "actor": "apify~instagram-reel-scraper",
   "profile": "cooper.simson",
   "targetCaption": "My SEO agency charged $2K/mo. This free Claude Skill does all their work in 3 minutes.",
@@ -31,7 +31,7 @@
   },
   "selectionRule": "Own profile, exact SEO topic, dated within 60 days before probe, at least 100000 public plays or views; otherwise stop without detail run. Do not expand pagination under this approval.",
   "safety": [
-    "No Actor runs made under this plan yet",
+    "Owner approved $0.50 maximum; no Actor runs made under this plan yet",
     "Earlier completed $1 research approval must not be reused",
     "Verify current PPE pricing and applied maxTotalChargeUsd before accepting a run",
     "Persist run ID immediately; never retry creation after ambiguous response",
