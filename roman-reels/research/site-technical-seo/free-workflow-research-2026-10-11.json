@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-11T18:11:32.522477+00:00",
+  "status": "research_only",
+  "viewerWorkflowFreeVerified": false,
+  "modelCalls": 0,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/playwright-mcp/main/LICENSE",
+      "status": 200,
+      "sha256": "9a7110fc2d2f964038e5dc49128f908f29f47a574c961cba16085914e879cbda",
+      "quote": "Apache License, Version 2.0",
+      "conclusion": "Лицензия MCP; не подтверждает бесплатность модели или всей связки."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ollama/ollama/main/LICENSE",
+      "status": 200,
+      "sha256": "5934ed2ce0d15154bcdb9c85203210abac0da4314af34081e36df4599f90b226",
+      "quote": "Permission is hereby granted, free of charge",
+      "conclusion": "Лицензия Ollama; конкретная модель, её лицензия, оборудование и опыт не проверены."
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "status": 200,
+      "sha256": "1afc9ffcbc0dbf2fecb0d806e47d8387a6f9d757b07feb1e7c40d8ab727f2a10",
+      "visibleExcerpt": "Gemini 2.5 Flash gemini-2.5-flash Try it in Google AI Studio Our first hybrid reasoning model which supports a 1M token context window and has thinking budgets. Standard Free Tier Paid Tier, per 1M tokens in USD Input price Free of charge $0.30 (text / image / video) $1.00 (audio) Output price (including thinking tokens) Free of charge $2.50 Context caching price Not available $0.03 (text / image / video) $0.1 (audio) $1.00 / 1,000,000 tokens per hour (storage price) Grounding with Google Search Free of charge, up to 500 RPD (limit shared with Flash-Lite RPD) 1,500 RPD (free, limit shared with Flash-Lite RPD), then $35 / 1,000 grounded prompts Grounding with Google Maps 500 RPD 1,500 RPD (free), then $25 / 1,000 grounded prompts Used to improve our products Yes No Batch Free Tier Paid Tier, per 1M tokens in USD Input price Not available $0.15 (text / image / video) $0.50 (audio) Output price (including thinking tokens) Not available $1.25 Context caching price Not available $0.03 (text / image / video) $0.1 (audio) $1.00 / 1,000,000 tokens per hour (storage price) Grounding with Google Search Not available 1,500 RPD (free, limit shared with Flash-Lite RPD), then $35 / 1,000 grounded prompts Grounding with Google Maps Not available Not available Used to improve our products Yes No Flex Free Tier Paid Tier, per 1M tokens in USD Input price Not available $0.15 (text / image / video) $0.50 (audio) Output price (including thinking tokens) Not available $1.25 Context caching price Not available $0.03 (text / image / video) $0.1 (audio) $1.00 / 1,000,000 tokens per hour (storage price) Grounding with Google Search Not available 1,500 RPD (free, limit shared with Flash-Lite RPD), then $35 / 1,000 grounded prompts Grounding with Google Maps Not available Not available Used to improve our products Yes No Priority Free Tier Paid Tier, per 1M tokens in USD Input price Free of charge $0.54 (text / image / video) $1.80 (audio) Output price (including thinking tokens) Free of charge $4.50 Context caching price Not available $0.054 (text / image / video) $0.18 (audio) $1.80 / 1,000,000 tokens per hour (storage price) Grounding with Google Search Free of charge, up to 500 RPD (limit shared with Flash-Lite RPD) 1,500 RPD (free, limit shared with Flash-Lite RPD), then $35 / 1,000 grounded prompts Grounding with Google Maps 500 RPD 1,500 RPD (free), then $25 / 1,000 grounded prompts Used to improve our products Yes No ",
+      "conclusion": "У Gemini 2.5 Flash указан Free Tier; доступность, квота проекта, права и полный опыт не проверены. Не отправлять закрытые данные в бесплатный тест."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/costs",
+      "status": 403,
+      "conclusion": "Страница не получена. Тариф не подтверждён; существующая Pro/Max подписка не считается бесплатной."
+    }
+  ],
+  "technicalExperiment": {
+    "artifact": "roman-reels/research/site-technical-seo/free-route-fixture-2026-10-11/audit-report.json",
+    "broken": {
+      "pass": 1,
+      "fail": 9
+    },
+    "fixed": {
+      "pass": 10,
+      "fail": 0
+    },
+    "modelCalls": 0,
+    "scope": "Локальный учебный стенд, детерминированные проверки. Не Claude, не ИИ-аудит, не проверка реального сайта или индексации."
+  },
+  "nextStep": "Выбрать и испытать модельный бесплатный путь на учебных данных, проверить квоты и требования. Не менять утверждённую речь до доказательств."
+}

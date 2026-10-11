@@ -1,0 +1,504 @@
+{
+  "checkedAt": "2026-10-11T18:10:47.631Z",
+  "synthetic": true,
+  "modelCalls": 0,
+  "driver": "Manually authored bounded Playwright/HTTP checks",
+  "browserVersion": "155.0.8059.12",
+  "browserSandbox": false,
+  "inputHashes": {
+    "./run-technical-seo-demo.mjs": "fd768647208ba14239689b46a5dd1071ba5f4d61f1d3bef7e5da47b9ee98746f",
+    "../research/site-technical-seo/fixture-site.mjs": "d88e470e45b9b565dc7903120d6b2885d7ca2ae60e274534a257dbd5c94b1c2c"
+  },
+  "variants": [
+    {
+      "variant": "broken",
+      "pages": [
+        {
+          "path": "/",
+          "httpStatus": 200,
+          "title": "Учебная мастерская",
+          "description": "Учебная мастерская: вымышленная учебная страница, не предложение услуг.",
+          "robots": "noindex",
+          "canonical": "http://127.0.0.1:45849/",
+          "h1Count": 2
+        },
+        {
+          "path": "/services",
+          "httpStatus": 200,
+          "title": "Учебная мастерская",
+          "description": "",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:45849/",
+          "h1Count": 1
+        },
+        {
+          "path": "/pricing",
+          "httpStatus": 200,
+          "title": "Учебные цены",
+          "description": "Учебные цены: вымышленная учебная страница, не предложение услуг.",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:45849/pricing",
+          "h1Count": 1
+        },
+        {
+          "path": "/contact",
+          "httpStatus": 200,
+          "title": "Контакты",
+          "description": "Контакты: вымышленная учебная страница, не предложение услуг.",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:45849/contact",
+          "h1Count": 1
+        }
+      ],
+      "checks": [
+        {
+          "id": "page-status",
+          "priority": "P1",
+          "expected": "Четыре заявленные страницы возвращают 200",
+          "observed": [
+            {
+              "path": "/",
+              "status": 200
+            },
+            {
+              "path": "/services",
+              "status": 200
+            },
+            {
+              "path": "/pricing",
+              "status": 200
+            },
+            {
+              "path": "/contact",
+              "status": 200
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "robots-crawl",
+          "priority": "P1",
+          "expected": "Учебная коммерческая /services не закрыта от обхода",
+          "observed": "User-agent: *\nDisallow: /services\nSitemap: http://127.0.0.1:45849/sitemap.xml\n",
+          "status": "FAIL"
+        },
+        {
+          "id": "index-directives",
+          "priority": "P1",
+          "expected": "На ожидаемых открытых страницах отсутствует noindex",
+          "observed": [
+            {
+              "path": "/",
+              "robots": "noindex"
+            },
+            {
+              "path": "/services",
+              "robots": "index,follow"
+            },
+            {
+              "path": "/pricing",
+              "robots": "index,follow"
+            },
+            {
+              "path": "/contact",
+              "robots": "index,follow"
+            }
+          ],
+          "status": "FAIL"
+        },
+        {
+          "id": "sitemap",
+          "priority": "P2",
+          "expected": "Все 4 ожидаемые канонические страницы перечислены, записи возвращают 200",
+          "observed": [
+            {
+              "path": "/",
+              "status": 200
+            },
+            {
+              "path": "/pricing",
+              "status": 200
+            },
+            {
+              "path": "/contact",
+              "status": 200
+            },
+            {
+              "path": "/gone",
+              "status": 404
+            }
+          ],
+          "status": "FAIL"
+        },
+        {
+          "id": "page-titles",
+          "priority": "P2",
+          "expected": "Непустые разные title по согласованному учебному требованию",
+          "observed": [
+            {
+              "path": "/",
+              "title": "Учебная мастерская"
+            },
+            {
+              "path": "/services",
+              "title": "Учебная мастерская"
+            },
+            {
+              "path": "/pricing",
+              "title": "Учебные цены"
+            },
+            {
+              "path": "/contact",
+              "title": "Контакты"
+            }
+          ],
+          "status": "FAIL"
+        },
+        {
+          "id": "descriptions",
+          "priority": "P3",
+          "expected": "Описания заданы на всех страницах по учебному чек-листу",
+          "observed": [
+            {
+              "path": "/",
+              "description": "Учебная мастерская: вымышленная учебная страница, не предложение услуг."
+            },
+            {
+              "path": "/services",
+              "description": ""
+            },
+            {
+              "path": "/pricing",
+              "description": "Учебные цены: вымышленная учебная страница, не предложение услуг."
+            },
+            {
+              "path": "/contact",
+              "description": "Контакты: вымышленная учебная страница, не предложение услуг."
+            }
+          ],
+          "status": "FAIL"
+        },
+        {
+          "id": "canonicals",
+          "priority": "P1",
+          "expected": "В этой модели каждая отличающаяся страница указывает на себя",
+          "observed": [
+            {
+              "path": "/",
+              "canonicalPath": "/"
+            },
+            {
+              "path": "/services",
+              "canonicalPath": "/"
+            },
+            {
+              "path": "/pricing",
+              "canonicalPath": "/pricing"
+            },
+            {
+              "path": "/contact",
+              "canonicalPath": "/contact"
+            }
+          ],
+          "status": "FAIL"
+        },
+        {
+          "id": "heading-structure",
+          "priority": "P3",
+          "expected": "Один основной заголовок по договорённости для этого сайта",
+          "observed": [
+            {
+              "path": "/",
+              "h1Count": 2
+            },
+            {
+              "path": "/services",
+              "h1Count": 1
+            },
+            {
+              "path": "/pricing",
+              "h1Count": 1
+            },
+            {
+              "path": "/contact",
+              "h1Count": 1
+            }
+          ],
+          "status": "FAIL"
+        },
+        {
+          "id": "legacy-redirect",
+          "priority": "P2",
+          "expected": "Постоянный переезд /old-services → /services: 301 или 308",
+          "observed": {
+            "status": 302,
+            "location": "/"
+          },
+          "status": "FAIL"
+        },
+        {
+          "id": "missing-status",
+          "priority": "P2",
+          "expected": "Заведомо отсутствующая страница возвращает 404, не 200",
+          "observed": {
+            "status": 200
+          },
+          "status": "FAIL"
+        }
+      ],
+      "pass": 1,
+      "fail": 9
+    },
+    {
+      "variant": "fixed",
+      "pages": [
+        {
+          "path": "/",
+          "httpStatus": 200,
+          "title": "Учебная мастерская",
+          "description": "Учебная мастерская: вымышленная учебная страница, не предложение услуг.",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:35901/",
+          "h1Count": 1
+        },
+        {
+          "path": "/services",
+          "httpStatus": 200,
+          "title": "Услуги автоматизации",
+          "description": "Услуги автоматизации: вымышленная учебная страница, не предложение услуг.",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:35901/services",
+          "h1Count": 1
+        },
+        {
+          "path": "/pricing",
+          "httpStatus": 200,
+          "title": "Учебные цены",
+          "description": "Учебные цены: вымышленная учебная страница, не предложение услуг.",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:35901/pricing",
+          "h1Count": 1
+        },
+        {
+          "path": "/contact",
+          "httpStatus": 200,
+          "title": "Контакты",
+          "description": "Контакты: вымышленная учебная страница, не предложение услуг.",
+          "robots": "index,follow",
+          "canonical": "http://127.0.0.1:35901/contact",
+          "h1Count": 1
+        }
+      ],
+      "checks": [
+        {
+          "id": "page-status",
+          "priority": "P1",
+          "expected": "Четыре заявленные страницы возвращают 200",
+          "observed": [
+            {
+              "path": "/",
+              "status": 200
+            },
+            {
+              "path": "/services",
+              "status": 200
+            },
+            {
+              "path": "/pricing",
+              "status": 200
+            },
+            {
+              "path": "/contact",
+              "status": 200
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "robots-crawl",
+          "priority": "P1",
+          "expected": "Учебная коммерческая /services не закрыта от обхода",
+          "observed": "User-agent: *\nDisallow: \nSitemap: http://127.0.0.1:35901/sitemap.xml\n",
+          "status": "PASS"
+        },
+        {
+          "id": "index-directives",
+          "priority": "P1",
+          "expected": "На ожидаемых открытых страницах отсутствует noindex",
+          "observed": [
+            {
+              "path": "/",
+              "robots": "index,follow"
+            },
+            {
+              "path": "/services",
+              "robots": "index,follow"
+            },
+            {
+              "path": "/pricing",
+              "robots": "index,follow"
+            },
+            {
+              "path": "/contact",
+              "robots": "index,follow"
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "sitemap",
+          "priority": "P2",
+          "expected": "Все 4 ожидаемые канонические страницы перечислены, записи возвращают 200",
+          "observed": [
+            {
+              "path": "/",
+              "status": 200
+            },
+            {
+              "path": "/services",
+              "status": 200
+            },
+            {
+              "path": "/pricing",
+              "status": 200
+            },
+            {
+              "path": "/contact",
+              "status": 200
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "page-titles",
+          "priority": "P2",
+          "expected": "Непустые разные title по согласованному учебному требованию",
+          "observed": [
+            {
+              "path": "/",
+              "title": "Учебная мастерская"
+            },
+            {
+              "path": "/services",
+              "title": "Услуги автоматизации"
+            },
+            {
+              "path": "/pricing",
+              "title": "Учебные цены"
+            },
+            {
+              "path": "/contact",
+              "title": "Контакты"
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "descriptions",
+          "priority": "P3",
+          "expected": "Описания заданы на всех страницах по учебному чек-листу",
+          "observed": [
+            {
+              "path": "/",
+              "description": "Учебная мастерская: вымышленная учебная страница, не предложение услуг."
+            },
+            {
+              "path": "/services",
+              "description": "Услуги автоматизации: вымышленная учебная страница, не предложение услуг."
+            },
+            {
+              "path": "/pricing",
+              "description": "Учебные цены: вымышленная учебная страница, не предложение услуг."
+            },
+            {
+              "path": "/contact",
+              "description": "Контакты: вымышленная учебная страница, не предложение услуг."
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "canonicals",
+          "priority": "P1",
+          "expected": "В этой модели каждая отличающаяся страница указывает на себя",
+          "observed": [
+            {
+              "path": "/",
+              "canonicalPath": "/"
+            },
+            {
+              "path": "/services",
+              "canonicalPath": "/services"
+            },
+            {
+              "path": "/pricing",
+              "canonicalPath": "/pricing"
+            },
+            {
+              "path": "/contact",
+              "canonicalPath": "/contact"
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "heading-structure",
+          "priority": "P3",
+          "expected": "Один основной заголовок по договорённости для этого сайта",
+          "observed": [
+            {
+              "path": "/",
+              "h1Count": 1
+            },
+            {
+              "path": "/services",
+              "h1Count": 1
+            },
+            {
+              "path": "/pricing",
+              "h1Count": 1
+            },
+            {
+              "path": "/contact",
+              "h1Count": 1
+            }
+          ],
+          "status": "PASS"
+        },
+        {
+          "id": "legacy-redirect",
+          "priority": "P2",
+          "expected": "Постоянный переезд /old-services → /services: 301 или 308",
+          "observed": {
+            "status": 301,
+            "location": "/services"
+          },
+          "status": "PASS"
+        },
+        {
+          "id": "missing-status",
+          "priority": "P2",
+          "expected": "Заведомо отсутствующая страница возвращает 404, не 200",
+          "observed": {
+            "status": 404
+          },
+          "status": "PASS"
+        }
+      ],
+      "pass": 10,
+      "fail": 0
+    }
+  ],
+  "productionReady": false,
+  "onePromptAuditTested": false,
+  "googleIndexVerified": false,
+  "limitations": [
+    "Four known synthetic URLs; not a general production crawler or all website states.",
+    "robots is a literal fixture rule check; Googlebot groups, wildcard matching and X-Robots-Tag not implemented.",
+    "noindex and canonical presence do not establish actual Google indexing or selected canonical.",
+    "Title, description and H1 requirements are fixture-specific quality rules, not guarantees of ranking penalties.",
+    "Sitemap is a discovery hint, not a guarantee; synthetic XML parser not for arbitrary input.",
+    "Speed, field Core Web Vitals, Search Console, content strategy, backlinks, security and real CRM not measured.",
+    "Local-demo sandbox opt-out only for this controlled loopback site."
+  ]
+}

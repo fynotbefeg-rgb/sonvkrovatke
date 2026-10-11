@@ -735,3 +735,7 @@ pending editorial/semantic. Два release-v6 JSON сохранены, ориг�
 ## 2026-10-11 — Roman requires free audience workflows
 
 CONTENT_REQUIREMENTS.md records evolving content acceptance rules and sources. GEMINI_EDITORIAL_RULES 1.2.0 adds free end-to-end viewer implementation; factory spend is separate. Editorial senders now require hash-bound cost evidence covering tool/model/integration/execution/data, applicable tested usage, official sources and limits; paid/unknown/trial-only/stale evidence blocks release. Structural validation is not an automated factual tariff check. No specific unnamed MCP pricing has been established. SEO v6 remains blocked; no speech, live approvals, Sheets or Docs were edited. No paid calls.
+
+## 2026-10-11 — free SEO route dependency research
+
+SEO_FREE_WORKFLOW_RESEARCH.md separates MCP/tool licenses from model costs. Official Gemini pricing lists a free tier; project eligibility/quotas and model workflow remain untested. Claude cost docs returned 403; no tariff claim inferred. Ollama MIT does not certify model license or hardware readiness. Existing deterministic local SEO fixture rerun: broken 1 pass/9 fail, fixed 10 pass, zero model calls. Evidence in site-technical-seo/free-route-fixture-2026-10-11; not Claude/AI execution or autonomous repair. Full free workflow and fresh popular reference remain blockers. No live Sheets, approvals, Docs, Windows changes or paid calls.
