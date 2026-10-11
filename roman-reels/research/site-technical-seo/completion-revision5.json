@@ -1,0 +1,52 @@
+{
+  "status": "pending_roman_exact_script_review",
+  "scriptRevision": 5,
+  "generationRun": 38125488979,
+  "inspectionRun": 38125537411,
+  "generationCalls": 1,
+  "model": "gemini-3-flash-preview",
+  "totalTokenCount": 5403,
+  "actualCostUsd": null,
+  "originalGeminiSnapshot": "generated-revision5.json",
+  "snapshotMethod": "Bounded artifact readback through GitHub runner; not raw provider transport",
+  "reviewed": "reviewed-revision5.json",
+  "editor": "Codex",
+  "documentId": "1q-Cr0jeYe6beBq5vTDSOnAnEP-7kX-pZJqdMOq_l094",
+  "documentReadbackVerified": true,
+  "otherDocumentTabsPreserved": true,
+  "parts": 6,
+  "platformVariants": 6,
+  "fullWordCounts": [
+    134,
+    132,
+    135,
+    135,
+    133,
+    136
+  ],
+  "allApprovalHashesChanged": true,
+  "productionReady": false,
+  "activeIntakeChanged": false,
+  "sheetsApprovalsChanged": false,
+  "localTests": 17,
+  "seoDemo": {
+    "expectedPages": 4,
+    "checks": 10,
+    "before": {
+      "pass": 1,
+      "fail": 9
+    },
+    "after": {
+      "pass": 10,
+      "fail": 0
+    },
+    "synthetic": true
+  },
+  "limits": [
+    "No general production crawler or complete audit coverage",
+    "No verified actual Google indexing, speed, field Core Web Vitals or ranking increase",
+    "No model-driven site audit or report interpretation tested; Gemini generated speech only",
+    "Separate prior functional demo; no actual CRM or live phone test",
+    "No verified popular external reference; exact speech v5 awaits Roman approval"
+  ]
+}

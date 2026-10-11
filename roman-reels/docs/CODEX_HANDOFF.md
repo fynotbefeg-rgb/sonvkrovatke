@@ -575,3 +575,35 @@ completion-revision4.json фиксирует текущий pending-статус
 до утверждения не записывать речь и не запускать производство.
 Следующее одно действие владельца — предложить Роману проверить основу,
 выбрать/утвердить хуки версии 4 и окончания либо дать точные замечания.
+
+## 2026-10-11 — технический и SEO-аудит, речь v5 pending
+
+Владелец расширил направление до технического/SEO-аудита сайта бизнеса.
+Созданы SITE_TECHNICAL_SEO_RESEARCH.md, отдельный owned loopback SEO-fixture и
+run-technical-seo-demo.mjs. Никакие старые fixture/evidence не изменены.
+Реальный браузерный/HTTP запуск: 4 заданных URL, 10 фиксированных проверок,
+до 1PASS/9FAIL, после 10PASS/0FAIL. Девять дефектов заложены намеренно; есть
+положительный контроль. 8 PNG и JSON с наблюдениями/хешами сохранены.
+Учебный robots/XML подход нельзя использовать как общий production crawler.
+Search Console, полевые CWV, скорость, контентная стратегия, JS и локализации
+не проверены. Официальные Google/Chrome источники открыты 2026-10-11.
+
+Бриф v5 опубликован коммитом 11029b0; mcp_site workflow selector читает его.
+Generation 38125488979 SUCCESS: один разрешённый Gemini POST, model
+gemini-3-flash-preview, totalTokenCount 5403, фактическая стоимость неизвестна.
+Inspect 38125537411 SUCCESS без повторного вызова модели: bounded artifact
+snapshot сохранён, не raw provider transport. Никаких Sheet/production writes.
+
+Codex исправил черновик: noindex не объявляется доказанным отсутствием в Google,
+ИИ не приписываются неисполненные анализ/задачи, нет обещания отсутствия всех
+препятствий. Функциональный опыт и новый SEO-тест явно разделены. reviewed,
+platform-packet и recording-layout v5 pending: 6 вариантов по 132–136 слов,
+6 частей, recordingAllowed/productionReady=false, все full hashes изменились.
+Редакторский checklist готовности к проверке не является Roman approval.
+
+Google Doc t.0 заменён на v5 с revision guard и проверен readback; вкладка
+следующих тем не изменена. ROMAN_RECORDING_TEXTS.md теперь v5, v4 архивирована.
+SCREEN_PLAN_V5.md — только план будущих собственных карточек/показа, не монтаж.
+17 offline tests прошли; reader, pending состояния и смена всех 6 хешей проверены.
+main, активный intake, ожидания исходников и утверждения Sheets не менялись.
+Следующее действие — Роман проверяет точную основу v5, три хука и окончания.
