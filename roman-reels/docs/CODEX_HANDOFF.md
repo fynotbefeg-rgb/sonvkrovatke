@@ -706,3 +706,24 @@ Live таблица, approvals, источник v6, intake, Telegram/HeyGen и 
 38160865900 (push) и 38160868441 (PR) завершились success на этом SHA:
 48 offline checks + addon/source parity. Изменения входят в открытый PR #5,
 feature/codex-pipeline → automation/roman-reels-v1. PR не слит, main не тронут.
+
+## 2026-10-11 — качество до отправки Роману: editorial release gate
+
+Найден разрыв: send-drafts-to-sheet проверял только pending/count, не завершённую
+редактуру. Добавлены editorial-release/check-editorial-release/send-shared-review.
+Перед отправкой обязательны exact hashes трёх сценариев, current rules 1.1.0,
+практическая задача, свежий inspected reference с primary views/plays>=100k,
+реальный совпадающий workflow demo + artifact hashes, восемь pass с evidence,
+отдельная семантическая проверка. Structural checks не доказывают истинность.
+Sender блокирует старый вызов с одним аргументом ДО Google/network. Shared sender
+mock проверен, live не вызывался. Поддерживает базовые 3 версии без окончаний;
+release binding шести платформенных версий ещё требуется отдельно.
+Legacy smoke и old pilot отправки остановлены early rejection; paid generation
+в legacy_smoke не запускается. Research preview/inspect/authorized generation
+сохранены, полноценный входной gate перед каждым research POST пока не подключён.
+Текущая SEO v6 preflight заблокирована: старый Cooper, Claude инструкция prepared,
+pending editorial/semantic. Два release-v6 JSON сохранены, оригинальные речь/Doc,
+таблица, approvals и производство не менялись. EDITORIAL_RELEASE_GATE.md содержит
+причину, правила, пределы проверки и задание для реального Claude опыта.
+11 новых тестов + 8 существующих research tests прошли локально; cloud CI теперь
+выполняет их вместе с предыдущими 48 (67 total). Новых paid calls не было.

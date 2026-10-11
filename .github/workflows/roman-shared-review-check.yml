@@ -7,6 +7,10 @@ on:
       - 'roman-reels/apps-script/**'
       - 'roman-reels/scripts/*review*'
       - 'roman-reels/scripts/apps-script.test.mjs'
+      - 'roman-reels/scripts/*editorial*'
+      - 'roman-reels/scripts/researched-gemini-drafts*'
+      - 'roman-reels/scripts/send-drafts-to-sheet.mjs'
+      - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
       - '.github/workflows/roman-shared-review-check.yml'
   pull_request:
     branches: [feature/codex-pipeline, automation/roman-reels-v1]
@@ -14,6 +18,10 @@ on:
       - 'roman-reels/apps-script/**'
       - 'roman-reels/scripts/*review*'
       - 'roman-reels/scripts/apps-script.test.mjs'
+      - 'roman-reels/scripts/*editorial*'
+      - 'roman-reels/scripts/researched-gemini-drafts*'
+      - 'roman-reels/scripts/send-drafts-to-sheet.mjs'
+      - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
       - '.github/workflows/roman-shared-review-check.yml'
 permissions:
   contents: read
@@ -32,6 +40,8 @@ jobs:
           node roman-reels/scripts/prepare-shared-review.test.mjs
           node roman-reels/scripts/production-queue.test.mjs
           node roman-reels/scripts/manual-intake.test.mjs
+          node roman-reels/scripts/editorial-release.test.mjs
+          node roman-reels/scripts/researched-gemini-drafts.test.mjs
       - name: Additive installer must match source
         run: |
           node roman-reels/scripts/build-approval-addon.mjs

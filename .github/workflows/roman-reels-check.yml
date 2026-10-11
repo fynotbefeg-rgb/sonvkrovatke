@@ -234,6 +234,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Block obsolete pilot publication without editorial release
+        if: inputs.send_pilot_drafts
+        run: |
+          echo '::error::Old pilot publication is paused. Current exact drafts require an editorial release review.'
+          exit 1
       - name: Read authenticated Google queue (no production)
         env:
           ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}

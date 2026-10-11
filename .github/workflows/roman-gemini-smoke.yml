@@ -33,6 +33,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Block obsolete unreviewed send before spending tokens
+        if: inputs.mode == 'legacy_smoke'
+        run: |
+          echo '::error::Legacy smoke publication is paused. Use research preview and exact editorial release review before sending.'
+          exit 1
       - name: Check existing Gemini access (model catalogue GET only)
         if: inputs.mode == 'prepare_research' || inputs.mode == 'generate_research'
         env:

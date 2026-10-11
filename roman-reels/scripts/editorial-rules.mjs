@@ -2,7 +2,7 @@
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 
-export const editorialRulesVersion = '1.0.0';
+export const editorialRulesVersion = '1.1.0';
 export const editorialRules = readFileSync(new URL('../docs/GEMINI_EDITORIAL_RULES.md', import.meta.url), 'utf8');
 export const editorialRulesSha256 = createHash('sha256').update(editorialRules).digest('hex');
 
