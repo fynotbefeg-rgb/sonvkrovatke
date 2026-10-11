@@ -727,3 +727,7 @@ pending editorial/semantic. Два release-v6 JSON сохранены, ориг�
 причину, правила, пределы проверки и задание для реального Claude опыта.
 11 новых тестов + 8 существующих research tests прошли локально; cloud CI теперь
 выполняет их вместе с предыдущими 48 (67 total). Новых paid calls не было.
+
+Облачные проверки editorial release: implementation 33c59e3. Runs 38161942760
+(push) и 38161945758 (PR) success на этом SHA: 67 offline tests и addon parity.
+Изменения в существующем PR #5; не слит. Live API вызовов публикации не было.
