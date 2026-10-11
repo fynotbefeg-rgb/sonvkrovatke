@@ -701,3 +701,8 @@ access/webhook token не дают source/deployment доступа. GitHub secr
 значения не читались. Не просить владельца менять код вручную на iPhone:
 нужна авторизованная сессия установки с backup и реальным e.user тестом.
 Live таблица, approvals, источник v6, intake, Telegram/HeyGen и main не изменены.
+
+Облачное подтверждение shared review: implementation a71efce. GitHub Actions
+38160865900 (push) и 38160868441 (PR) завершились success на этом SHA:
+48 offline checks + addon/source parity. Изменения входят в открытый PR #5,
+feature/codex-pipeline → automation/roman-reels-v1. PR не слит, main не тронут.
