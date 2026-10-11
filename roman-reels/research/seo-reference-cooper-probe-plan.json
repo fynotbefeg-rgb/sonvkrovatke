@@ -1,5 +1,5 @@
 {
-  "status": "approved_metadata_pending",
+  "status": "completed_stopped_no_qualifying_seo_reel",
   "actor": "apify~instagram-reel-scraper",
   "profile": "cooper.simson",
   "targetCaption": "My SEO agency charged $2K/mo. This free Claude Skill does all their work in 3 minutes.",
@@ -15,7 +15,9 @@
     "maxRuns": 1,
     "maxTotalChargeUsd": 0.1,
     "input": {
-      "username": ["cooper.simson"],
+      "username": [
+        "cooper.simson"
+      ],
       "resultsLimit": 15,
       "includeSharesCount": false,
       "includeTranscript": false,
@@ -31,12 +33,13 @@
   },
   "selectionRule": "Own profile, exact SEO topic, dated within 60 days before probe, at least 100000 public plays or views; otherwise stop without detail run. Do not expand pagination under this approval.",
   "safety": [
-    "Owner approved $0.50 maximum; no Actor runs made under this plan yet",
+    "Owner approved $0.50 maximum; one metadata run completed, no detail run created",
     "Earlier completed $1 research approval must not be reused",
     "Verify current PPE pricing and applied maxTotalChargeUsd before accepting a run",
     "Persist run ID immediately; never retry creation after ambiguous response",
     "No upgrade, payment method changes or bypassing platform restrictions",
     "Public views are not unique reach; unknown counters remain null",
     "Author's replacement-agency, free and three-minute claims require separate validation"
-  ]
+  ],
+  "resultFile": "seo-reference-cooper-probe-results.json"
 }
