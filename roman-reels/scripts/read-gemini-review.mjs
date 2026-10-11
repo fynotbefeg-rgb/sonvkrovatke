@@ -14,6 +14,7 @@ for(const item of data.items){
 }
 // No raw transport response, headers, environment, or credential values.
 const output={items:data.items,source_sets:data.source_sets,productionReady:false,editorialReviewRequired:true,
+ ...(data.editorialReview ? {editorialReview:data.editorialReview} : {}),
  provenance:{author:data.provenance?.author,model:data.provenance?.model,generatedAt:data.provenance?.generatedAt,
  usageMetadata:data.provenance?.usageMetadata,actualCostUsd:null,briefSha256:data.provenance?.briefSha256,
  evidenceIds:data.provenance?.evidenceIds,limitations:data.provenance?.limitations,syntheticDemo:true,clientCaseTested:false}};
