@@ -1,0 +1,30 @@
+{
+  "schema": "windows-mcp-seo-supplement-v1",
+  "purpose": "Close the single gap 'not measured' from observations.json: status of /gone listed in the broken sitemap.",
+  "synthetic": true,
+  "variant": "broken",
+  "supplementaryCommit": "026e5c6",
+  "fixtureCodeIdenticalTo": "db1adac (fixture-site.mjs and serve-seo-fixture.mjs unchanged between db1adac and 026e5c6)",
+  "session": {
+    "note": "New loopback session; not the original 50492/50645 ports.",
+    "serverStartedUtc": "2026-10-11T19:00:58Z",
+    "origin": "http://127.0.0.1:63444",
+    "pid": 14948,
+    "stopped": true,
+    "portReleased": true
+  },
+  "mcpToolsCalled": ["browser_navigate", "browser_evaluate", "browser_network_requests"],
+  "observation": {
+    "requestedUrl": "http://127.0.0.1:63444/gone",
+    "observedAtUtc": "2026-10-11T19:01:03.726Z",
+    "networkLog": "[GET] http://127.0.0.1:63444/gone => [404] Not Found",
+    "httpStatus": 404,
+    "finalUrl": "http://127.0.0.1:63444/gone",
+    "redirectCount": 0,
+    "title": "Не найдено",
+    "h1": "Страница не найдена",
+    "metaRobots": null
+  },
+  "interpretation": "In the broken state the sitemap lists a URL that answers 404: a sitemap/status conflict on this fixture. The fixed sitemap no longer lists /gone; /gone was not requested in the fixed state.",
+  "remoteModelCalls": 0
+}

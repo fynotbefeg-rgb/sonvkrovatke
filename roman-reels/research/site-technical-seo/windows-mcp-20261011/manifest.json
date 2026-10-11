@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0.0",
+  "synthetic": true,
+  "dataSource": "Windows local Claude Code session calling Playwright MCP tools; not a cloud Playwright script",
+  "sourceCommit": "db1adac",
+  "supplementaryCommit": "026e5c6",
+  "fixtureCodeChangedBetweenCommits": false,
+  "environment": {
+    "os": "Windows 10 Pro 22H2 build 19045.6456 x64",
+    "node": "v24.21.0 x64 (%LOCALAPPDATA%\\Programs\\nodejs\\node.exe, pre-installed, same runtime as MCP)",
+    "browser": "Microsoft Edge 155.0.4283.45 (Chromium 155.0.8059.40), headless, existing MCP configuration unchanged",
+    "mcpTools": [
+      "browser_resize",
+      "browser_navigate",
+      "browser_evaluate",
+      "browser_network_requests",
+      "browser_network_request",
+      "browser_take_screenshot"
+    ]
+  },
+  "sessions": [
+    {
+      "id": "main",
+      "commit": "db1adac",
+      "observedUtc": "2026-10-11T18:50Z..18:52Z",
+      "origins": {
+        "broken": "http://127.0.0.1:50492",
+        "fixed": "http://127.0.0.1:50645"
+      },
+      "file": "observations.json"
+    },
+    {
+      "id": "gone-supplement",
+      "commit": "026e5c6",
+      "observedUtc": "2026-10-11T19:01:03.726Z",
+      "url": "http://127.0.0.1:63444/gone",
+      "file": "gone-observation.json"
+    }
+  ],
+  "originalObservations": {
+    "location": "outside Git, %LOCALAPPDATA%\\RomanReels\\seo-check\\20261011-215050\\observations.json",
+    "sha256": "f3e5b164b4fab20c115036ecd8bf6448ae12537a045bf31512377f5590ec10d6"
+  },
+  "redactions": [
+    {
+      "file": "observations.json",
+      "field": "node.path",
+      "from": "C:\\Users\\<user>\\AppData\\Local\\Programs\\nodejs\\node.exe",
+      "to": "%LOCALAPPDATA%\\Programs\\nodejs\\node.exe",
+      "reason": "local username in path"
+    }
+  ],
+  "pngCopiedByteForByte": true,
+  "identicalArtifacts": [
+    [
+      "broken-services.png",
+      "fixed-services.png",
+      "differences are in <head> only"
+    ]
+  ],
+  "notExported": [
+    "server stdout/stderr and PID files (local only)",
+    "MCP config, browser profile, network/console logs, MCP snapshot .yml files"
+  ],
+  "missingEvidence": [
+    "no screenshots of /pricing, /contact, robots.txt, sitemap.xml, /old-services, /missing-test-page, /gone (JSON observations only)",
+    "/gone not requested in fixed state"
+  ],
+  "paidApiCalls": 0,
+  "remoteModelCalls": 0,
+  "costNote": "No paid API calls in this stage; infrastructure and subscription costs are not claimed as zero.",
+  "artifacts": [
+    {
+      "file": "observations.json",
+      "bytes": 4889,
+      "sha256": "7a9f46834ce19def1e24049087e4be31cd7ea8282a167bbc607a17abd68e0bba"
+    },
+    {
+      "file": "gone-observation.json",
+      "bytes": 1346,
+      "sha256": "2f27d9fcb9251bd7c1a5306fb4f2038b38bd921711f7e8cbf0bd0f706e5dbd4a"
+    },
+    {
+      "file": "broken-home.png",
+      "bytes": 41120,
+      "sha256": "cea5d95700163f925097f0dc5f1dd443dcc0391617b6aacd6e0d18086f37fd3f"
+    },
+    {
+      "file": "broken-services.png",
+      "bytes": 34465,
+      "sha256": "61e0fdabce13a649c79c4073115a4e94f5c3c5b43388f14829117b27dcb5485c"
+    },
+    {
+      "file": "fixed-home.png",
+      "bytes": 34866,
+      "sha256": "90c321b1fd52277a476f3f77caaaeed6fc35744d724b7d1e7bb7a4b4b0286f17"
+    },
+    {
+      "file": "fixed-services.png",
+      "bytes": 34465,
+      "sha256": "61e0fdabce13a649c79c4073115a4e94f5c3c5b43388f14829117b27dcb5485c"
+    },
+    {
+      "file": "README.md",
+      "bytes": 5719,
+      "sha256": "dfc372576c2b7023fdf7cd3e187aad42ff13117552ead4de31d2ab9137e56995"
+    }
+  ]
+}
