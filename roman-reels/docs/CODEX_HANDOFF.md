@@ -629,3 +629,22 @@ SEO_CHECKLIST_FOR_ROMAN.md: 13 проверок с доказательства�
 промпт для Claude и три предварительных направления хуков авторства Codex.
 Адрес/доступ клиентского сайта не являются блокером этого материала.
 Новая речь не сгенерирована и не утверждена; Claude-промпт ещё не испытан.
+
+## 2026-10-11 — Gemini: SEO-чек-лист, редакция 6 pending
+
+Добавлен отдельный workflow selector seo_checklist; старые seo/mcp_site пути
+сохранены. Бриф v6 опубликован 69f75d6. Generation 38140203814 success:
+один Gemini POST, gemini-3-flash-preview, totalTokenCount 5439, стоимость
+неизвестна. Direct artifact download вернул 403; inspect_saved 38140250461
+success прочитал результат без повторного вызова модели.
+generated-revision6.json сохраняет bounded snapshot, не raw transport.
+Codex исправил преувеличение о canonical, усилил чек-лист и отделил
+подготовленный промпт от выполненного аудита. Сохранены edited/reviewed v6;
+три варианта по 127–129 слов без окончания, pending_approval и
+productionReady=false. Reader проверил контракт/хеши; 8 тестов прошли,
+включая offline preview нового брифа. EditorialReview остаётся pending.
+SEO_CHECKLIST_SCRIPT_V6.md — отдельная редакция для обсуждения; активный
+ROMAN_RECORDING_TEXTS.md/v5, intake, Sheets и производственные ожидания
+не переключены. Прежнее кодовое слово САЙТ не заменять молча на SEO:
+нужны новые окончания и проверка бота перед записью. Claude-аудит и
+сильный доступный внешний референс ещё не проверены.
