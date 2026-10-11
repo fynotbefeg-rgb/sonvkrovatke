@@ -28,6 +28,10 @@ function setup(t) {
    reference:{platform:'instagram',inspectionMode:'frames_and_transcript',relevance:'TEST ONLY specific business process',evidence:save('reference.json',record)},
    demonstration:{status:'tested',workflowMatchesScript:true,syntheticDisclosed:true,artifacts:[save('demo.json',{testOnly:true,result:'pass'})],
     steps:[{action:'Учебный шаг',observed:'Учебный результат',verification:'Проверены поля',status:'pass'}]},
+   costReview:{status:'verified',scope:'viewer_workflow',workflowMatchesScript:true,evidence:save('cost.json',{
+    scope:'viewer_workflow',requiredPayment:false,trialOnly:false,testedUsage:'TEST ONLY one synthetic operation',limitations:'TEST ONLY bounded usage',
+    components:['tool','model','integration','execution','data'].map(layer=>({layer,name:'TEST ONLY '+layer,access:'free',requiredPayment:false,requiredCost:0,
+      checkedAt:'2026-10-11T11:00:00Z',limits:'TEST ONLY local fixture',sourceUrl:'https://example.com/pricing',sourceQuote:'TEST ONLY fictional source'}))})},
    criteria:ids.map(id=>({id,status:'pass',note:'TEST ONLY reviewer note',evidence:['test artifact']}))};
  return {root,manifest,review,record,save,options:{root,now}};
 }
@@ -109,4 +113,23 @@ test('shared publisher calls exactly one protected POST after release, keeps pen
  const result=await publishSharedReview(manifest,review,'Тема',opts);assert.equal(calls,1);assert.equal(result.productionStarted,false);
  const blocked={...review,semanticReviewCompleted:false};await assert.rejects(publishSharedReview(manifest,blocked,'Тема',opts),/blocked/);assert.equal(calls,1);
  opts.fetchImpl=async()=>{calls++;throw Error('Lost reply');};await assert.rejects(publishSharedReview(manifest,review,'Тема',opts),/Lost reply/);assert.equal(calls,2);
+});
+
+test('paid, unknown, trial-only, incomplete and stale audience cost evidence blocks release',t=>{
+ const {manifest,review,save,options}=setup(t);
+ const original=JSON.parse(readFileSync(join(options.root,review.costReview.evidence.path),'utf8'));
+ const changes=[r=>r.requiredPayment=true,r=>r.trialOnly=true,r=>r.components.pop(),r=>r.components[1].access='paid',
+  r=>r.components[1].requiredCost=1,r=>r.components[1].requiredPayment=true,r=>delete r.components[1].requiredCost,
+  r=>r.components[0].checkedAt='2026-08-01',r=>r.components[0].checkedAt='2026-10-12',
+  r=>r.components[0].access='unknown',r=>r.components[0].sourceQuote='',r=>r.scope='factory'];
+ for(const change of changes) {const record=structuredClone(original);change(record);const r=structuredClone(review);
+  r.costReview.evidence=save('cost.json',record);assert.ok(assessEditorialRelease(manifest,r,options).blockers.some(b=>b.id==='costs'));}
+ const missing=structuredClone(review);delete missing.costReview;assert.ok(assessEditorialRelease(manifest,missing,options).blockers.some(b=>b.id==='costs'));
+});
+test('free tier requires stated limits; unused layer requires an explanation',t=>{
+ const {manifest,review,save,options}=setup(t),record=JSON.parse(readFileSync(join(options.root,review.costReview.evidence.path),'utf8'));
+ record.components[0].access='free_tier';review.costReview.evidence=save('cost.json',record);assert.equal(assessEditorialRelease(manifest,review,options).eligibleForRomanReview,true);
+ record.components[0].limits='';review.costReview.evidence=save('cost.json',record);assert.equal(assessEditorialRelease(manifest,review,options).eligibleForRomanReview,false);
+ record.components[0].limits='TEST ONLY';record.components[0].access='not_required';review.costReview.evidence=save('cost.json',record);assert.equal(assessEditorialRelease(manifest,review,options).eligibleForRomanReview,false);
+ record.components[0].notRequiredReason='TEST ONLY no dependency';review.costReview.evidence=save('cost.json',record);assert.equal(assessEditorialRelease(manifest,review,options).eligibleForRomanReview,true);
 });

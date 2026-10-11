@@ -1,7 +1,7 @@
 {
   "reviewVersion": "1.0.0",
-  "rulesVersion": "1.1.0",
-  "rulesSha256": "f84461bc7cfdcf99c5141caf87ddfcddcb4a92b662c07bd5a5a93e6c165ff0ef",
+  "rulesVersion": "1.2.0",
+  "rulesSha256": "80243e06b1687cdd6cc0865e46185676c4a35c568704a1f3846fba8c8a526b64",
   "reviewer": "Codex preflight — incomplete editorial review",
   "semanticReviewCompleted": false,
   "romanApprovalGranted": false,
@@ -92,5 +92,11 @@
       "note": "Нужно закончить редакторскую проверку до отправки Роману",
       "evidence": []
     }
-  ]
+  ],
+  "costReview": {
+    "status": "unknown",
+    "scope": "viewer_workflow",
+    "workflowMatchesScript": false,
+    "reason": "Не проверены стоимость MCP, доступ к модели, бесплатный путь и его применимые лимиты; это не утверждение платности конкретного MCP."
+  }
 }

@@ -731,3 +731,7 @@ pending editorial/semantic. Два release-v6 JSON сохранены, ориг�
 Облачные проверки editorial release: implementation 33c59e3. Runs 38161942760
 (push) и 38161945758 (PR) success на этом SHA: 67 offline tests и addon parity.
 Изменения в существующем PR #5; не слит. Live API вызовов публикации не было.
+
+## 2026-10-11 — Roman requires free audience workflows
+
+CONTENT_REQUIREMENTS.md records evolving content acceptance rules and sources. GEMINI_EDITORIAL_RULES 1.2.0 adds free end-to-end viewer implementation; factory spend is separate. Editorial senders now require hash-bound cost evidence covering tool/model/integration/execution/data, applicable tested usage, official sources and limits; paid/unknown/trial-only/stale evidence blocks release. Structural validation is not an automated factual tariff check. No specific unnamed MCP pricing has been established. SEO v6 remains blocked; no speech, live approvals, Sheets or Docs were edited. No paid calls.

@@ -1,6 +1,6 @@
 {
   "gateVersion": "1.0.0",
-  "checkedAt": "2026-10-11T17:56:31.691Z",
+  "checkedAt": "2026-10-11T18:05:47.502Z",
   "eligibleForRomanReview": false,
   "productionReady": false,
   "romanApprovalGranted": false,
@@ -13,6 +13,10 @@
     {
       "id": "demo",
       "message": "Run the actual proposed workflow and document verified output; a prepared prompt is not a tested demonstration"
+    },
+    {
+      "id": "costs",
+      "message": "Verified end-to-end viewer workflow pricing required"
     },
     {
       "id": "editorial",

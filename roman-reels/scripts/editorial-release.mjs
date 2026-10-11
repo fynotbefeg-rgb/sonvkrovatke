@@ -62,6 +62,22 @@ export function assessEditorialRelease(manifest,review,{root=projectRoot,now=Dat
     demo.steps.some(s=>!s||s.status!=='pass'||['action','observed','verification'].some(k=>!nonempty(s[k])))) {
   block('demo','Run the actual proposed workflow and document verified output; a prepared prompt is not a tested demonstration');
  } else for(const artifact of demo.artifacts)try {proof(artifact,root);}catch(error){block('demo_artifact',error.message);}
+ // Pricing is checked for the audience workflow, independently of factory costs.
+ try {
+  const cost=review?.costReview;
+  if(cost?.status!=='verified'||cost.scope!=='viewer_workflow'||cost.workflowMatchesScript!==true)throw Error('Verified end-to-end viewer workflow pricing required');
+  const record=JSON.parse(proof(cost.evidence,root));
+  if(record.scope!=='viewer_workflow'||record.requiredPayment!==false||record.trialOnly!==false||!nonempty(record.testedUsage)||!nonempty(record.limitations))throw Error('Free workflow, tested usage and explicit limits required; a trial is insufficient');
+  const layers=['tool','model','integration','execution','data'];
+  if(!Array.isArray(record.components)||layers.some(layer=>!record.components.some(c=>c.layer===layer)))throw Error('Review all cost layers, including model, integrations and execution');
+  for(const c of record.components) {
+   const checked=Date.parse(c.checkedAt);
+   if(!layers.includes(c.layer)||!nonempty(c.name)||!['free','free_tier','not_required'].includes(c.access)||c.requiredPayment!==false||c.requiredCost!==0||
+     !nonempty(c.limits)||!nonempty(c.sourceQuote)||!Number.isFinite(checked)||checked>now||now-checked>30*86400000)throw Error('Unknown, paid or stale component pricing blocks release');
+   const url=new URL(c.sourceUrl);if(url.protocol!=='https:'||url.username||url.password)throw Error('Official pricing/documentation HTTPS source required');
+   if(c.access==='not_required'&&!nonempty(c.notRequiredReason))throw Error('Explain why a cost layer is not required');
+  }
+ } catch(error) {block('costs',error.message);}
  const checks=review?.criteria;
  if(!Array.isArray(checks)||checks.length!==criteria.length||new Set(checks.map(c=>c.id)).size!==criteria.length||
     criteria.some(id=>!checks.some(c=>c.id===id&&c.status==='pass'&&nonempty(c.note)&&Array.isArray(c.evidence)&&c.evidence.length&&c.evidence.every(nonempty))))

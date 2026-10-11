@@ -107,3 +107,11 @@ node roman-reels/scripts/check-editorial-release.mjs \
 
 Здесь нет активной сессии Claude Code с браузером Windows; прямой опыт модели
 пока не выполнен. Задание подготовлено в репозитории, не отправлено в чужой чат.
+
+## Стоимость: обязательный costReview (правила 1.2.0)
+
+Требования Романа ведутся в CONTENT_REQUIREMENTS.md. Отправители блокируют отсутствие проверенного бесплатного пути для зрителя. Протокол содержит `costReview`: `status: verified`, `scope: viewer_workflow`, `workflowMatchesScript: true` и `evidence: {path, sha256}` на JSON в research.
+
+Артефакт стоимости: `scope: viewer_workflow`, `requiredPayment: false`, `trialOnly: false`, непустые `testedUsage`, `limitations`, массив `components`. Покрыть все слои `tool`, `model`, `integration`, `execution`, `data`, включая все обязательные зависимости каждого слоя. Для каждого: `layer`, `name`, `access` (free/free_tier/not_required), `requiredPayment: false`, `requiredCost: 0`, `checkedAt`, `limits`, `sourceUrl` (официальный HTTPS источник), `sourceQuote`. Для not_required дополнительно `notRequiredReason`. Тарифы проверяются не более 30 дней назад. При любом неизвестном/платном/просроченном компоненте отправка запрещена.
+
+Цитаты, полноту списка зависимостей, официальность URL и соответствие теста проверяет редактор: автоматическая структура и хеш не подтверждают их истинность. Учебные example.com данные существуют только в тестах, не являются доказательствами стоимости реальных сервисов. Платная подписка Claude Pro/Max не превращается в бесплатную из-за того, что она уже куплена.
