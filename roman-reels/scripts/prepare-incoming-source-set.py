@@ -28,7 +28,48 @@ def require(ok, message):
         raise ValueError(message)
 
 
+def four_expectations(packet):
+    """Explicit four-part packet; never infer this mode from missing endings."""
+    require(packet.get("draftVersion") == "3.0.0" and packet.get("mode") == "editorial"
+            and packet.get("productionReady") is False, "Unsupported four-part packet")
+    source = packet["sourceSet"]
+    topic = source["topic_id"]
+    require(isinstance(topic, str) and re.fullmatch(r"[a-z0-9][a-z0-9_-]*", topic), "Invalid topic ID")
+    require(source.get("recordingParts") == 4 and not source.get("endings")
+            and source.get("status") == "pending_approval", "Explicit four parts without endings required")
+    hooks = source["hooks"]
+    require(len(hooks) == 3 and all(type(h["hook_id"]) is int for h in hooks)
+            and {h["hook_id"] for h in hooks} == {1, 2, 3}, "Exactly three hooks required")
+    items = packet["items"]
+    require(len(items) == 3 and all(type(i["hook_id"]) is int for i in items)
+            and {i["hook_id"] for i in items} == {1, 2, 3}, "Three full-text variants required")
+    versions = {i["script_revision"] for i in items}
+    require(len(versions) == 1, "One script revision required")
+    version = next(iter(versions))
+    require(type(version) is int and 1 <= version <= 9999, "Invalid script revision")
+    expected = [{"fileName": "body.mp4", "role": "body", "text": source["body_text"]}]
+    expected += [{"fileName": f"hook-{h['hook_id']}.mp4", "role": "hook",
+                  "hookNumber": h["hook_id"], "text": h["hook_text"]}
+                 for h in sorted(hooks, key=lambda h: h["hook_id"])]
+    for part in expected:
+        require(isinstance(part["text"], str) and part["text"].strip(), "Empty part text")
+        part["textHash"] = assembler.text_hash(part["text"])
+    require(expected[0]["textHash"] == source["body_text_hash"], "Body text hash mismatch")
+    for item in items:
+        hook = next(h for h in hooks if h["hook_id"] == item["hook_id"])
+        text = "\n\n".join([hook["hook_text"], source["body_text"]])
+        job = {"reelId": f"R-{topic}-h{item['hook_id']}", "scriptVersion": version,
+               "hookText": hook["hook_text"], "scriptText": text}
+        require(item.get("platform") is None and item["topic_id"] == topic
+                and item["version_id"] == job["reelId"] and item["hook_text"] == hook["hook_text"]
+                and item["script_text"] == text and item["script_hash"] == contract.legacy_hash(job)
+                and item["status"] == "pending_approval", "Four-part full-text binding mismatch")
+    return topic, version, expected
+
+
 def expectations(packet):
+    if packet.get("draftVersion") == "3.0.0":
+        return four_expectations(packet)
     require(packet.get("draftVersion") == "2.0.0" and packet.get("mode") == "editorial"
             and packet.get("productionReady") is False, "Unsupported editorial packet")
     source = packet["sourceSet"]
@@ -97,7 +138,7 @@ def inspect(packet, relative_directory):
             and type(receipt["scriptVersion"]) is int and receipt["scriptVersion"] == version,
             "Receipt topic/revision mismatch")
     files = receipt["files"]
-    require(isinstance(files, list) and len(files) == 6, "Six declared source files required")
+    require(isinstance(files, list) and len(files) == len(expected), "Exactly the expected source files must be declared")
     declared = {}
     for entry in files:
         require(set(entry) == {"fileName", "sha256", "textHash"} and
@@ -111,12 +152,19 @@ def inspect(packet, relative_directory):
                 "Recording belongs to a different text/version")
     if missing:
         return {**base, "status": "waiting_for_parts", "missing": missing}
-    plan = {"assemblyVersion": "2.0.0", "mode": "development", "topicId": topic,
+    four = len(expected) == 4
+    plan = {"assemblyVersion": "1.0.0" if four else "2.0.0", "mode": "development", "topicId": topic,
             "scriptVersion": version, "hooks": [], "endings": []}
+    if four:
+        plan.pop("scriptVersion")
+        plan.pop("endings")
     for part in expected:
         entry = {"localPath": (Path(relative_directory) / part["fileName"]).as_posix(),
                  "sha256": declared[part["fileName"]]["sha256"],
                  "text": part["text"], "textHash": part["textHash"]}
+        if four:
+            entry.pop("text")
+            entry.pop("textHash")
         require((root / part["fileName"]).resolve().is_relative_to(root), "Source escaped incoming directory")
         if part["role"] == "body":
             plan["body"] = entry
@@ -124,7 +172,7 @@ def inspect(packet, relative_directory):
             plan["hooks"].append({**entry, "hookNumber": part["hookNumber"]})
         else:
             plan["endings"].append({**entry, "platform": part["platform"]})
-    assembler.verify_platform_plan(plan)  # Full decode/SHA/text checks before marking complete.
+    (assembler.verify if four else assembler.verify_platform_plan)(plan)  # Full decode/SHA/text checks before marking complete.
     return {**base, "status": "ready_for_development_assembly", "missing": [], "plan": plan}
 
 

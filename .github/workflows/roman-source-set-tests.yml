@@ -42,6 +42,8 @@ jobs:
           python roman-reels/scripts/platform-source-set.test.py
           python roman-reels/scripts/gsc-export.test.py
           python roman-reels/scripts/drive-intake.test.py
+          python roman-reels/scripts/four-part-drive-intake.test.py
+          node roman-reels/scripts/four-part-receipt.test.mjs
           python roman-reels/scripts/source-set.test.py
           python roman-reels/scripts/assembled-jobs.test.py
           python roman-reels/scripts/factory-contract.test.py
