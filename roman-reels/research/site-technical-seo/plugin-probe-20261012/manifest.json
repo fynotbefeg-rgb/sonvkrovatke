@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-12",
+  "environment": "cloud Linux Python 3.12.14; not Windows",
+  "geoPackage": "geo-optimizer-skill==4.19.0",
+  "geoRepositoryCommit": "a630a954578a8a4af445a7a28e326b065ff172d0",
+  "gscRepositoryCommit": "d49eea9e5efb5eb645b722249303179b2c150b49",
+  "checks": {
+    "geoCliAuditExitCode": 0,
+    "geoAuditError": null,
+    "staticCounterexampleConfirmed": true,
+    "gscReview": "static source review only",
+    "gscAccountConnected": false,
+    "paidSeoCalls": false,
+    "romanTopicApproved": false,
+    "productionAllowed": false
+  },
+  "files": {
+    "example-audit.json": "2f0b2041a4419e0d7918e82a8bc417648b24d587e8235aa8e995f001034bb712",
+    "static-counterexample.json": "61577082a7d4a9f0c6871e678b9294d4938ed307a3806e4abec1129852e94c2b",
+    "static-counterexample.py": "b00ff4dd30026aa476a18a7d9d2c0b22d821491e5e8bc3f0057a919aa6a247a2"
+  }
+}
