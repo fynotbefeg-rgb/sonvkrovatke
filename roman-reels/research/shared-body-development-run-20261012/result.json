@@ -74,8 +74,14 @@
     "fullVideoReviewed": false
   },
   "driveUpload": {
-    "completed": false,
-    "reason": "Automatic approval review rejected specific voice-containing payload/destination; no retry or alternate upload performed"
+    "completed": true,
+    "ownerExplicitlyAuthorized": true,
+    "destination": "owner ChatGPT folder, private preview",
+    "metadataVerified": true,
+    "sizeVerified": 33726109,
+    "remoteChecksumIndependentlyVerified": false,
+    "publicSharingEnabled": false,
+    "productionDelivery": false
   },
   "limits": [
     "Cached part timings; no fresh ASR",

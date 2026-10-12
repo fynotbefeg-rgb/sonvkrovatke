@@ -58,3 +58,8 @@ pending_approval/rendered, не qc_passed; нужна проверка слов/
 specific voice-containing payload/destination requires explicit owner approval.
 Ничего не загружено; обхода/повторной передачи нет. Требуется отдельное разрешение
 для этого конкретного файла/папки, если владелец хочет просмотр через Drive.
+
+Владелец затем явно разрешил загрузку этого MP4 в ChatGPT. Connected Drive upload
+успешен, readback подтвердил имя/MIME/parent и размер33726109. Удалённый checksum
+connector metadata не вернул; независимо не сверялся. Публичный доступ не включался,
+это private development preview, не approved production delivery.
