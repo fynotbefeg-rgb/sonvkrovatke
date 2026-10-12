@@ -34,3 +34,11 @@
 - Информационное сообщение `host_unprivileged.json does not exist, skipping read` — штатное для первой регистрации.
 - RustDesk и MCP работают, Edge не трогался.
 - Подключение с iPhone в приложении Chrome Remote Desktop пока NOT_TESTED — проверяет владелец.
+
+## Приложение на iPhone, 2026-10-12
+
+Владелец не нашёл приложение Chrome Remote Desktop в App Store. Проверка через публичный iTunes Search API (регионы US и RU, запрос «chrome remote desktop»): отдельного приложения Chrome Remote Desktop от Google LLC в выдаче нет — есть только Google Chrome, AnyDesk, Windows App Mobile и другие. Поиск по прежнему id 944025852 возвращает 0 результатов в обоих регионах. Вывод: нативного iOS-приложения CRD в App Store сейчас нет (или оно недоступно через этот API).
+
+Оставшийся путь для CRD — веб-клиент `https://remotedesktop.google.com/access` в браузере iPhone под тем же аккаунтом Google. Работа веб-клиента на iOS не проверена.
+
+Для сравнения: RustDesk Remote Desktop (Purslane Limited, бесплатно) в российском App Store есть; служба RustDesk на ноутбуке работает.
