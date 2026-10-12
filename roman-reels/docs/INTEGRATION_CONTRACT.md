@@ -89,3 +89,7 @@ version_id/script_revision/script_text/script_hash; shared_review — допол
 проверяемая provenance, не новая семантика хеша. См. SHARED_REVIEW_BRIDGE.md.
 Canonical legacy receipt для managed темы не может обойти отзыв в новом виде.
 Это совместимое дополнение, не изменение live контракта или утверждения.
+
+## Research topic snapshot v1 — не production контракт
+
+Дополнительная схема topic-research-snapshot-v1.schema.json и TOPIC_SELECTION_READER.md описывают только selected_for_research для зарегистрированных shared topics. Проверенный source/receipt не утверждает body/hook и не является items production queue. Речь/FactoryJob v1 и существующий scriptHash не меняются. reviewRevision относится к shared packet; research scope revision отдельная. Новый reader не решает topic-only регистрацию до создания речи и требует отдельного live deployment.

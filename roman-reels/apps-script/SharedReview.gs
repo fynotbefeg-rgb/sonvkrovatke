@@ -180,6 +180,26 @@ const RomanSharedReview = (function() {
       return {ok: true, added: true, firstRow: firstRow, rows: 4, approvalGranted: false};
     });
   }
+  // Read-only topic selection; does not approve speech or change cells/receipts.
+  function topicSnapshot(approvers, withLock) {
+    return withLock(function() {
+      const capturedAt = new Date().toISOString(), topics = [];
+      if (enabled()) configs().forEach(function(c) {
+        if (!matches(c)) return;
+        const receipt = receipts(c, approvers).topic;
+        if (!receipt || Date.parse(receipt.approvedAt) > Date.parse(capturedAt)) return;
+        topics.push({topicId: c.packet.topicId, topicText: c.packet.topicText,
+          reviewRevision: c.packet.revision, topicHash: receipt.hash,
+          approvedBy: receipt.approvedBy, approvedAt: receipt.approvedAt,
+          status: 'selected_for_research'});
+      });
+      if (topics.length > 90) throw Error('Topic snapshot exceeds bound');
+      topics.sort(function(a, b) { return a.topicId.localeCompare(b.topicId); });
+      return {ok: true, snapshotVersion: '1.0.0', source: 'apps_script_shared_review',
+        capturedAt: capturedAt, enabled: enabled(), topics: topics,
+        scriptApprovalGranted: false, productionAllowed: false};
+    });
+  }
   function queue(legacy, approvers) {
     const current = configs(), managed = new Set();
     current.forEach(function(c) {
@@ -216,5 +236,5 @@ const RomanSharedReview = (function() {
     if (new Set(result.map(function(x) { return x.version_id; })).size !== result.length) throw Error('Ambiguous queue versions');
     return result;
   }
-  return {enabled: enabled, handles: handles, edit: edit, register: register, queue: queue};
+  return {enabled: enabled, handles: handles, edit: edit, register: register, queue: queue, topicSnapshot: topicSnapshot};
 })();

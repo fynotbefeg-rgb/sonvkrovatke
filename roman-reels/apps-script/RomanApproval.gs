@@ -210,6 +210,10 @@ function doPost(e) {
       if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
       return romanJson_(RomanSharedReview.register(body.packet, romanLock_));
     }
+    if (body.action === 'get_topic_research_snapshot') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.topicSnapshot(romanApprovers_(), romanLock_));
+    }
     if (body.action === 'get_production_queue') return romanJson_(getProductionQueueResponse());
     if (body.action && body.action !== 'add_drafts') return romanJson_({ok: false, error: 'Unknown action'});
     return romanJson_(romanAddDrafts_(body.items));
