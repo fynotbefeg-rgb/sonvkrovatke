@@ -1,6 +1,6 @@
 {
   "checkedAt": "2026-10-12",
-  "scope": "6 public HTML pages including missing page, robots, sitemap index and one child; one GEO homepage audit",
+  "scope": "6 existing public HTML pages plus one missing page, robots, sitemap index and one child; one GEO homepage audit",
   "approvalStatus": "not_approved",
   "productionAllowed": false,
   "googleSearchConsoleConnected": false,
