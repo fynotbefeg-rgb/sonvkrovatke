@@ -111,3 +111,20 @@ Register-ScheduledTask -TaskName 'RomanReels-SourceUploader' -Action $a -Trigger
 - Реальный ответ Drive на create с уже существующим ID (ожидается 409, обрабатывается как «найти по ID») проверен только на fake.
 - Ровно одно скачивание HeyGen → одно задание. Кто и как создаёт JSON задания (Telegram, worker, вручную), здесь не решается.
 - Облачный приёмщик не примет комплект без окончаний и квитанции (см. выше).
+
+## Реальная тестовая загрузка (2026-10-12, по разрешению владельца)
+
+Задание: `jobId=windows-uploader-test-20261012-h1`, тема `windows-uploader-test-20261012`, версия 1, роль `hook-1`, исходник `roman-reels/pv/public/ai/h1.mp4` (development fixture). `heygenTitle=null`, `textHash=null`, утверждения не назначались. Задание лежало в отдельной папке test-jobs вне Git, код на `9fa989c`.
+
+| Проверка | Результат |
+|---|---|
+| Проход 1 (новый процесс) | `uploaded`, exit 0, 1 попытка, длительность 6.485 с |
+| Проход 2 (новый процесс) | `already_uploaded`, exit 0, **тот же file ID** `1LUxLlL6jatNuvmVGtxVXsGOBAiNABh0U` |
+| Размещение | incoming → `windows-uploader-test-20261012` (`1YD0vpjfg-xSaBKjJhURmMxvVlWUJ9dCx`) → `v1` (`1EKijBmdHvvOa1Nk0oVpWq-t1ra3mUfxI`) → `hook-1.mp4` |
+| Содержимое `v1` (независимый listing через API) | **один** файл `hook-1.mp4`, временных `.uploading-*` нет; в теме только папка `v1` |
+| Размер | 7 204 618 байт локально = Drive |
+| MD5 | `21f50283a0f66959bb79e3c8c4d93ff2` локально = Drive `md5Checksum` |
+| SHA-256 | `8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd` локально = Drive `sha256Checksum` = `appProperties.rrSha256` |
+| Локальный исходник после двух проходов | размер, mtime и SHA-256 прежние; `git status` чистый |
+
+Облачный приёмщик знает только темы из своих packets, поэтому тестовую тему не обрабатывает. Для шестичастного приёма в этом слоте нет `hook-2/3`, `body`, окончаний и квитанции. Ничего не удалялось. Автозапуск, HeyGen и монтаж не запускались. Тестовая папка оставлена в incoming; удалять её можно только по решению владельца.
