@@ -205,7 +205,11 @@ function doPost(e) {
     if (!token || !body || typeof body.token !== 'string' || body.token !== token) return romanJson_({ok: false, error: 'Unauthorized'});
     if (body.action === 'add_shared_review') {
       if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
-      return romanJson_(RomanSharedReview.register(body.packet, romanLock_));
+      return romanJson_(RomanSharedReview.register(body.packet, romanLock_, romanApprovers_()));
+    }
+    if (body.action === 'add_topic_review') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.registerTopic(body.packet, romanLock_));
     }
     if (body.action === 'get_topic_research_snapshot') {
       if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');

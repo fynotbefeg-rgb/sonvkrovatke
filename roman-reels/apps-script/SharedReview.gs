@@ -4,6 +4,7 @@
 const RomanSharedReview = (function() {
   const spreadsheetId = '1DZVjhxTOlFZnVynDgeIUS5nXjVxxmZpsDZYeBiZ0XN0';
   const prefix = 'ROMAN_SHARED_REVIEW:';
+  const topicPrefix = 'ROMAN_TOPIC_ONLY_REVIEW:';
   const approved = 'Утверждено';
   function props() { return PropertiesService.getScriptProperties(); }
   function enabled() { return props().getProperty('ROMAN_SHARED_REVIEW_ENABLED') === 'true'; }
@@ -18,6 +19,91 @@ const RomanSharedReview = (function() {
   function exactKeys(value, keys) {
     if (!value || typeof value !== 'object' || Array.isArray(value) ||
         Object.keys(value).length !== keys.length || Object.keys(value).some(function(k) { return keys.indexOf(k) < 0; })) throw Error('Unexpected review fields');
+  }
+  function validateTopic(p) {
+    exactKeys(p, ['schemaVersion', 'topicId', 'topicText', 'revision', 'analysis', 'statistics', 'referenceUrl']);
+    if (p.schemaVersion !== '1.0.0' || typeof p.topicId !== 'string' || !/^[a-z0-9][a-z0-9_-]{0,99}$/.test(p.topicId) ||
+        !Number.isSafeInteger(p.revision) || p.revision < 1) throw Error('Invalid topic-only packet');
+    ['topicText', 'analysis', 'statistics', 'referenceUrl'].forEach(function(k) { text(p[k]); });
+    if (!/^https:\/\/[^\s]+$/.test(p.referenceUrl)) throw Error('Invalid public reference');
+    return p;
+  }
+  function topicConfigs() {
+    const all = props().getProperties();
+    const result = Object.keys(all).filter(function(k) { return k.indexOf(topicPrefix) === 0; }).map(function(k) {
+      const c = JSON.parse(all[k]); validateTopic(c.packet);
+      if (k !== topicPrefix + c.packet.topicId || c.packetHash !== digest(c.packet) ||
+          !Number.isSafeInteger(c.firstRow) || c.firstRow < 2 || !Number.isSafeInteger(c.sheetId)) throw Error('Invalid topic-only binding');
+      return c;
+    });
+    if (result.length > 90) throw Error('Topic-only registry exceeds bound');
+    return result;
+  }
+  function topicHash(p) { return digest(['shared-review-v1', p.topicId, p.revision, 'topic', p.topicText]); }
+  function topicMatches(c) {
+    const range = sheetFor(c).getRange(c.firstRow, 1, 1, 4), row = range.getValues()[0];
+    return !range.getFormulas()[0].some(Boolean) && row[0] === c.packet.topicText && row[2] === '' && row[3] === '';
+  }
+  function topicReceiptKey(c) { return 'ROMAN_TOPIC_ONLY_RECEIPT:' + c.packet.topicId; }
+  function topicReceipt(c, approvers) {
+    if (!topicMatches(c) || sheetFor(c).getRange(c.firstRow, 2).getValues()[0][0] !== approved) return null;
+    try {
+      const r = JSON.parse(props().getProperty(topicReceiptKey(c)) || 'null');
+      if (!r || r.topicId !== c.packet.topicId || r.part !== 'topic' || r.hash !== topicHash(c.packet) ||
+          approvers.indexOf(r.approvedBy) < 0 || typeof r.approvedAt !== 'string' ||
+          !Number.isFinite(Date.parse(r.approvedAt)) || Date.parse(r.approvedAt) > Date.now()) return null;
+      return r;
+    } catch (error) { return null; }
+  }
+  function revokeTopic(c, clear) {
+    props().deleteProperty(topicReceiptKey(c));
+    const cell = sheetFor(c).getRange(c.firstRow, 2);
+    if (clear && cell.getValues()[0][0] === approved) cell.setValue('');
+  }
+  function editTopics(e, approvers, email) {
+    topicConfigs().forEach(function(c) {
+      if (c.sheetId !== e.range.getSheet().getSheetId() || e.range.getRow() > c.firstRow || e.range.getLastRow() < c.firstRow) return;
+      if (!topicMatches(c)) { revokeTopic(c, true); return; }
+      const first = e.range.getColumn(), last = first + e.range.getNumColumns() - 1;
+      if (first > 4 || last < 2) return;
+      if (e.range.getNumRows() !== 1 || e.range.getNumColumns() !== 1 || first !== 2) {
+        if (first <= 2 && last >= 2) revokeTopic(c, true);
+        return;
+      }
+      const decision = e.range.getValues()[0][0];
+      if (decision !== approved || !email || approvers.indexOf(email) < 0) { revokeTopic(c, decision === approved); return; }
+      props().setProperty(topicReceiptKey(c), JSON.stringify({topicId: c.packet.topicId, part: 'topic',
+        hash: topicHash(c.packet), approvedBy: email, approvedAt: new Date().toISOString()}));
+    });
+  }
+  function registerTopic(packet, withLock) {
+    if (!enabled()) throw Error('Shared review disabled');
+    validateTopic(packet);
+    if (Utilities.newBlob(JSON.stringify(packet)).getBytes().length > 8000) throw Error('Topic exceeds Script Property limit');
+    return withLock(function() {
+      const current = topicConfigs(), old = current.filter(function(c) { return c.packet.topicId === packet.topicId; })[0];
+      if (old) {
+        if (old.packetHash === digest(packet)) {
+          if (!topicMatches(old)) throw Error('Topic registration incomplete or edited');
+          return {ok: true, added: false, firstRow: old.firstRow, approvalGranted: false};
+        }
+        if (packet.revision <= old.packet.revision) throw Error('Changed topic packet requires higher revision');
+      } else if (current.length >= 90) throw Error('Topic-only registry exceeds bound');
+      // Do not retrofit existing full-script approvals as topic-only choices.
+      if (!old && configs().some(function(c) { return c.packet.topicId === packet.topicId; })) throw Error('Existing shared topic requires explicit migration');
+      const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Темы и хуки');
+      if (!sheet) throw Error('Review sheet unavailable');
+      const firstRow = Math.max(2, sheet.getLastRow() + 1);
+      const c = {packet: packet, packetHash: digest(packet), firstRow: firstRow, sheetId: sheet.getSheetId()};
+      props().setProperty(topicPrefix + packet.topicId, JSON.stringify(c));
+      revokeTopic(c, false);
+      sheet.getRange(firstRow, 1, 1, 7).setValues([[packet.topicText, '', '', '', packet.analysis, packet.statistics, packet.referenceUrl]]);
+      const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Утверждено', 'Не утверждено'], true).setAllowInvalid(false).build();
+      sheet.getRange(firstRow, 2).setDataValidation(rule);
+      sheet.getRange(firstRow, 1, 1, 7).setWrap(true);
+      SpreadsheetApp.flush();
+      return {ok: true, added: true, firstRow: firstRow, rows: 1, approvalGranted: false};
+    });
   }
   function validate(packet) {
     exactKeys(packet, ['schemaVersion', 'topicId', 'topicText', 'revision', 'bodyText', 'hooks', 'endings']);
@@ -119,6 +205,7 @@ const RomanSharedReview = (function() {
   function edit(e, approvers, withLock) {
     return withLock(function() {
       const email = e.user && typeof e.user.getEmail === 'function' ? String(e.user.getEmail()).trim().toLowerCase() : '';
+      editTopics(e, approvers, email);
       configs().forEach(function(c) {
         if (c.sheetId !== e.range.getSheet().getSheetId() || e.range.getLastRow() < c.firstRow || e.range.getRow() > c.firstRow + 3) return;
         const parts = Object.keys(components(c.packet));
@@ -149,12 +236,16 @@ const RomanSharedReview = (function() {
   }
   // Authenticated operator registers exact pending content, never an approval.
   // Append only: preserve earlier rows/decisions/history. No reuse of old row locations.
-  function register(packet, withLock) {
+  function register(packet, withLock, approvers) {
     if (!enabled()) throw Error('Shared review disabled');
     validate(packet);
     const json = JSON.stringify(packet);
     if (Utilities.newBlob(json).getBytes().length > 8000) throw Error('Packet exceeds Script Property limit');
     return withLock(function() {
+      const topicConfig = topicConfigs().filter(function(c) { return c.packet.topicId === packet.topicId; })[0];
+      const selectedTopic = topicConfig ? topicReceipt(topicConfig, approvers || []) : null;
+      if (topicConfig && (!selectedTopic || topicConfig.packet.topicText !== packet.topicText ||
+          topicConfig.packet.revision !== packet.revision || selectedTopic.hash !== components(packet).topic)) throw Error('Current exact topic selection required');
       const old = props().getProperty(prefix + packet.topicId);
       if (old) {
         const c = JSON.parse(old);
@@ -172,6 +263,12 @@ const RomanSharedReview = (function() {
       props().setProperty(prefix + packet.topicId, JSON.stringify(c));
       revoke(c, Object.keys(components(packet)));
       sheet.getRange(firstRow, 1, 4, 7).setValues(expectedRows(packet));
+      if (selectedTopic) {
+        // Preserve only the verified approval of the exact same topic/revision.
+        // Speech and hooks remain pending; never create a new topic hash/timestamp.
+        sheet.getRange(firstRow, 2).setValue(approved);
+        props().setProperty(receiptKey(c, 'topic'), JSON.stringify(selectedTopic));
+      }
       const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Утверждено', 'Не утверждено'], true).setAllowInvalid(false).build();
       sheet.getRange(firstRow, 2).setDataValidation(rule);
       sheet.getRange(firstRow, 4, 4, 1).setDataValidation(rule);
@@ -184,7 +281,16 @@ const RomanSharedReview = (function() {
   function topicSnapshot(approvers, withLock) {
     return withLock(function() {
       const capturedAt = new Date().toISOString(), topics = [];
+      const standaloneTopics = enabled() ? topicConfigs() : [];
+      if (enabled()) standaloneTopics.forEach(function(c) {
+        const receipt = topicReceipt(c, approvers);
+        if (!receipt) return;
+        topics.push({topicId: c.packet.topicId, topicText: c.packet.topicText,
+          reviewRevision: c.packet.revision, topicHash: receipt.hash, approvedBy: receipt.approvedBy,
+          approvedAt: receipt.approvedAt, status: 'selected_for_research'});
+      });
       if (enabled()) configs().forEach(function(c) {
+        if (standaloneTopics.some(function(t) { return t.packet.topicId === c.packet.topicId; })) return;
         if (!matches(c)) return;
         const receipt = receipts(c, approvers).topic;
         if (!receipt || Date.parse(receipt.approvedAt) > Date.parse(capturedAt)) return;
@@ -194,6 +300,7 @@ const RomanSharedReview = (function() {
           status: 'selected_for_research'});
       });
       if (topics.length > 90) throw Error('Topic snapshot exceeds bound');
+      if (new Set(topics.map(function(t) { return t.topicId; })).size !== topics.length) throw Error('Ambiguous topic snapshot');
       topics.sort(function(a, b) { return a.topicId.localeCompare(b.topicId); });
       return {ok: true, snapshotVersion: '1.0.0', source: 'apps_script_shared_review',
         capturedAt: capturedAt, enabled: enabled(), topics: topics,
@@ -202,6 +309,12 @@ const RomanSharedReview = (function() {
   }
   function queue(legacy, approvers) {
     const current = configs(), managed = new Set();
+    const standaloneTopics = topicConfigs();
+    standaloneTopics.forEach(function(c) {
+      managed.add(c.packet.topicId);
+      managed.add(c.packet.topicId + '-instagram');
+      managed.add(c.packet.topicId + '-tiktok');
+    });
     current.forEach(function(c) {
       managed.add(c.packet.topicId);
       c.packet.endings.forEach(function(e) { managed.add(c.packet.topicId + '-' + e.platform); });
@@ -211,6 +324,11 @@ const RomanSharedReview = (function() {
     if (!enabled()) return result; // Disabling pauses managed topics; never restores stale legacy approvals.
     current.forEach(function(c) {
       if (!matches(c)) return;
+      const selectedConfig = standaloneTopics.filter(function(t) { return t.packet.topicId === c.packet.topicId; })[0];
+      if (selectedConfig) {
+        const selected = topicReceipt(selectedConfig, approvers);
+        if (!selected || selected.hash !== components(c.packet).topic) return;
+      }
       const r = receipts(c, approvers);
       if (!r.topic || !r.body) return;
       const p = c.packet, endings = p.endings.length ? p.endings : [{platform: null, text: ''}];
@@ -236,5 +354,5 @@ const RomanSharedReview = (function() {
     if (new Set(result.map(function(x) { return x.version_id; })).size !== result.length) throw Error('Ambiguous queue versions');
     return result;
   }
-  return {enabled: enabled, handles: handles, edit: edit, register: register, queue: queue, topicSnapshot: topicSnapshot};
+  return {enabled: enabled, handles: handles, edit: edit, register: register, registerTopic: registerTopic, queue: queue, topicSnapshot: topicSnapshot};
 })();
