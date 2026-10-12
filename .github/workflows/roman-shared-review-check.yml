@@ -9,6 +9,9 @@ on:
       - 'roman-reels/scripts/apps-script.test.mjs'
       - 'roman-reels/scripts/*editorial*'
       - 'roman-reels/scripts/build-seo-evidence-report*'
+      - 'roman-reels/scripts/topic-reference-plan*'
+      - 'roman-reels/research/narrow-topic-search/**'
+      - 'roman-reels/research/seo-reference-cooper-probe-results.json'
       - 'roman-reels/scripts/researched-gemini-drafts*'
       - 'roman-reels/scripts/send-drafts-to-sheet.mjs'
       - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
@@ -21,6 +24,9 @@ on:
       - 'roman-reels/scripts/apps-script.test.mjs'
       - 'roman-reels/scripts/*editorial*'
       - 'roman-reels/scripts/build-seo-evidence-report*'
+      - 'roman-reels/scripts/topic-reference-plan*'
+      - 'roman-reels/research/narrow-topic-search/**'
+      - 'roman-reels/research/seo-reference-cooper-probe-results.json'
       - 'roman-reels/scripts/researched-gemini-drafts*'
       - 'roman-reels/scripts/send-drafts-to-sheet.mjs'
       - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
@@ -44,6 +50,7 @@ jobs:
           node roman-reels/scripts/manual-intake.test.mjs
           node roman-reels/scripts/editorial-release.test.mjs
           node roman-reels/scripts/build-seo-evidence-report.test.mjs
+          node roman-reels/scripts/topic-reference-plan.test.mjs
           node roman-reels/scripts/researched-gemini-drafts.test.mjs
       - name: Additive installer must match source
         run: |
