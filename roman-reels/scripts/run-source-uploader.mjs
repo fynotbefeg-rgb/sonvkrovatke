@@ -4,12 +4,14 @@
 //   check-auth                                 refresh token + verify incoming is writable (prints no secrets)
 //   validate <job.json>                        offline job validation
 //   run [--jobs <dir>] [--max <n>]             one bounded pass over explicit job files
+//   receipt --packet <packet.json>             after four verified uploads: recheck Drive parts, publish recording-set.json
 // Runtime lives outside Git: %LOCALAPPDATA%\RomanReels\source-uploader (override: ROMAN_UPLOADER_HOME).
 import {existsSync, promises as fs} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {INCOMING_ID, driveClient, exitCode, mediaChecker, runJobs, validateJob} from './source-uploader.mjs';
 import {loadClient, login, tokenProvider} from './source-uploader-auth.mjs';
+import {receiptExitCode, runReceipt} from './four-part-receipt-upload.mjs';
 
 const [command, ...rest] = process.argv.slice(2);
 const option = (name, fallback) => { const i = rest.indexOf(`--${name}`); return i >= 0 ? rest[i + 1] : fallback; };
@@ -53,7 +55,16 @@ async function main() {
     console.log(JSON.stringify(summary, null, 2));
     return exitCode(summary);
   }
-  console.error('Usage: run-source-uploader.mjs auth|check-auth|validate <job.json>|run [--jobs dir] [--max n]');
+  if (command === 'receipt') {
+    // An absent packet is reported as a blocker before any Drive access.
+    const packetFile = option('packet', null);
+    const outcome = await runReceipt({packetFile, stateDir: home, drive});
+    await fs.mkdir(home, {recursive: true});
+    await fs.appendFile(path.join(home, 'uploader-log.jsonl'), JSON.stringify({at: new Date().toISOString(), command: 'receipt', ...outcome}) + '\n');
+    console.log(JSON.stringify(outcome, null, 2));
+    return receiptExitCode(outcome);
+  }
+  console.error('Usage: run-source-uploader.mjs auth|check-auth|validate <job.json>|run [--jobs dir] [--max n]|receipt --packet <packet.json>');
   return 64;
 }
 
