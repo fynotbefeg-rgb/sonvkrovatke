@@ -156,3 +156,18 @@ Drive ошибка отсутствовала. Это ограничение п�
 речью. MP4/assembly.json/QC находятся только в Actions artifact
 roman-four-part-assembled-fixture на три дня, не загружаются в Drive/Git.
 Расписание/автозапуск/HeyGen/утверждения не меняются.
+
+### Реальная облачная сборка
+
+Actions `38289563703`, commit `bcdfec6`, 2026-10-12: success за 1m9s.
+Тот же runner прочитал pinned комплект из настоящего Drive и собрал три
+синтетических hook+body MP4; проверенный script требует complete=true,
+три technicalPassed=true и неизменённые удалённые metadata после сборки.
+Оба upload-artifact шага success; assembled outputs в artifact
+`roman-four-part-assembled-fixture`, retention3days. Другие service jobs skipped,
+отдельная offline CI `test` success. Raw artifact в этой cloud session не
+скачивался; утверждение основано на job status и reviewed success gates.
+
+Монтажный Director/Remotion, анализ речи, субтитры и готовый output Drive
+пока не подключены к этому пути. Синусоидальные звуки нельзя превращать в
+выдуманную речь/субтитры; этот комплект проверяет только техническую сборку.
