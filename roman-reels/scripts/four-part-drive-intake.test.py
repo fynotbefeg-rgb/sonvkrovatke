@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -146,6 +147,54 @@ class FourPartTests(unittest.TestCase):
                                  [self.packet], forbidden, now=100)
         self.assertEqual(report['sets'][0]['status'], 'awaiting_approval')
         self.assertFalse(report['renderAllowed'])
+
+    def test_node_generated_receipt_passes_full_cloud_inspection(self):
+        journal = {'journalVersion': '1.0.0', 'jobs': {}}
+        _, _, parts = intake.incoming.expectations(self.packet)
+        for number, part in enumerate(parts):
+            role = part['fileName'].removesuffix('.mp4')
+            key = f'upload-job-{number}'
+            journal['jobs'][key] = {'jobId': key, 'topicId': self.packet['sourceSet']['topic_id'],
+                'scriptVersion': 1, 'role': role, 'status': 'uploaded', 'driveFileId': f'id-{number}',
+                'driveName': part['fileName'], 'sha256': media.sha256(self.source / part['fileName']),
+                'textHash': part['textHash'], 'size': (self.source / part['fileName']).stat().st_size}
+        builder = Path(__file__).with_name('build-four-part-receipt.mjs').resolve().as_uri()
+        command = f"import {{buildFourPartReceipt}} from '{builder}'; let s=''; for await (const c of process.stdin) s+=c; const [p,j]=JSON.parse(s); console.log(JSON.stringify(buildFourPartReceipt(p,j)));"
+        output = subprocess.run(['node', '--input-type=module', '-e', command],
+            input=json.dumps([self.packet, journal]), text=True, capture_output=True, timeout=20, check=True)
+        (self.source / 'recording-set.json').write_text(output.stdout)
+        self.drive = helpers.FakeDrive(self.source, self.packet)
+        self.assertEqual(self.scan()['downloadedSets'], 1)
+        job = next(iter(self.store.state['jobs'].values()))
+        self.assertEqual(job['status'], 'awaiting_approval')
+        self.assertFalse(job['renderAllowed'])
+        self.assertEqual(len(job['sourceSha256']), 4)
+
+    def test_explicit_registry_validates_before_network_and_rejects_duplicates(self):
+        spec = importlib.util.spec_from_file_location('intake_runner', Path(__file__).with_name('run-drive-intake.py'))
+        runner = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(runner)
+        file = Path(self.temp.name) / 'packets.json'
+        file.write_text(json.dumps(self.packet))
+        self.assertEqual(runner.load_packets(file), [self.packet])
+        for data in [[self.packet, self.packet], [], [self.packet] * 31,
+                     {**self.packet, 'syntheticFixtures': 'false'}]:
+            file.write_text(json.dumps(data))
+            with self.assertRaises(ValueError):
+                runner.load_packets(file)
+        file.write_bytes(b' ' * (2 * 1024 * 1024 + 1))
+        with self.assertRaises(ValueError):
+            runner.load_packets(file)
+
+    def test_legacy_six_part_registry_remains_supported(self):
+        spec = importlib.util.spec_from_file_location('intake_runner', Path(__file__).with_name('run-drive-intake.py'))
+        runner = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(runner)
+        file = Path(__file__).resolve().parents[1] / 'research/platform-ending-drafts-v2.json'
+        packets = runner.load_packets(file)
+        self.assertTrue(packets)
+        for packet in packets:
+            self.assertEqual(len(intake.incoming.expectations(packet)[2]), 6)
 
     def test_plan_compatible_with_existing_four_part_assembler(self):
         self.scan()
