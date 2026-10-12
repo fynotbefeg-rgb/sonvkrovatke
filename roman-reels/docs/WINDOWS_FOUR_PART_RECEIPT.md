@@ -62,3 +62,37 @@ node scripts/run-source-uploader.mjs receipt --packet C:\путь\packet.json
 Не проверено: настоящий Drive multipart create с заданным ID и 409 на повторе. Это следующий отдельный
 ограниченный живой этап с явным synthetic-пакетом; он никогда не становится утверждённой речью или
 production-видео.
+
+## Живой ограниченный тест (2026-10-12, по поручению владельца)
+
+Код ветки на `b6bdba0`. Тема `windows-receipt-test-20261012`, версия 1. Пакет `draftVersion 3.0.0`,
+`syntheticFixtures: true`, `productionReady: false`, вымышленные тексты с пометкой «СИНТЕТИЧЕСКИЙ ТЕСТ»,
+все варианты `pending_approval`, утверждений нет. Четыре MP4 (360×640, 1,52 с, видео + синус разной частоты)
+сгенерированы кодом из BMP-кадров встроенным ffmpeg Remotion; ни одной записи Романа/HeyGen. Пакет, задания,
+MP4 и резервная копия журнала лежат вне Git в `%LOCALAPPDATA%\RomanReels\source-uploader\receipt-test-20261012`.
+`textHash` каждого задания вычислен из текста пакета до загрузки.
+
+| Шаг | Результат |
+|---|---|
+| `check-auth` | `incomingVisible=true`, `incomingWritable=true` |
+| `run --jobs <тестовая папка> --max 4` (ffprobe + полный decode) | 4 × `uploaded`, exit 0 |
+| `receipt --packet` (новый процесс) | `uploaded`, exit 0, ID `1F22PKL-R04ye0yUkcRnCE3ggcBVWbivH` |
+| `receipt --packet` повтор (новый процесс) | `already_uploaded`, exit 0, **тот же ID** |
+
+Независимая read-only сверка через Drive API (полный listing папки, скачивание квитанции):
+
+| Файл | Drive ID | Байт | Совпадение |
+|---|---|---|---|
+| `body.mp4` | `1HG-0o9k9t7wl00_ibBQu7m6czRQgXLMA` | 21 308 | размер/MD5/SHA-256 = локальный файл |
+| `hook-1.mp4` | `1C5gKqnxSvLvkDn5Qg3gEZ94sIsqhFbpE` | 21 380 | то же |
+| `hook-2.mp4` | `1S7x76f0RHxhhtOjiyuuCOMs8OTQFrV9j` | 21 375 | то же |
+| `hook-3.mp4` | `1Q6ZdEgArQte-utBB0Z9VlpkT6ls6W7KJ` | 20 999 | то же |
+| `recording-set.json` | `1F22PKL-R04ye0yUkcRnCE3ggcBVWbivH` | 971 | `application/json`; байты = вывод builder; SHA-256 `68193f53…1ef961` = Drive; только поля receipt v1 |
+
+В теме одна папка `v1`, в ней ровно пять файлов, временных `.uploading-*` нет. Старая тестовая папка
+`windows-uploader-test-20261012/v1` по-прежнему содержит один `hook-1.mp4` с прежним ID и MD5; её запись в
+журнале байт-в-байт совпадает с резервной копией, `textHash` ей не назначался. Ничего не удалялось.
+
+Не выполнялось: облачный приёмщик для этой темы (её нет в packets; `--packets` в workflow не передаётся),
+изменение intake-state, HeyGen, автозапуск, монтаж, рендер, производство. Тест не является утверждённой речью
+и не даёт права на production. Удалять тестовую папку — только по решению владельца.
