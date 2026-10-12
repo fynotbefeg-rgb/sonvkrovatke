@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-12",
+  "scope": "6 public HTML pages including missing page, robots, sitemap index and one child; one GEO homepage audit",
+  "approvalStatus": "not_approved",
+  "productionAllowed": false,
+  "googleSearchConsoleConnected": false,
+  "paidCalls": false,
+  "downloadsOfSoftware": false,
+  "modificationsOfWebsite": false,
+  "files": {
+    "geo-audit-summary.json": "2265e06ccc2873ce95e246db965f5e7e0ff0cf74d0cd91cfeee4204a3a081bf5",
+    "observations.json": "32d53fc64403b75de79940998187ab192d14383eb89b8ff561005e4fe9645c78",
+    "sitemap-observations.json": "a67df5b5596bf387eb5cac173759df2d29efc4424b0f1e7a139bde884296b5fc"
+  }
+}
