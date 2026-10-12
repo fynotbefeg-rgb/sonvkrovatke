@@ -21,11 +21,12 @@ class DriveClient:
         self.refresh()
 
     @classmethod
-    def service_account(cls, info):
+    def service_account(cls, info, readonly=False):
         from google.oauth2 import service_account
         instance = cls.__new__(cls)
         instance.credentials = service_account.Credentials.from_service_account_info(
-            info, scopes=["https://www.googleapis.com/auth/drive"])
+            info, scopes=["https://www.googleapis.com/auth/drive.readonly" if readonly else
+                          "https://www.googleapis.com/auth/drive"])
         instance.refresh()
         return instance
 

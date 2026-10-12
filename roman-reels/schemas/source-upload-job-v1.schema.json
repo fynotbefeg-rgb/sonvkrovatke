@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Roman Windows source upload job v1: one explicit local MP4 for one role of one topic version",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "jobId", "topicId", "scriptVersion", "role", "localPath"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "jobId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{7,79}$"},
+    "topicId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{1,79}$", "not": {"pattern": "^intake-self-test"}},
+    "scriptVersion": {"type": "integer", "minimum": 1, "maximum": 9999},
+    "role": {"enum": ["hook-1", "hook-2", "hook-3", "body"]},
+    "localPath": {"type": "string", "description": "Absolute path to a finished .mp4 (not .crdownload/.partial/.tmp)", "pattern": "\\.[mM][pP]4$"},
+    "heygenTitle": {"type": ["string", "null"], "maxLength": 300, "description": "Original HeyGen video title, informational only; never used to infer topic or role"},
+    "textHash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$", "description": "Only when supplied by the verified job; the uploader never computes or invents it"}
+  }
+}

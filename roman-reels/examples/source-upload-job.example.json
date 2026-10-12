@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "jobId": "example-20261012-hook1",
+  "topicId": "example-topic",
+  "scriptVersion": 1,
+  "role": "hook-1",
+  "localPath": "C:\\path\\to\\finished-download.mp4",
+  "heygenTitle": "Видео аватара"
+}
