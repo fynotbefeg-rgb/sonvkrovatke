@@ -61,7 +61,7 @@ class FixtureProbeTests(unittest.TestCase):
                 client = helpers.FakeDrive(source, packet)
                 client.files['topic']['parents'] = [probe.INCOMING]
                 with patch.object(media, 'PUBLIC', root):
-                    report = probe.check_fixture(client)
+                    report = probe.check_fixture(client, assemble_output=Path(directory) / 'assembled')
                 self.assertTrue(report['ok'])
                 self.assertEqual(client.downloads, 5)
                 self.assertFalse(report['driveWrites'])
@@ -69,6 +69,15 @@ class FixtureProbeTests(unittest.TestCase):
                 self.assertFalse(report['durableState'])
                 self.assertFalse(report['renderAllowed'])
                 self.assertEqual(len(report['parts']), 4)
+                self.assertTrue(report['assembly']['complete'])
+                self.assertFalse(report['assembly']['productionReady'])
+                self.assertFalse(report['assembly']['professionalMontage'])
+                self.assertEqual(len(report['assembly']['variants']), 3)
+                for variant in report['assembly']['variants']:
+                    self.assertTrue(variant['technicalPassed'])
+                    self.assertGreater(variant['duration'], variant['bodyStart'])
+                self.assertEqual(len(list((Path(directory) / 'assembled').glob('*.mp4'))), 3)
+                self.assertEqual(list((Path(directory) / 'assembled').glob('*.partial.mp4')), [])
         finally:
             helpers.DriveIntakeTests.tearDownClass()
 

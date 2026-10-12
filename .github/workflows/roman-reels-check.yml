@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      assemble_four_part_fixture:
+        description: 'With four-part self-test only: assemble three synthetic MP4s; no professional montage or Drive writes'
+        type: boolean
+        default: false
       four_part_drive_self_test:
         description: 'Read-only pinned Windows four-part synthetic fixture; no journal writes or render'
         type: boolean
@@ -109,6 +113,7 @@ jobs:
       - name: Validate only pinned synthetic fixture, no persistent journal or approval service
         env:
           GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+          ROMAN_ASSEMBLE_FOUR_PART_FIXTURE: ${{ inputs.assemble_four_part_fixture }}
         run: python roman-reels/scripts/check-four-part-drive-fixture.py
       - uses: actions/upload-artifact@v4
         if: always()
@@ -117,6 +122,13 @@ jobs:
           path: ${{ runner.temp }}/four-part-drive-fixture-report.json
           retention-days: 3
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: success() && inputs.assemble_four_part_fixture
+        with:
+          name: roman-four-part-assembled-fixture
+          path: ${{ runner.temp }}/four-part-assembled-fixture/
+          retention-days: 3
+          if-no-files-found: error
   drive-intake:
     if: inputs.run_drive_intake && !inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest
