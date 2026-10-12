@@ -58,6 +58,7 @@ jobs:
           node roman-reels/scripts/build-seo-evidence-report.test.mjs
           node roman-reels/scripts/topic-reference-plan.test.mjs
           node roman-reels/scripts/topic-selection-reader.test.mjs
+          node roman-reels/scripts/disabled-topic-snapshot.test.mjs
           node roman-reels/scripts/researched-gemini-drafts.test.mjs
       - name: Additive installer must match source
         run: |

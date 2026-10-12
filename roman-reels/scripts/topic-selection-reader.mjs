@@ -22,7 +22,7 @@ export function validateTopicSnapshot(data,{now=Date.now()}={}) {
  }
  return data;
 }
-export async function readTopicSnapshot({url,token,fetchImpl=fetch,now}={}) {
+async function requestTopicSnapshot({url,token,fetchImpl=fetch}={}) {
  if(typeof url!=='string'||!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url)||
   typeof token!=='string'||!token.trim()||/[\r\n]/.test(token))throw Error('Existing protected webhook configuration required');
  const signal=AbortSignal.timeout(30000);
@@ -38,9 +38,22 @@ export async function readTopicSnapshot({url,token,fetchImpl=fetch,now}={}) {
   }
   if(!response.ok)throw Error('Topic endpoint rejected request');
   const raw=await response.text();if(raw.length>200000)throw Error('Topic response too large');
-  const data=validateTopicSnapshot(JSON.parse(raw),{now:now??Date.now()});
-  authenticated.set(data,digest(data));return data;
+  return JSON.parse(raw);
  } catch {throw Error('Topic snapshot unavailable or invalid; no fallback approval or automatic retry');}
+}
+export async function readTopicSnapshot(options={}) {
+ const data=validateTopicSnapshot(await requestTopicSnapshot(options),{now:options.now??Date.now()});
+ authenticated.set(data,digest(data));return data;
+}
+// Deployment health check only: disabled data never gains planner provenance.
+export async function checkDisabledTopicSnapshot(options={}) {
+ const data=await requestTopicSnapshot(options),now=options.now??Date.now(),captured=Date.parse(data?.capturedAt);
+ if(!Number.isFinite(now)||!exact(data,['ok','snapshotVersion','source','capturedAt','enabled','topics','scriptApprovalGranted','productionAllowed'])||
+  data.ok!==true||data.snapshotVersion!=='1.0.0'||data.source!=='apps_script_shared_review'||data.enabled!==false||
+  data.scriptApprovalGranted!==false||data.productionAllowed!==false||!Array.isArray(data.topics)||data.topics.length!==0||
+  !Number.isFinite(captured)||captured>now||now-captured>5*60000)
+  throw Error('Expected current disabled research-only snapshot; no feature changes performed');
+ return {enabled:false,topicCount:0,productionAllowed:false};
 }
 export function planForSelectedTopic(scope,batch,snapshot,{now=Date.now()}={}) {
  if(!snapshot||authenticated.get(snapshot)!==digest(snapshot))throw Error('Live authenticated snapshot required; a saved or modified JSON is not authority');
