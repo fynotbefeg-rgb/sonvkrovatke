@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      four_part_drive_self_test:
+        description: 'Read-only pinned Windows four-part synthetic fixture; no journal writes or render'
+        type: boolean
+        default: false
       drive_intake_self_test:
         description: 'When scanning: only the isolated synthetic six-file fixture, never approve/render'
         type: boolean
@@ -85,6 +89,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  four-part-drive-self-test:
+    if: inputs.four_part_drive_self_test && inputs.check_drive_intake_access && !inputs.run_drive_intake && github.ref == 'refs/heads/feature/codex-four-part-intake'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install media and read-only Drive transport
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r roman-reels/schemas/requirements.txt -r roman-reels/scripts/drive-intake-requirements.txt
+      - name: Validate only pinned synthetic fixture, no persistent journal or approval service
+        env:
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: python roman-reels/scripts/check-four-part-drive-fixture.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: roman-four-part-drive-fixture-report
+          path: ${{ runner.temp }}/four-part-drive-fixture-report.json
+          retention-days: 3
+          if-no-files-found: ignore
   drive-intake:
     if: inputs.run_drive_intake && !inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline'
     runs-on: ubuntu-latest

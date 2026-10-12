@@ -103,3 +103,23 @@ CLI не создаёт сценарии, не доказывает выбор �
 по журналу fake uploader с SHA реальных синтетических MP4, затем скачивает
 и полностью проверяет комплект Python-приёмщиком. Это сквозная локальная
 проверка двух языков и файлов; реальный Drive здесь не используется.
+
+## Только чтение настоящего Windows fixture
+
+`check-four-part-drive-fixture.py` жёстко привязан к пакету
+windows-receipt-test-20261012/v1 и SHA-256
+`e9524729a2103ef2211d1eb79cf886d74a83f02d78dacf250fbad805845263c3`.
+Файл перенесён побайтно из PR25, коммит 1f67da8. CRLF меняет SHA и блокирует
+проверку; не нормализовать этот файл без осознанной смены fixture pin.
+
+Ручной workflow roman-reels-check в feature/codex-four-part-intake:
+включить только four_part_drive_self_test и check_drive_intake_access.
+Остальные опции false. Новый job использует existing service-account credential
+с OAuth scope drive.readonly; клиент обёрнут интерфейсом без операций записи.
+Локальный временный журнал нужен только для проверки существующего scan;
+общий intake-state не читается/не меняется. Нет approval/LLM/HeyGen/рендера.
+
+Успех = downloadedSets1, четыре SHA/textHash, полный decode, awaiting_approval,
+renderAllowed=false. Report в Actions artifact на три дня, без токенов и текстов.
+Это реальное облачное чтение тестового комплекта, не включение scheduled
+приёмки, не проверка речи и не новый production-job.
