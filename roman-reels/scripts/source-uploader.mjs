@@ -3,7 +3,7 @@
 // sources, and never touches the cloud intake-state-v1.json. Drive files get pre-generated IDs that are
 // persisted in a local journal BEFORE any create, so an ambiguous network failure is reconciled by ID
 // instead of blindly creating a duplicate.
-import {createHash} from 'node:crypto';
+import {createHash, randomUUID} from 'node:crypto';
 import {createReadStream, promises as fs} from 'node:fs';
 import {spawn} from 'node:child_process';
 import path from 'node:path';
@@ -414,6 +414,15 @@ export function driveClient({getToken, fetchImpl = fetch}) {
       if (!session) throw new AmbiguousNetworkError('uploadInit');
       return json('upload', await call('upload', session, {method: 'PUT', duplex: 'half',
         headers: {'content-type': 'video/mp4', 'content-length': String(size)}, body: Readable.toWeb(stream)}, {replayable: false}));
+    },
+    // Small JSON file (recording-set.json) in one multipart request with a pre-generated ID.
+    async uploadJson({id, name, parentId, bytes, appProperties}) {
+      const boundary = `rr-${randomUUID()}`;
+      const meta = JSON.stringify({id, name, parents: [parentId], mimeType: 'application/json', appProperties});
+      const body = Buffer.concat([Buffer.from(`--${boundary}\r\ncontent-type: application/json; charset=utf-8\r\n\r\n${meta}\r\n` +
+        `--${boundary}\r\ncontent-type: application/json\r\n\r\n`), bytes, Buffer.from(`\r\n--${boundary}--\r\n`)]);
+      return json('uploadJson', await call('uploadJson', `${upload}files?uploadType=multipart&fields=${fields}&supportsAllDrives=true`, {method: 'POST',
+        headers: {'content-type': `multipart/related; boundary=${boundary}`}, body}));
     },
     async rename(id, name) {
       return json('rename', await call('rename', `${api}files/${encodeURIComponent(id)}?fields=${fields}&supportsAllDrives=true`, {method: 'PATCH',
