@@ -2,13 +2,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {mkdtemp, readFile, readdir, rm} from 'node:fs/promises';
+import {mkdtemp, readFile, readdir, rm, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {tmpdir} from 'node:os';
 import {ProductionQueue} from './production-queue.mjs';
 import {readApprovedQueue} from './approved-four-part-jobs.mjs';
 import {scriptHash} from './approval-manifest.mjs';
-import {emptyDelivery, parseDelivery, validateDeliveryPlan} from './windows-plan-delivery.mjs';
+import {emptyDelivery, parseDelivery, buildDelivery, validateDeliveryPlan} from './windows-plan-delivery.mjs';
 import {emptyAck} from './windows-plan-ack.mjs';
 import {expectedBindings, prepareQueueDelivery, waitingJobsFor} from './queue-delivery-bridge.mjs';
 
@@ -72,6 +72,18 @@ test('repeat while envelope is live: reused, no duplicate file', async t => {
   const second = await s.run({now: now + 1000});
   assert.deepEqual([second.status, second.deliveryId, second.file], ['already_prepared', first.deliveryId, first.file]);
   assert.equal((await readdir(s.outbox)).length, 1);
+});
+
+test('a valid different envelope under the expected filename is rejected without creating a duplicate', async t => {
+  const s = await setup(t);
+  const first = await s.run();
+  const saved = parseDelivery(await readFile(path.join(s.outbox, first.file)), {now});
+  saved.payload.jobs[0].localPath += '.different.mp4';
+  const changed = buildDelivery(saved.payload, {now});
+  await writeFile(path.join(s.outbox, first.file), changed);
+  await assert.rejects(s.run({now: now + 1000}), /differs from current plan/);
+  assert.equal((await readdir(s.outbox)).length, 1);
+  assert.deepEqual(await readFile(path.join(s.outbox, first.file)), changed);
 });
 
 test('incomplete queue or revoked/changed approval never produces an envelope', async t => {

@@ -54,7 +54,10 @@ export async function prepareQueueDelivery({queueDbPath, review, downloadsDir, r
   // One live envelope per plan: an unexpired prepared envelope for the same deliveryId is reused, never duplicated.
   for (const name of (await fs.readdir(outbox)).filter(n => n.startsWith(`${deliveryId}.`) && n.endsWith('.json'))) {
     const existing = await fs.readFile(path.join(outbox, name));
-    try { parseDelivery(existing, {now: clock()}); return {...base, status: 'already_prepared', deliveryId, file: name, gate: gate.reason}; } catch {}
+    const raw = JSON.parse(existing.toString('utf8'));
+    const saved = parseDelivery(existing, {now: raw.issuedAt});
+    if (saved.deliveryId !== deliveryId || saved.issuedAt > clock()) throw Error('Saved outbox envelope differs from current plan');
+    if (clock() < saved.expiresAt) return {...base, status: 'already_prepared', deliveryId, file: name, gate: gate.reason};
   }
   const name = `${deliveryId}.${JSON.parse(bytes).issuedAt}.json`;
   await fs.writeFile(path.join(outbox, name), bytes, {flag: 'wx', mode: 0o600});
