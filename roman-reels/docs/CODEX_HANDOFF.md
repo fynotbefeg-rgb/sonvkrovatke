@@ -899,3 +899,36 @@ matching receipt; preserve ack/local records, refuse real or modified plans. Exi
 remains in Actions; three pinned file/folder IDs are private vars and have NOT been configured.
 Eight offline probe tests passed. CI covers Python publisher/probe on Windows and Linux. No live
 dispatch, Drive file, bot, Google or scheduler changes. This does not connect the local outbox to cloud.
+
+## 2026-10-13 — ordered branch review, conditional merges, topic-review preparation
+
+Owner explicitly authorized these five branch merges only with green exact-head CI and no blocking
+review findings. Duplicate discovery reused PR42/43/44/45; missing continuity PR46 was created.
+Merged in requested order: PR46 head e4ded882 (merge a9cc4c16), PR42 head e7279313
+(merge 4f4eb632), PR45 head 11e62c22 (merge f38bc8a2). Successful Linux/Windows source CI:
+38406879367, 38407294217, 38408283072 respectively. Documentation now triggers source CI;
+updated handoff separates historical preparation from the owner-relayed completed laptop exchange
+and A/B/C scheduler tests. Recovery drills are in both Linux/Windows jobs, local 4/4 passed.
+The laptop's latest relayed poller is PID7804 with a registered five-minute user-session task;
+root did not independently run it, reboot recovery remains untested, topics remain unapproved.
+
+Held PR43 at cca194c1 despite green CI38403548374. Offline review reproduced relayDecision returning
+publish from plain saved JSON with approved status but no reader provenance/approval receipts;
+malformed mailbox {status,deliveryId} unlocked replacement of an unconsumed slot (one Fake Drive write).
+Anchored blocking review asks for fresh unchanged authenticated reader authority, full pinned mailbox
+identity/checksum/envelope validation, and regressions before CLI/Python relay. Existing seven tests
+passed but do not cover these boundaries. No live outbox or cloud relay configured.
+
+Held PR44 at 6ff23aab despite green CI38403614120. Two real Node processes with Fake fetch and day/week
+request cap1 both generated successfully, while the ledger recorded only one reservation. Cross-process
+load/check/reserve/publication is not locked; same-process clients also collide on the PID temp name.
+Anchored blocking review requires exclusive durable reservation, strict finite limits and ledger schema,
+parallel-process regressions and registration of Gemini tests in Windows (currently Linux only).
+Original five tests passed. No real key read, no Gemini API or paid call executed.
+
+Separate preparation branch adds ROMAN_TOPIC_REVIEW_MESSAGE.md and ROMAN_TOPIC_REVIEW_ENABLEMENT_PLAN.md:
+two candidate references from the prepared private catalog, operator-only bot limitation, new Google
+rows/IDs without speech, existing module flag and global allowlist risks, verified personal e.user choice,
+separate body/three-hook approval and rollback retaining evidence. No packet registered, Google flag,
+Apps Script, rows, triggers, receipts, bot, scheduler, uploads, HeyGen, real video, montage or production
+changed by root. Part2 remains a reviewable PR, not a live release; owner must separately authorize enablement.
