@@ -87,3 +87,47 @@ test('truncated, blocked, oversized or lost responses fail closed without retry;
   assert.equal(error.code, 'http_403');
   assert.ok(!error.message.includes(KEY));
 });
+
+test('two real processes racing for a cap of one: exactly one request, one ledger entry', async t => {
+  const {spawn} = await import('node:child_process');
+  const {fileURLToPath, pathToFileURL} = await import('node:url');
+  const s = await setup(t);
+  const lib = pathToFileURL(fileURLToPath(new URL('./gemini-bounded-client.mjs', import.meta.url))).href;
+  const child = `import {createGeminiClient} from ${JSON.stringify(lib)};
+    const c = createGeminiClient({apiKey: 'fake-key-never-real-0123456789', ledgerFile: process.argv[1], allowGenerate: true,
+      limits: {maxRequestsPerDay: 1, maxRequestsPerWeek: 1},
+      fetchImpl: async () => new Response(JSON.stringify({candidates: [{finishReason: 'STOP', content: {parts: [{text: 'x'}]}}]}))});
+    try { await c.generate({task: 'summarize', prompt: 'fictional'}); console.log('generated'); } catch (e) { console.log(e.code); }`;
+  const run = () => new Promise(resolve => { let out = ''; const p = spawn(process.execPath, ['--input-type=module', '-e', child, s.ledgerFile], {stdio: ['ignore', 'pipe', 'inherit']});
+    p.stdout.on('data', d => { out += d; }); p.on('close', () => resolve(out.trim())); });
+  const results = (await Promise.all([run(), run(), run()])).sort();
+  assert.deepEqual(results.filter(r => r === 'generated').length, 1, results.join(','));
+  assert.ok(results.filter(r => r !== 'generated').every(r => r === 'day_budget_exhausted'), results.join(','));
+  assert.equal(JSON.parse(await readFile(s.ledgerFile, 'utf8')).requests.length, 1);
+});
+
+test('concurrent clients in one process share the cap and never collide on temp files', async t => {
+  const s = await setup(t, {responses: Array.from({length: 6}, () => ok()), limits: {maxRequestsPerDay: 2, maxRequestsPerWeek: 2}});
+  const settled = await Promise.allSettled(Array.from({length: 6}, () => ask(s.client())));
+  assert.equal(settled.filter(x => x.status === 'fulfilled').length, 2);
+  assert.ok(settled.filter(x => x.status === 'rejected').every(x => x.reason.code === 'day_budget_exhausted'));
+  assert.equal(s.calls.length, 2);
+  const one = s.client({limits: {maxRequestsPerRun: 1, maxRequestsPerDay: 10, maxRequestsPerWeek: 10}});
+  const both = await Promise.allSettled([ask(one), ask(one)]);
+  assert.deepEqual(both.map(x => x.status).sort(), ['fulfilled', 'rejected']);
+});
+
+test('limits must be finite integers in range; malformed ledgers are refused untouched', async t => {
+  const s = await setup(t);
+  for (const bad of [{maxRequestsPerDay: Infinity}, {maxRequestsPerWeek: NaN}, {maxRequestsPerRun: 0}, {maxRequestsPerRun: 1.5},
+    {maxOutputTokens: -1}, {maxRequestsPerDay: 50, maxRequestsPerWeek: 10}, {surprise: 1}, {timeoutMs: '90000'}])
+    assert.throws(() => s.client({limits: bad}), {code: 'invalid_limits'}, JSON.stringify(bad));
+  const {writeFile} = await import('node:fs/promises');
+  for (const body of ['{"ledgerVersion":"1.0.0","requests":[{"at":"now","task":"summarize","model":"m"}]}',
+    '{"ledgerVersion":"1.0.0","requests":[{"at":1,"task":"approve","model":"m"}]}', '{"ledgerVersion":"1.0.0"}', '[]']) {
+    await writeFile(s.ledgerFile, body);
+    await assert.rejects(ask(s.client()), {code: 'ledger_invalid'});
+    assert.equal(await readFile(s.ledgerFile, 'utf8'), body);
+  }
+  assert.equal(s.calls.length, 0);
+});
