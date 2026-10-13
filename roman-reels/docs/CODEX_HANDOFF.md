@@ -890,3 +890,12 @@ contracts even after expiry, preserves exact bytes, and matches topic/revision/i
 Python publisher 12/12, ack 9/9 and delivery 10/10 passed locally. Windows CI now includes delivery/ack.
 One serialized cloud writer required; cross-file readback guard is not distributed CAS. No live bot,
 Google, Drive, generation, upload or render changed. PR35 is a dependency, not merged here.
+
+## 2026-10-13 — manual fictional cloud delivery workflow candidate
+
+Prepared an isolated manual mode in the existing registered check workflow. Fixed fictional Windows
+source plan only, one cloud writer group, no other jobs when selected. Inspect/publish/clear only after
+matching receipt; preserve ack/local records, refuse real or modified plans. Existing cloud credential
+remains in Actions; three pinned file/folder IDs are private vars and have NOT been configured.
+Eight offline probe tests passed. CI covers Python publisher/probe on Windows and Linux. No live
+dispatch, Drive file, bot, Google or scheduler changes. This does not connect the local outbox to cloud.
