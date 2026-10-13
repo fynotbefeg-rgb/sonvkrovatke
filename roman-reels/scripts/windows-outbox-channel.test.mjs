@@ -10,6 +10,7 @@ import {emptyAck} from './windows-plan-ack.mjs';
 import {AmbiguousNetworkError} from './source-uploader.mjs';
 import {deliveryPlan} from './testing/delivery-fixture.mjs';
 import {OUTBOX_NAME, emptyOutbox, newestPrepared, parseOutboxSlot, pushOutbox, relayDecision} from './windows-outbox-channel.mjs';
+import {readApprovedQueue} from './approved-four-part-jobs.mjs';
 
 const now = Date.parse('2026-10-13T12:00:00Z');
 const md5 = b => createHash('md5').update(b).digest('hex');
@@ -41,7 +42,7 @@ async function setup(t, envelopes = [envA()]) {
   for (const bytes of envelopes) { const d = JSON.parse(bytes); await writeFile(path.join(outboxDir, `${d.deliveryId}.${d.issuedAt}.json`), bytes); }
   return {root, outboxDir, drive: new FakeDrive(), push(extra = {}) { return pushOutbox({drive: this.drive, outboxConfig, mailboxConfig, outboxDir, now, ...extra}); }};
 }
-const queueFor = env => ({ok: true, items: JSON.parse(env).payload.packet.items.map(i => ({...i, status: 'approved', approved_by: 'approver@example.test', approved_at: '2026-10-13T11:00:00Z'}))});
+
 
 test('push: newest live envelope goes to the empty outbox slot once; repeat is already_sent', async t => {
   const s = await setup(t, [envA(now - 1000), envA(now)]);
@@ -98,21 +99,52 @@ test('push: lost response is resolved by reading the slot next time, no second w
   assert.equal(b.drive.count('update'), 2);
 });
 
-test('relay: publishes only a live envelope whose texts are still approved, through the acknowledgement gate', () => {
-  const a = envA();
-  assert.deepEqual(relayDecision({outboxBytes: EMPTY_OUT, approvedQueue: queueFor(a), mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}).status, 'nothing_to_relay');
-  const ok = relayDecision({outboxBytes: a, approvedQueue: queueFor(a), mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now});
+const plainQueueFor = env => ({ok: true, items: JSON.parse(env).payload.packet.items.map(i => ({...i, status: 'approved', approved_by: 'approver@example.test', approved_at: '2026-10-13T11:00:00Z'}))});
+// Authenticated read through the real reader with a fake transport: only such objects are relay authority.
+const authed = (data, at = now) => readApprovedQueue({url: 'https://script.google.com/macros/s/test/exec', token: 'test-token', now: at, fetchImpl: async () => Response.json(data)});
+
+test('relay: publishes only a live envelope whose texts are still approved, through the acknowledgement gate', async () => {
+  const a = envA(), q = await authed(plainQueueFor(a));
+  assert.equal(relayDecision({outboxBytes: EMPTY_OUT, approvedQueue: q, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}).status, 'nothing_to_relay');
+  const ok = relayDecision({outboxBytes: a, approvedQueue: q, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now});
   assert.deepEqual([ok.status, ok.reason, ok.generationAllowed], ['publish', 'mailbox_empty', false]);
-  assert.equal(relayDecision({outboxBytes: a, approvedQueue: queueFor(a), mailboxBytes: a, ackBytes: EMPTY_ACK, now}).status, 'already_published');
-  assert.equal(relayDecision({outboxBytes: a, approvedQueue: queueFor(a), mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now: now + 900000}).status, 'outbox_expired');
-  const revoked = queueFor(a); revoked.items.pop();
-  assert.equal(relayDecision({outboxBytes: a, approvedQueue: revoked, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}).status, 'approval_changed_or_revoked');
-  const edited = queueFor(a); edited.items[0].script_text += ' ';
-  assert.equal(relayDecision({outboxBytes: a, approvedQueue: edited, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}).status, 'approval_changed_or_revoked');
+  assert.equal(relayDecision({outboxBytes: a, approvedQueue: q, mailboxBytes: a, ackBytes: EMPTY_ACK, now}).status, 'already_published');
+  const later = await authed(plainQueueFor(a), now + 900000);
+  assert.equal(relayDecision({outboxBytes: a, approvedQueue: later, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now: now + 900000}).status, 'outbox_expired');
+  const revoked = plainQueueFor(a); revoked.items.pop();
+  assert.equal(relayDecision({outboxBytes: a, approvedQueue: await authed(revoked), mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}).status, 'approval_changed_or_revoked');
   const b = envB();
-  const blocked = relayDecision({outboxBytes: b, approvedQueue: queueFor(b), mailboxBytes: a, ackBytes: EMPTY_ACK, now});
+  const blocked = relayDecision({outboxBytes: b, approvedQueue: await authed(plainQueueFor(b)), mailboxBytes: a, ackBytes: EMPTY_ACK, now});
   assert.deepEqual([blocked.status, blocked.reason], ['blocked', 'previous_not_acknowledged']);
-  assert.throws(() => relayDecision({outboxBytes: Buffer.from('{"x":1}'), approvedQueue: queueFor(a), mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}));
+  assert.throws(() => relayDecision({outboxBytes: Buffer.from('{"x":1}'), approvedQueue: q, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}));
+});
+
+test('relay: saved, copied, mutated or stale queue JSON is never authority, even when it says approved', async () => {
+  const a = envA(), q = await authed(plainQueueFor(a));
+  for (const forged of [plainQueueFor(a), structuredClone(q)])
+    assert.throws(() => relayDecision({outboxBytes: a, approvedQueue: forged, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}), /authenticated/);
+  assert.throws(() => relayDecision({outboxBytes: a, approvedQueue: q, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now: now + 300001}), /authenticated/);
+  const mutated = await authed(plainQueueFor(a)); mutated.items[0].script_text += ' ';
+  assert.throws(() => relayDecision({outboxBytes: a, approvedQueue: mutated, mailboxBytes: EMPTY_BOX, ackBytes: EMPTY_ACK, now}), /authenticated/);
+});
+
+test('malformed mailbox never counts as consumed and blocks the relay', async t => {
+  const fake = Buffer.from(JSON.stringify({status: 'staging_only', deliveryId: JSON.parse(envA()).deliveryId}));
+  const s = await setup(t, [envB()]);
+  s.drive.put(outboxConfig.fileId, OUTBOX_NAME, envA());
+  s.drive.put(mailboxConfig.fileId, MAILBOX_NAME, fake);
+  assert.equal((await s.push()).status, 'blocked_unconsumed');
+  assert.equal(s.drive.count('update'), 0);
+  assert.ok(s.drive.outbox().equals(envA()));
+  // A real envelope with the same deliveryId but different bytes (renewed) is not proof of consumption either.
+  s.drive.put(mailboxConfig.fileId, MAILBOX_NAME, envA(now - 1000));
+  assert.equal((await s.push()).status, 'blocked_unconsumed');
+  // Wrong mailbox metadata (moved file) is not proof either.
+  s.drive.put(mailboxConfig.fileId, MAILBOX_NAME, envA()); s.drive.files.get(mailboxConfig.fileId).parents = ['elsewhere'];
+  assert.equal((await s.push()).status, 'blocked_unconsumed');
+  assert.equal(s.drive.count('update'), 0);
+  const q = await authed(plainQueueFor(envB()));
+  assert.throws(() => relayDecision({outboxBytes: envB(), approvedQueue: q, mailboxBytes: fake, ackBytes: EMPTY_ACK, now}));
 });
 
 test('slot parser accepts only the empty marker or a complete envelope, independent of current time', () => {

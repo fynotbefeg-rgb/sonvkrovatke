@@ -4,8 +4,9 @@
 import {createHash} from 'node:crypto';
 import {promises as fs} from 'node:fs';
 import path from 'node:path';
-import {MAX_DELIVERY_BYTES, parseDelivery} from './windows-plan-delivery.mjs';
+import {MAILBOX_NAME, MAX_DELIVERY_BYTES, parseDelivery} from './windows-plan-delivery.mjs';
 import {mayReplaceDelivery} from './windows-plan-ack.mjs';
+import {assertFreshAuthenticatedQueue} from './approved-four-part-jobs.mjs';
 
 export const OUTBOX_NAME = 'source-plan-outbox-v1.json';
 export const emptyOutbox = () => ({outboxVersion: '1.0.0', status: 'empty'});
@@ -23,10 +24,28 @@ export function parseOutboxSlot(bytes) {
   return parseDelivery(bytes, {now: data.issuedAt}); // full contract check, independent of the current clock
 }
 
-const mailboxDeliveryId = bytes => {
+// Mailbox content must be the exact empty marker or one complete envelope; anything else is refused.
+export function parseMailbox(bytes) {
+  require(bytes.length > 0 && bytes.length <= MAX_DELIVERY_BYTES, 'Invalid mailbox size');
   const data = JSON.parse(Buffer.from(bytes).toString('utf8'));
-  return data.status === 'staging_only' ? data.deliveryId : null;
-};
+  if (data?.status === 'empty') return parseDelivery(bytes);
+  require(data?.status === 'staging_only' && Number.isSafeInteger(data.issuedAt), 'Mailbox holds unexpected data');
+  return parseDelivery(bytes, {now: data.issuedAt});
+}
+
+const mailboxOk = (meta, cfg) => meta && meta.id === cfg.fileId && meta.name === MAILBOX_NAME && !meta.trashed &&
+  meta.mimeType === 'application/json' && (meta.parents || []).includes(cfg.folderId) && Number(meta.size) > 0 &&
+  Number(meta.size) <= MAX_DELIVERY_BYTES && /^[a-f0-9]{32}$/.test(meta.md5Checksum || '');
+
+// The cloud has consumed the slot only if the pinned, checksum-verified mailbox holds exactly the slot's bytes.
+async function consumedByMailbox(drive, mailboxConfig, slotBytes) {
+  const meta = await drive.get(mailboxConfig.fileId);
+  if (!mailboxOk(meta, mailboxConfig)) return false;
+  const bytes = await drive.readJsonBytes(mailboxConfig.fileId, MAX_DELIVERY_BYTES);
+  if (bytes.length !== Number(meta.size) || md5(bytes) !== meta.md5Checksum) return false;
+  try { parseMailbox(bytes); } catch { return false; }
+  return bytes.equals(slotBytes);
+}
 
 // Newest unexpired prepared envelope in the local bridge outbox (files are never deleted here).
 export async function newestPrepared(outboxDir, now) {
@@ -61,8 +80,7 @@ export async function pushOutbox({drive, outboxConfig, mailboxConfig, outboxDir,
   if (current.equals(prepared.bytes)) return result('already_sent');
   const slot = parseOutboxSlot(current);
   if (slot.status !== 'empty' && slot.deliveryId !== prepared.data.deliveryId && clock() < slot.expiresAt) {
-    const consumed = mailboxDeliveryId(await drive.readJsonBytes(mailboxConfig.fileId, MAX_DELIVERY_BYTES)) === slot.deliveryId;
-    if (!consumed) return result('blocked_unconsumed');
+    if (!(await consumedByMailbox(drive, mailboxConfig, current))) return result('blocked_unconsumed');
   }
   const recheck = await drive.get(outboxConfig.fileId);
   require(recheck?.md5Checksum === before.md5Checksum && recheck?.size === before.size, 'Outbox slot changed before write');
@@ -75,12 +93,16 @@ export async function pushOutbox({drive, outboxConfig, mailboxConfig, outboxDir,
 }
 
 const SAME = ['topic_id', 'hook_id', 'script_revision', 'hook_text', 'script_text', 'script_hash'];
-// Cloud side, pure. `approvedQueue` must come from a fresh authenticated read in the same process.
+// Cloud side. `approvedQueue` must be the object returned by readApprovedQueue in this process (fresh, unchanged):
+// saved or copied JSON is refused even if it says "approved". The mailbox must be a complete valid envelope or empty.
 export function relayDecision({outboxBytes, approvedQueue, mailboxBytes, ackBytes, now = Date.now()}) {
+  assertFreshAuthenticatedQueue(approvedQueue, {now});
+  parseMailbox(Buffer.from(mailboxBytes));
   const slot = parseOutboxSlot(outboxBytes);
   if (slot.status === 'empty') return {status: 'nothing_to_relay', ...flags};
   if (now >= slot.expiresAt || slot.issuedAt > now) return {status: 'outbox_expired', deliveryId: slot.deliveryId, ...flags};
-  const live = new Map((approvedQueue?.items || []).filter(i => i.status === 'approved').map(i => [i.version_id, i]));
+  const live = new Map(approvedQueue.items.filter(i => i.status === 'approved' && typeof i.approved_by === 'string' && i.approved_by.trim() &&
+    Number.isFinite(Date.parse(i.approved_at)) && Date.parse(i.approved_at) <= now).map(i => [i.version_id, i]));
   for (const item of slot.payload.packet.items) {
     const current = live.get(item.version_id);
     if (!current || SAME.some(k => current[k] !== item[k])) return {status: 'approval_changed_or_revoked', deliveryId: slot.deliveryId, ...flags};
