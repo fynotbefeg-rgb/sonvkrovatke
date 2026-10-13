@@ -131,3 +131,18 @@ test('limits must be finite integers in range; malformed ledgers are refused unt
   }
   assert.equal(s.calls.length, 0);
 });
+
+test('read-only access check never calls generateContent and does not claim free-tier status', async () => {
+  const {checkGeminiAccess} = await import('./gemini-bounded-client.mjs');
+  const calls = [];
+  const fetchImpl = async (url, init = {}) => { calls.push(String(url));
+    if (String(url).includes('/models?')) return Response.json({models: [{name: 'models/gemini-3-flash-preview', supportedGenerationMethods: ['generateContent']}]});
+    return Response.json({totalTokens: 7}); };
+  const r = await checkGeminiAccess({apiKey: KEY, fetchImpl});
+  assert.deepEqual([r.modelListed, r.sampleTokens, r.generationCalls, r.freeTierAndBilling], [true, 7, 0, 'not_determinable_via_api']);
+  assert.ok(calls.every(u => !u.includes('generateContent')) && calls.some(u => u.includes(':countTokens')));
+  const denied = await checkGeminiAccess({apiKey: KEY, fetchImpl: async () => new Response('{}', {status: 403})});
+  assert.deepEqual([denied.catalogueHttpStatus, denied.modelListed, denied.sampleTokens], [403, false, null]);
+  await assert.rejects(checkGeminiAccess({apiKey: '', fetchImpl}), {code: 'missing_key'});
+  await assert.rejects(checkGeminiAccess({apiKey: KEY, model: 'gemini-pro-expensive', fetchImpl}), {code: 'model_not_allowed'});
+});
