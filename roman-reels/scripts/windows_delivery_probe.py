@@ -81,5 +81,12 @@ if __name__ == '__main__':
         credential=os.environ.get('GDRIVE_SA_JSON');publisher.require(bool(credential),'Existing cloud Drive credential required')
         client=DriveClient.service_account(json.loads(credential),readonly=args.action == 'inspect')
         print(json.dumps(run_probe(client,*ids,args.action)))
-    except (ValueError,DriveError,OSError,KeyError,TypeError,subprocess.SubprocessError):
+    except (ValueError,DriveError,OSError,KeyError,TypeError,subprocess.SubprocessError) as error:
+        # Safe reason only: fixed require() texts, Drive HTTP status or the exception class. Never IDs, bytes or credentials.
+        import re as safe_re
+        text=str(error)
+        if isinstance(error,DriveError):reason=f'drive_http_{error.status}' if error.status else 'drive_error'
+        elif type(error) is ValueError and text.isascii() and len(text) <= 120 and not safe_re.search(r'[A-Za-z0-9_-]{20,}',text):reason=text
+        else:reason=type(error).__name__
+        print(json.dumps({'status':'probe_not_confirmed','reason':reason,'generationAllowed':False,'uploadAllowed':False,'renderAllowed':False}))
         raise SystemExit('Probe not confirmed; inspect private configuration and slot state. No production executed.') from None
