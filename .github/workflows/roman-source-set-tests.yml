@@ -89,6 +89,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-telegram-config.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-plan-delivery.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-plan-ack.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $parseErrors = $null
           $tokens = $null
           [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path roman-reels/scripts/setup-windows-telegram.ps1), [ref]$tokens, [ref]$parseErrors) | Out-Null
