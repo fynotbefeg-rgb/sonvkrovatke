@@ -6,7 +6,8 @@ on:
     branches: [automation/roman-reels-v1, feature/codex-pipeline]
     paths:
       - 'roman-reels/scripts/**'
-      - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
+      - 'roman-reels/docs/**'
+      - 'CLAUDE.md'
       - 'roman-reels/schemas/**'
       - 'roman-reels/research/platform-ending-drafts-v2.json'
       - 'roman-reels/research/gemini-revision-seo/**'
@@ -59,6 +60,7 @@ jobs:
           node roman-reels/scripts/windows-plan-ack.test.mjs
           node roman-reels/scripts/windows-outbox-channel.test.mjs
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
+          node roman-reels/scripts/recovery-drills.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py
           python roman-reels/scripts/windows-delivery-probe.test.py
           python roman-reels/scripts/source-set.test.py
@@ -112,6 +114,8 @@ jobs:
           node roman-reels/scripts/windows-outbox-channel.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/recovery-drills.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $parseErrors = $null
           $tokens = $null
