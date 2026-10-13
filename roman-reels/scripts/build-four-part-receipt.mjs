@@ -10,7 +10,7 @@ const require = (ok, message) => { if (!ok) throw new Error(message); };
 const hex = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 const roles = ['body', 'hook-1', 'hook-2', 'hook-3'];
 
-export function buildFourPartReceipt(packet, journal) {
+export function validateFourPartPacket(packet) {
   require(packet?.draftVersion === '3.0.0' && packet.mode === 'editorial' && packet.productionReady === false,
     'Explicit four-part editorial packet required');
   const source = packet.sourceSet;
@@ -38,6 +38,11 @@ export function buildFourPartReceipt(packet, journal) {
       item.status === 'pending_approval' && item.script_hash === textHash(JSON.stringify([id, version, hook.hook_text, script])),
       'Full-text binding mismatch');
   }
+  return {source, version};
+}
+
+export function buildFourPartReceipt(packet, journal) {
+  const {source, version} = validateFourPartPacket(packet);
   require(journal?.journalVersion === '1.0.0' && journal.jobs && typeof journal.jobs === 'object' &&
     !Array.isArray(journal.jobs) && Object.keys(journal.jobs).length <= 10000, 'Invalid uploader journal');
   const selected = Object.entries(journal.jobs).filter(([, e]) => e.topicId === source.topic_id && e.scriptVersion === version);

@@ -101,6 +101,15 @@ class DriveClient:
                     stream.write(block)
         return count
 
+    def update_json_bytes(self, file_id, body, etag, single_writer=False):
+        if not etag and not single_writer: raise DriveError("Drive state has no ETag or serialized writer")
+        if not isinstance(body, bytes) or not 0 < len(body) <= 65536:
+            raise DriveError("Delivery JSON byte cap exceeded")
+        json.loads(body)  # JSON only, never commands or arbitrary binary.
+        with self.request("PATCH", "files/" + urllib.parse.quote(file_id, safe=""),
+            {"uploadType": "media", "fields": "id,version"}, body, etag, upload=True) as response:
+            return json.load(response)
+
     def update_json(self, file_id, data, etag, single_writer=False):
         if not etag and not single_writer: raise DriveError("Drive state has no ETag or serialized writer")
         body = json.dumps(data, ensure_ascii=False, allow_nan=False).encode("utf-8")
