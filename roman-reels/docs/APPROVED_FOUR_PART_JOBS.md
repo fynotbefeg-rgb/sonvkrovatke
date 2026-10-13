@@ -76,3 +76,16 @@ artifact (в них речь клиента). CLI печатает только 
 пустой/частичный выбор, saved/mutated/stale authority, source/receipt changes,
 invalid/future/duplicate approvals, paths, redirect без token leak,
 HTTP/network/invalid/oversize fail-closed. Все8 прошли локально без сервисов.
+
+## Фактическая проверка 2026-10-13
+
+Код b3316ed: новая suite8/8, общая CI38337924866 success.
+Read-only workflow38337924933/google-queue115102152502 success: старый reader
+и новый строгий reader оба прочитали0 approved items. В логах нового:
+authenticatedRead=true,generationAllowed=false,renderAllowed=false,googleWrites=false.
+Ни планирование, ни задания не создавались. Другие service jobs skipped.
+Причина пустой очереди не устанавливалась: это не доказательство того,
+что Роман не выбирал тему, и не утверждение о текущем значении feature flag.
+Живой непустой shared approval→plan ещё не проверен. Диагностический report
+research/approved-four-part-jobs-20261013/check.json не содержит речевых текстов,
+URL webhook/token и не может авторизовать planner.
