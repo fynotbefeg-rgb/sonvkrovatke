@@ -26,6 +26,21 @@
 | Почтовый ящик заданий | `_windows-jobs/source-plan-v1.json` пуст (`status=empty`); `delivery-config.json` вне Git |
 | Слот подтверждений | `_windows-jobs/source-plan-ack-v1.json` создан, `{"ackVersion":"1.0.0","status":"empty"}`, права: владелец + один читатель, без публичного доступа; `delivery-ack-config.json` вне Git; `ack-windows-plan.mjs` → `waiting` |
 
+## Этап 2 ВЫПОЛНЕН — технический обмен вымышленным пакетом (2026-10-13, 12:52–13:05 UTC)
+
+- Первый `inspect` отказал без причины; PR №41 (`70fac38`, слит владельцем) добавил безопасную причину отказа.
+  Причина: в значениях трёх repository variables был перевод строки в конце; владелец исправил их.
+- `inspect` → зелёный (`empty`); `publish_fixture` → зелёный.
+- Ноутбук (наблюдатель только читал ящик): 12:58:18 обнаружен фиксированный пакет `transport-test`
+  (contentSha256 `cc14ec9f…`); первый проход `ack-windows-plan.mjs` → `received` + `acknowledged`, повтор
+  новым процессом → `already_received` + `already_acknowledged`; один хеш подтверждения в обоих проходах и в
+  слоте Drive, подтверждение привязано к точному конверту; 1 локальное подтверждение, 1 каталог пакета,
+  0 `.partial`; все флаги генерации/загрузки/рендера false. Отчёт: `%LOCALAPPDATA%\RomanReels\delivery-probe\`.
+- Облако: повторный `publish_fixture` → `acknowledged: true`, `already_acknowledged` (без записи).
+- `clear_acknowledged_fixture` → затем `inspect` (владелец). Независимая проверка на ноутбуке: ящик ровно
+  пустой JSON, слот подтверждения хранит запись `transport-test` с false-флагами, локальные пакет и
+  подтверждение сохранены, `receive-windows-plan.mjs` → `waiting`. Бот PID 23064 не трогался.
+
 ## Обновление 2026-10-13, после слияния PR №37–40
 
 - Основной клон: fast-forward до `d6c0dfa` (PR №40), бот PID 23064 не перезапускался.
