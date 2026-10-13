@@ -40,7 +40,9 @@ const fail = (code, message, options) => { throw new UploaderError(code, message
 const canonical = value => JSON.stringify(value, Object.keys(value).sort());
 const sha256 = text => createHash('sha256').update(text).digest('hex');
 
-export function validateJob(raw) {
+export function validateJob(raw, {pathStyle = 'native'} = {}) {
+  if (!['native', 'windows'].includes(pathStyle)) fail('invalid_job', 'Unknown path style');
+  const paths = pathStyle === 'windows' ? path.win32 : path;
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) fail('invalid_job', 'Job must be a JSON object');
   for (const key of Object.keys(raw)) if (!JOB_KEYS.has(key)) fail('invalid_job', `Unknown job field: ${key}`);
   const {schemaVersion, jobId, topicId, scriptVersion, role, localPath, heygenTitle = null, textHash = null} = raw;
@@ -50,13 +52,13 @@ export function validateJob(raw) {
     fail('invalid_job', 'Invalid or reserved topicId');
   if (!Number.isInteger(scriptVersion) || scriptVersion < 1 || scriptVersion > 9999) fail('invalid_job', 'Invalid scriptVersion');
   if (!ROLES.includes(role)) fail('invalid_job', `Role must be one of ${ROLES.join(', ')}`);
-  if (typeof localPath !== 'string' || !path.isAbsolute(localPath) || !/\.mp4$/i.test(localPath) || TEMP_NAME.test(localPath))
+  if (typeof localPath !== 'string' || !paths.isAbsolute(localPath) || !/\.mp4$/i.test(localPath) || TEMP_NAME.test(localPath))
     fail('invalid_job', 'localPath must be an absolute path to a finished .mp4');
   if (heygenTitle !== null && (typeof heygenTitle !== 'string' || heygenTitle.length > 300 || /[\u0000-\u001f]/.test(heygenTitle)))
     fail('invalid_job', 'Invalid heygenTitle');
   if (textHash !== null && (typeof textHash !== 'string' || !/^[a-f0-9]{64}$/.test(textHash)))
     fail('invalid_job', 'textHash must come from the verified job as 64 lowercase hex characters');
-  const job = {schemaVersion, jobId, topicId, scriptVersion, role, localPath: path.resolve(localPath), heygenTitle, textHash};
+  const job = {schemaVersion, jobId, topicId, scriptVersion, role, localPath: paths.resolve(localPath), heygenTitle, textHash};
   return {job, jobDigest: sha256(canonical(job))};
 }
 
@@ -396,6 +398,19 @@ export function driveClient({getToken, fetchImpl = fetch}) {
       const q = `'${parentId.replace(/[\\']/g, '\\$&')}' in parents and name = '${name.replace(/[\\']/g, '\\$&')}' and trashed = false`;
       const data = await json('list', await call('list', `${api}files?${new URLSearchParams({q, fields: `files(${fields})`, pageSize: '10', supportsAllDrives: 'true', includeItemsFromAllDrives: 'true'})}`));
       return data.files || [];
+    },
+    // Bounded read of a pinned private delivery file; no writes or redirects.
+    async readJsonBytes(id, maxBytes = 65536) {
+      const response = await call('readJsonBytes', `${api}files/${encodeURIComponent(id)}?alt=media`,
+        {redirect: 'error', signal: AbortSignal.timeout(30000)});
+      if (!response.ok) throw new DriveHttpError(response.status, 'readJsonBytes');
+      const chunks = []; let total = 0;
+      for await (const chunk of response.body) {
+        total += chunk.length;
+        if (total > maxBytes) fail('delivery_too_large', 'Delivery JSON exceeds byte cap');
+        chunks.push(chunk);
+      }
+      return Buffer.concat(chunks);
     },
     async generateId() {
       const data = await json('generateIds', await call('generateIds', `${api}files/generateIds?count=1&space=drive&type=files`));
