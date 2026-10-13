@@ -58,10 +58,16 @@ export async function readApprovedQueue({url, token, fetchImpl = fetch, now = Da
   } catch { throw new Error('Authenticated production queue unavailable or invalid; no fallback or retry'); }
 }
 
-export function planApprovedUploads(review, bindings, queue, {now = Date.now()} = {}) {
-  const read = queue && receipts.get(queue);
+// Only an object returned by readApprovedQueue in this process, unchanged and at most five minutes old, is authority.
+export function assertFreshAuthenticatedQueue(queue, {now = Date.now()} = {}) {
+  const read = queue && typeof queue === 'object' && receipts.get(queue);
   require(read && read.digest === digest(queue) && Number.isFinite(now) && now >= read.capturedAt &&
     now - read.capturedAt <= 300000, 'Fresh unchanged authenticated queue required; saved JSON is not authority');
+  return queue;
+}
+
+export function planApprovedUploads(review, bindings, queue, {now = Date.now()} = {}) {
+  assertFreshAuthenticatedQueue(queue, {now});
   validateReview(review);
   const selected = queue.items.filter(i => i.topic_id === review.topicId);
   const base = {planVersion: '1.0.0', topicId: review.topicId, scriptVersion: review.revision,
