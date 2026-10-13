@@ -91,3 +91,20 @@ test('invalid or unordered update batches never gain verified provenance',async(
   const api=telegramApi({token,fetchImpl:async()=>new Response(JSON.stringify({ok:true,result:batch}))});await assert.rejects(api.updates(0),/Invalid Telegram batch/);
  }
 });
+function detailed(n=1){return {ok:true,snapshotVersion:'1.0.0',source:'apps_script_review_status',capturedAt:new Date().toISOString(),enabled:true,
+ topics:Array.from({length:n},(_,i)=>({topicId:`review-${i}`,title:`Тема ${i}`,reviewRevision:1,kind:'shared',
+ components:{topic:'approved',body:'pending',hook1:'not_approved',hook2:'unverified',hook3:'binding_changed'}})),approvalWrites:false,productionAllowed:false};}
+test('detailed panel shows each component and paginates without queue writes or approval reads',async t=>{
+ const h=setup(t);h.options.readReviewStatus=async()=>detailed(6);h.options.readCurrentApprovals=async()=>{throw Error('not used')};
+ await handleTelegramPanel(await h.verified(callback('panel:approvals:1')),h.options);
+ assert.match(h.sent[0].text,/Тема 5/);assert.ok(!h.sent[0].text.includes('Тема 0'));
+ for(const part of ['Тема: утверждено','Основа: ожидает решения','Хук 1: не утверждено (таблица)','Хук 2: нет подтверждения','Хук 3: пакет изменён'])assert.ok(h.sent[0].text.includes(part));
+ assert.equal(h.queue.countJobs(),0);
+});
+test('disabled or unavailable detailed view never says Roman rejected everything or falls back to approval',async t=>{
+ const h=setup(t);h.options.readReviewStatus=async()=>({...detailed(0),enabled:false});
+ await handleTelegramPanel(await h.verified(callback('panel:approvals:0')),h.options);assert.match(h.sent[0].text,/не означает, что Роман отклонил/);
+ h.options.readReviewStatus=async()=>{throw Error('private')};
+ assert.equal((await handleTelegramPanel(await h.verified(callback('panel:approvals:0',3)),h.options)).blocked,true);
+ assert.match(h.sent.at(-1).text,/Это не означает отказ/);assert.equal(h.queue.countJobs(),0);
+});

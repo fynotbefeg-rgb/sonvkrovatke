@@ -18,12 +18,14 @@ It is not a completed autonomous video factory.
   waiting for source files or waiting for a Windows worker. They are explicitly
   shown as waiting, never as active avatar generation or montage.
 
-Important source limitation: `get_production_queue` contains only approved
+Original source limitation: `get_production_queue` contains only approved
 variants. It cannot distinguish rejected items from items awaiting a decision,
 and it does not expose the separate topic/body/hook review statuses. The panel
 states this limitation. No pending/rejected decision is inferred from absence.
 Full component status needs a new authenticated read-only Google contract and a
-separate reviewed deployment. That work is not included here.
+separate reviewed deployment. The candidate in REVIEW_STATUS_PANEL.md adds this
+display endpoint and runtime reader; it still requires a Google deployment and
+bot update before those statuses are available live.
 
 The button currently **queues waiting work only**. It does not publish a Windows
 source plan, create speech in HeyGen, upload sources, finalize a receipt, render,

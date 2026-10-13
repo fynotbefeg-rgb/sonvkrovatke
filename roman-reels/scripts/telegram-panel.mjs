@@ -3,6 +3,7 @@
 import {isVerifiedTelegramUpdate} from './telegram-bot-api.mjs';
 import {validateManifest} from './approval-manifest.mjs';
 import {handleVerifiedStart} from './telegram-start-controller.mjs';
+import {validateReviewStatusSnapshot} from './review-status-reader.mjs';
 
 const pageSize=10;
 const displayId=id=>id.length>100?`${id.slice(0,97)}…`:id;
@@ -15,13 +16,13 @@ function authorized(update,ids) {
 }
 const controls=()=>({inline_keyboard:[[{text:'Утверждения Романа',callback_data:'panel:approvals:0'}],
   [{text:'Сейчас создаются',callback_data:'panel:production:0'}]]});
-const pageControls=(kind,page,total)=>({inline_keyboard:[
+const pageControls=(kind,page,total,size=pageSize)=>({inline_keyboard:[
   ...(page>0?[[{text:'Назад',callback_data:`panel:${kind}:${page-1}`}]]:[]),
-  ...((page+1)*pageSize<total?[[{text:'Далее',callback_data:`panel:${kind}:${page+1}`}]]:[]),
+  ...((page+1)*size<total?[[{text:'Далее',callback_data:`panel:${kind}:${page+1}`}]]:[]),
   [{text:'Меню',callback_data:'panel:menu'}]]});
 function currentApproved(data){const items=validateManifest(data);if(items.length>180||items.some(i=>i.status!=='approved'||Date.parse(i.approved_at)>Date.now()))throw Error('Current approved queue required');return items;}
 
-export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,readCurrentApprovals}={}) {
+export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,readCurrentApprovals,readReviewStatus}={}) {
   if(!isVerifiedTelegramUpdate(update))throw Error('Authenticated Telegram transport required');
   const actor=authorized(update,allowedOperatorIds);if(!actor)return {ignored:true};
   if(typeof readCurrentApprovals!=='function')throw Error('Authenticated approval reader required');
@@ -49,6 +50,22 @@ export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,r
   const approvals=data==='/approvals'||match?.[1]==='approvals';
   const menu=['/start','/run','panel:menu'].includes(data);
   if(!approvals&&!menu){await api.send(actor,'Открой /start, /approvals или /production.');return {ignored:true};}
+  if(approvals&&typeof readReviewStatus==='function'){
+    let snapshot;
+    try{snapshot=validateReviewStatusSnapshot(await readReviewStatus());}
+    catch{await api.send(actor,'Подробные статусы Google недоступны. Проверь установку нового обработчика. Это не означает отказ Романа.');return {blocked:true};}
+    const size=5,page=match?Number(match[2]):0,total=snapshot.topics.length;
+    if(page>Math.max(0,Math.ceil(total/size)-1))return {ignored:true};
+    const labels={approved:'утверждено',pending:'ожидает решения',not_approved:'не утверждено (таблица)',
+      unverified:'нет подтверждения',binding_changed:'пакет изменён — нужна проверка',not_created:'не подготовлен'};
+    const names={topic:'Тема',body:'Основа',hook1:'Хук 1',hook2:'Хук 2',hook3:'Хук 3'};
+    const lines=snapshot.topics.slice(page*size,(page+1)*size).map(t=>
+      `${displayId(t.topicId)} · версия ${t.reviewRevision}\n${t.title}\n`+
+      Object.keys(names).map(p=>`${names[p]}: ${labels[t.components[p]]}`).join('\n')).join('\n\n');
+    await api.send(actor,!snapshot.enabled?'Просмотр общего согласования выключен в Google. Это не означает, что Роман отклонил темы.':
+      `Тем на проверке: ${total}\n${lines||'Зарегистрированных тем нет.'}\n\n«Не утверждено» — значение в таблице; автор отказа не подтверждён. Это экран статусов, разрешений на запуск он не выдаёт.`,pageControls('approvals',page,total,size));
+    return {readOnly:true,topics:total};
+  }
   let current,items;
   try{current=await readCurrentApprovals();items=currentApproved(current);}
   catch{await api.send(actor,'Google недоступен или ответ не прошёл проверку. Сохранённые данные не использую для запуска.');return {blocked:true};}
