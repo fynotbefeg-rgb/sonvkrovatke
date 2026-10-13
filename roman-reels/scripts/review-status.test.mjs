@@ -73,6 +73,8 @@ test('reader rejects stale/future/invalid permission metadata, duplicate topics,
   {...base,capturedAt:new Date(Date.now()+60000).toISOString()}, {...base,topics:[base.topics[0],base.topics[0]]},
   {...base,topics:[{...base.topics[0],components:{...base.topics[0].components,topic:'rejected'}}]},
   {...base,privateToken:'bad'}, {...base,enabled:false}])assert.throws(()=>validateReviewStatusSnapshot(bad));
+ // Small coordinator clock lag (Google capture slightly "in the future") is accepted.
+ assert.equal(validateReviewStatusSnapshot({...base,capturedAt:new Date(Date.now()+2000).toISOString()}).ok,true);
 });
 test('reader blocks foreign redirects, malformed/oversized/error responses without retry or leaking secrets',async()=>{
  const choices=[()=>new Response('',{status:302,headers:{location:'https://example.test/echo'}}),()=>new Response('x'.repeat(200001)),
