@@ -115,6 +115,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/recovery-drills.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test roman-reels/scripts/gemini-bounded-client.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $parseErrors = $null
           $tokens = $null
           [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path roman-reels/scripts/setup-windows-telegram.ps1), [ref]$tokens, [ref]$parseErrors) | Out-Null
