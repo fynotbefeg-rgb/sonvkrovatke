@@ -68,6 +68,7 @@ jobs:
           node --test roman-reels/scripts/platform-ending-drafts.test.mjs
           node --test roman-reels/scripts/shared-body-drafts.test.mjs
           node --test roman-reels/scripts/researched-gemini-drafts.test.mjs
+          node --test roman-reels/scripts/gemini-bounded-client.test.mjs
           node --test roman-reels/scripts/source-uploader.test.mjs
           node --test roman-reels/scripts/four-part-receipt-upload.test.mjs
 
