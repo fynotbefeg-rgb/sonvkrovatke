@@ -41,6 +41,18 @@
   пустой JSON, слот подтверждения хранит запись `transport-test` с false-флагами, локальные пакет и
   подтверждение сохранены, `receive-windows-plan.mjs` → `waiting`. Бот PID 23064 не трогался.
 
+## Разрешение A выполнено — живой тест супервизора (2026-10-13, по разрешению владельца)
+
+- Основной клон: fast-forward до `7ba6345` (PR №41). Бот 23064 сверен по командной строке, `serve.pid` и lock,
+  остановлен только он; `--status` → `stale_lock` (PID 23064).
+- Один проход `ensure-roman-runtime.ps1 -BotDeploymentApproved -Receive`: `action=started`, новый PID **4968**,
+  `clearedStaleLock=true`, `confirmation=confirmed`, приёмщик `ok/waiting`, stderr пуст.
+- После завершения прохода поллер жив: `--status` → `running` 4968, один поллер, lock и `serve.pid` его;
+  события `telegram_identity_verified` и `telegram_poll_completed`, ошибок и `retry_wait` нет.
+- Повторный проход: `action=none` (второй поллер не запускается), приёмщик `waiting`.
+- Флаг `ROMAN_TELEGRAM_DEPLOYMENT_APPROVED` не сохранён в пользователе/системе; DPAPI-конфиг, SQLite, курсор
+  не менялись. Задача планировщика **не** зарегистрирована (это разрешение B).
+
 ## Обновление 2026-10-13, после слияния PR №37–40
 
 - Основной клон: fast-forward до `d6c0dfa` (PR №40), бот PID 23064 не перезапускался.
