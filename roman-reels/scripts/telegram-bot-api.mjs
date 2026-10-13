@@ -17,7 +17,8 @@ export function telegramApi({token,fetchImpl=fetch}={}) {
     }catch{throw Error('Telegram request failed; no automatic network retry');}
   }
   return {
-    async identity(){const bot=await call('getMe',{});if(bot?.is_bot!==true||!Number.isSafeInteger(bot.id)||bot.id<=0)throw Error('Invalid bot identity');return String(bot.id);},
+    async identity(expectedUsername){const bot=await call('getMe',{});if(bot?.is_bot!==true||!Number.isSafeInteger(bot.id)||bot.id<=0||
+      (expectedUsername!==undefined&&bot.username!==expectedUsername))throw Error('Invalid bot identity');return String(bot.id);},
     async updates(offset){
       if(!Number.isSafeInteger(offset)||offset<0)throw Error('Invalid update offset');
       const data=await call('getUpdates',{offset,limit:20,timeout:20,allowed_updates:['message','callback_query']});
