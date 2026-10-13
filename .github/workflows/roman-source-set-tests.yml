@@ -45,6 +45,7 @@ jobs:
           python roman-reels/scripts/four-part-drive-intake.test.py
           python roman-reels/scripts/four-part-drive-fixture.test.py
           node roman-reels/scripts/four-part-receipt.test.mjs
+          node roman-reels/scripts/approved-four-part-jobs.test.mjs
           python roman-reels/scripts/source-set.test.py
           python roman-reels/scripts/assembled-jobs.test.py
           python roman-reels/scripts/shared-body-development.test.py
