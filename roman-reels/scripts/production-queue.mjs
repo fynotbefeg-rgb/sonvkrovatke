@@ -36,7 +36,9 @@ export class ProductionQueue {
         production_key TEXT PRIMARY KEY, provider TEXT NOT NULL, state TEXT NOT NULL,
         snapshot TEXT NOT NULL, expected_name TEXT NOT NULL, requested_by TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS callbacks (
-        id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, actor_id TEXT NOT NULL, response TEXT NOT NULL);`);
+        id TEXT PRIMARY KEY, ticket_id TEXT NOT NULL, actor_id TEXT NOT NULL, response TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS telegram_offsets (
+        bot_id TEXT PRIMARY KEY, next_offset INTEGER NOT NULL);`);
   }
   close() { this.db.close(); }
 
@@ -109,6 +111,23 @@ export class ProductionQueue {
       requested_by: row.requested_by, generation_started: false, render_allowed: false};
   }
   countJobs() { return this.db.prepare('SELECT count(*) AS count FROM jobs').get().count; }
+
+  // Panel metadata only: never export stored speech/approver identities.
+  listPanelJobs({limit=10, offset=0}={}) {
+    if (!Number.isSafeInteger(limit)||limit<1||limit>20||!Number.isSafeInteger(offset)||offset<0) throw Error('Invalid panel page');
+    return this.db.prepare('SELECT state,snapshot FROM jobs ORDER BY rowid LIMIT ? OFFSET ?').all(limit,offset)
+      .map(row=>{const item=JSON.parse(row.snapshot);return {version_id:item.version_id,state:row.state};});
+  }
+  telegramOffset(botId) {
+    actorId(botId);
+    return this.db.prepare('SELECT next_offset FROM telegram_offsets WHERE bot_id=?').get(botId)?.next_offset??0;
+  }
+  advanceTelegramOffset(botId,next) {
+    actorId(botId);
+    if(!Number.isSafeInteger(next)||next<0)throw Error('Invalid Telegram offset');
+    this.db.prepare(`INSERT INTO telegram_offsets VALUES (?, ?) ON CONFLICT(bot_id)
+      DO UPDATE SET next_offset=max(telegram_offsets.next_offset,excluded.next_offset)`).run(botId,next);
+  }
 
   // Migrates a WAITING job. It cannot create another generation of the same script.
   // A future worker must recheck live approvals and atomically claim before Generate.
