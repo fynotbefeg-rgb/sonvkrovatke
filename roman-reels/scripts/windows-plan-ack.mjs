@@ -118,7 +118,8 @@ export function isAcknowledged(mailboxBytes, ackBytes) {
   let ack;
   try { ack = parseAckSlot(ackBytes); } catch { return false; }
   return ack.status === 'received' && ack.deliveryId === data.deliveryId && ack.contentSha256 === sha(mailboxBytes) &&
-    ack.planKey === data.payload.planKey && ack.expiresAt === data.expiresAt;
+    ack.planKey === data.payload.planKey && ack.expiresAt === data.expiresAt && ack.issuedAt === data.issuedAt &&
+    ack.topicId === data.payload.topicId && ack.scriptVersion === data.payload.scriptVersion;
 }
 
 // The coordinator never replaces an unacknowledged delivery with a different one. Renewal of the same plan is allowed.

@@ -1,9 +1,10 @@
 """One pre-created user-owned Drive mailbox, one trusted cloud writer.
 
 This is data delivery only, never avatar/render execution or approval authority.
-No file creation, no overwriting a different outstanding plan, no blind write retry.
+No file creation, no overwriting an unacknowledged different plan, no blind write retry.
 """
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -18,6 +19,8 @@ MAX_BYTES = 65536
 FOLDER = 'application/vnd.google-apps.folder'
 ASSETS = '1bLzHi6K1HxXesmRj_dhghCsWk5spcPuf'
 VALIDATOR = Path(__file__).with_name('validate-windows-delivery.mjs')
+REPLACEMENT_VALIDATOR = Path(__file__).with_name('validate-windows-replacement.mjs')
+MAX_ACK_BYTES = 4096
 
 
 def require(ok, message):
@@ -35,9 +38,11 @@ def stable(file):
     return {k:file.get(k) for k in ['id','name','mimeType','parents','size','md5Checksum','version','trashed']}
 
 
-def publish(client, file_id, folder_id, bytes_, single_writer=False):
+def publish(client, file_id, folder_id, bytes_, single_writer=False, ack_file_id=None):
     require(single_writer is True, 'Explicit serialized cloud writer required')
     require(all(isinstance(x,str) and re.fullmatch(r'[A-Za-z0-9_-]{10,100}',x) for x in [file_id,folder_id]), 'Pinned mailbox IDs required')
+    require(ack_file_id is None or (isinstance(ack_file_id,str) and re.fullmatch(r'[A-Za-z0-9_-]{10,100}',ack_file_id) and
+            ack_file_id not in [file_id,folder_id]), 'Separate pinned acknowledgement ID required')
     new_meta, new = validated(bytes_)
     require(new_meta['status'] == 'staging_only', 'Publisher does not clear an outstanding delivery')
     folder,_ = client.metadata(folder_id)
@@ -57,10 +62,32 @@ def publish(client, file_id, folder_id, bytes_, single_writer=False):
         require(old == {'deliveryVersion':'1.0.0','status':'empty','generationAllowed':False,'renderAllowed':False}, 'Invalid empty mailbox')
     else:
         # Expired same plan may be renewed; a different plan is never lost by overwrite.
+        same_plan = old.get('deliveryId') == new_meta['deliveryId'] and old.get('payload') == new['payload']
         require(old.get('deliveryVersion') == '1.0.0' and old.get('status') == 'staging_only' and
                 old.get('generationAllowed') is False and old.get('renderAllowed') is False and
-                old.get('deliveryId') == new_meta['deliveryId'] and old.get('payload') == new['payload'],
-                'A different outstanding delivery must be reconciled first')
+                (same_plan or ack_file_id is not None), 'A different outstanding delivery must be reconciled first')
+        ack_bytes = None
+        ack_before = None
+        if not same_plan:
+            ack_before,_ = client.metadata(ack_file_id)
+            require(ack_before.get('id') == ack_file_id and ack_before.get('name') == 'source-plan-ack-v1.json' and
+                    ack_before.get('mimeType') == 'application/json' and not ack_before.get('trashed') and
+                    folder_id in ack_before.get('parents',[]) and 0 < int(ack_before.get('size',0)) <= MAX_ACK_BYTES,
+                    'Acknowledgement slot identity mismatch')
+            with tempfile.TemporaryDirectory() as directory:
+                ack_path=Path(directory)/'ack.json';client.download(ack_file_id,ack_path,MAX_ACK_BYTES)
+                ack_bytes=ack_path.read_bytes()
+            require(len(ack_bytes) == int(ack_before['size']) and
+                    hashlib.md5(ack_bytes,usedforsecurity=False).hexdigest() == ack_before.get('md5Checksum'),
+                    'Acknowledgement checksum mismatch')
+        request = {key:base64.b64encode(value).decode('ascii') if value is not None else None
+                   for key,value in [('current',old_bytes),('next',bytes_),('ack',ack_bytes)]}
+        reply = subprocess.run(['node',str(REPLACEMENT_VALIDATOR)],input=json.dumps(request).encode(),capture_output=True,timeout=20)
+        require(reply.returncode == 0 and json.loads(reply.stdout).get('allowed') is True,
+                'Outstanding delivery acknowledgement not confirmed')
+        if ack_before is not None:
+            ack_current,_ = client.metadata(ack_file_id)
+            require(stable(ack_current) == stable(ack_before), 'Acknowledgement changed before write')
     current,_ = client.metadata(file_id)
     require(stable(current) == stable(before), 'Mailbox changed before write')
     if old_bytes == bytes_:
@@ -87,6 +114,7 @@ if __name__ == '__main__':
         info=os.environ.get('GDRIVE_SA_JSON');require(bool(info),'Existing cloud Drive credential required')
         client=DriveClient.service_account(json.loads(info))
         print(json.dumps(publish(client,os.environ.get('ROMAN_WINDOWS_DELIVERY_FILE_ID'),
-                                 os.environ.get('ROMAN_WINDOWS_DELIVERY_FOLDER_ID'),bytes_,single_writer=True)))
+                                 os.environ.get('ROMAN_WINDOWS_DELIVERY_FOLDER_ID'),bytes_,single_writer=True,
+                                 ack_file_id=os.environ.get('ROMAN_WINDOWS_DELIVERY_ACK_FILE_ID'))))
     except (ValueError,DriveError,OSError,subprocess.SubprocessError,KeyError,TypeError):
         raise SystemExit('Windows delivery not confirmed; inspect auth/config/state privately. No jobs executed.') from None

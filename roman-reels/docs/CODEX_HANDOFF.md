@@ -880,3 +880,13 @@ Owner explicitly says Roman has not viewed/approved the proposed topics. This ov
 ## 2026-10-13 — Windows delivery acknowledgement candidate (code/tests only)
 
 windows-plan-ack.mjs + ack-windows-plan.mjs: receipt ack v1 bound to deliveryId, envelope contentSha256, planKey and expiresAt; created only in receiveDelivery afterVerified (under receive.lock, after full staging and verifyStaged re-read, also new for fresh staging). Separate stores: local delivery-acks (tmp+fsync+hard link, reused bytes on repeat) and one pinned owner-created Drive slot source-plan-ack-v1.json (PATCH by ID, identical bytes no write, foreign content not overwritten, readback). Expired/corrupt/tampered/foreign never acknowledged. Coordinator mayReplaceDelivery blocks a different plan unless the exact current bytes are acknowledged; publisher wiring not done. Ack is never approval/upload/generation/render permission. 9 offline tests. No live Drive/bot/Google changes. WINDOWS_PLAN_ACK.md.
+## 2026-10-13 — publisher acknowledgement guard, prepared only
+
+Follow-up to the Windows acknowledgement branch: publish-windows-plan.py may replace a different
+outstanding plan only with a pinned, checksum-verified acknowledgement of the exact current envelope.
+Optional ROMAN_WINDOWS_DELIVERY_ACK_FILE_ID is read-only; no live setting or file was created.
+Same-plan renewal and empty mailbox remain compatible. Shared Node validator checks complete old
+contracts even after expiry, preserves exact bytes, and matches topic/revision/issuedAt as well as hashes.
+Python publisher 12/12, ack 9/9 and delivery 10/10 passed locally. Windows CI now includes delivery/ack.
+One serialized cloud writer required; cross-file readback guard is not distributed CAS. No live bot,
+Google, Drive, generation, upload or render changed. PR35 is a dependency, not merged here.
