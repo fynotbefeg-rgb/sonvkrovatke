@@ -899,3 +899,14 @@ matching receipt; preserve ack/local records, refuse real or modified plans. Exi
 remains in Actions; three pinned file/folder IDs are private vars and have NOT been configured.
 Eight offline probe tests passed. CI covers Python publisher/probe on Windows and Linux. No live
 dispatch, Drive file, bot, Google or scheduler changes. This does not connect the local outbox to cloud.
+
+
+## 2026-10-13 — re-review after Windows fixes and completed credential rotation
+
+Owner reports webhook rotation completed in Google Script Properties, Windows DPAPI and GitHub Actions; clipboard cleared, one bot PID21944, supervisor enabled. Root did not inspect token values or independently control Windows. Old leaked token must not be reused.
+
+PR43 re-reviewed at ee6176d6c8572ea71a15f637405a4b696d197f30: fresh unchanged authenticated queue provenance enforced; consumption requires pinned valid mailbox metadata/checksum/full envelope and identical bytes. Nine outbox tests and adjacent queue/ack suites passed offline, exact-head CI38458162987 succeeded. Prior blocking review explicitly cleared; owner-authorized merge02e3c6cfda67b63320a3eb13ae937bd8502f164a.
+
+PR44 re-reviewed: exclusive cross-process reservation, unique temp files, strict limits and ledger schema address earlier blockers. Eight fake-fetch tests passed, including actual child processes; cloud sandbox initially suppressed child stdout, rerun with supported execution permissions passed. No real Gemini API calls or credentials used. Base integration89ba012c807aa7b98c5c7c1bf2ec92537ac6cfd5 retains recovery/outbox/Gemini tests in both Linux and Windows jobs. Exact-head CI38459344941 passed Linux and Windows; prior blocking comment cleared and owner-authorized merge ef74b92a6ce3a75ed4b14d9373a3fa3d7e7e369b completed. Both PR43 and PR44 are merged; main unchanged.
+
+Next Claude tasks: CLAUDE_NEXT_AUTOMATION_TASK.md (outbox CLI/cloud relay, then integrate bounded Gemini adapter into editorial CLI; code/tests only). Current direct editorial CLI does not yet use the adapter; merging the adapter alone does not offload work or enforce its budget on that CLI. Shared cloud ledger persistence still needs design. Three replacement SEO hooks are accepted in owner-relayed conversation, exact liked body still awaits Roman. No server approval receipts may be fabricated.
