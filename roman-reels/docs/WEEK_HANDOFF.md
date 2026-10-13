@@ -183,3 +183,7 @@ node scripts/receive-windows-plan.mjs
 ```
 и (после слияния этапа 3) `node scripts/run-windows-supervisor.mjs --status`.
 Ожидается: `authenticatedRead=true`, `waiting`, `running`; все флаги генерации и рендера false.
+
+## 2026-10-13 — просмотр двух тем для Романа включён
+
+По плану PR №47: проверки пройдены, `ROMAN_SHARED_REVIEW_ENABLED` (ключа не было) = true, две topic-only регистрации — строки **11** и **12**, тема pending, основа/хуки not_created, очередь 0. Подробности и откат — `ROMAN_TOPIC_REVIEW_ENABLED.md`; сообщение Роману — `ROMAN_TOPIC_REVIEW_MESSAGE_ROWS.md` (не отправлено). Инцидент: значение webhook-токена попало в вывод сессии — рекомендована смена токена отдельным разрешением. Следующая задача: после правки Романа проверить квитанцию выбора; если `e.user` пуст — блокер.
