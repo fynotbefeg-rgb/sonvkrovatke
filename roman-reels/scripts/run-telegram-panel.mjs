@@ -11,6 +11,7 @@ import {pollTelegramPanelOnce} from './telegram-panel.mjs';
 import {loadWindowsTelegramConfig} from './windows-telegram-config.mjs';
 import {readReviewStatuses} from './review-status-reader.mjs';
 import {runTelegramPoller} from './telegram-poll-recovery.mjs';
+import {readCandidateCatalog} from './telegram-candidates.mjs';
 
 async function main(){
   const mode=process.argv[2],windows=mode?.startsWith('--windows-');
@@ -36,7 +37,8 @@ async function main(){
     try{
       await runTelegramPoller({identify:()=>api.identity(config?.botUsername),
         poll:botId=>pollTelegramPanelOnce({api,botId,queue,allowedOperatorIds:ids,
-          readCurrentApprovals:()=>readApprovedQueue({url,token}),readReviewStatus:()=>readReviewStatuses({url,token})}),
+          readCurrentApprovals:()=>readApprovedQueue({url,token}),readReviewStatus:()=>readReviewStatuses({url,token}),
+          readCandidates:()=>readCandidateCatalog(windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-panel','candidate-topics.json'):process.env.ROMAN_TELEGRAM_CANDIDATES_PATH)}),
         continuous:['--serve','--windows-serve'].includes(mode),log:record=>console.log(JSON.stringify(record))});
     }finally{queue.close();}
   });

@@ -4,6 +4,7 @@ import {isVerifiedTelegramUpdate} from './telegram-bot-api.mjs';
 import {validateManifest} from './approval-manifest.mjs';
 import {handleVerifiedStart} from './telegram-start-controller.mjs';
 import {validateReviewStatusSnapshot} from './review-status-reader.mjs';
+import {validateCandidateCatalog} from './telegram-candidates.mjs';
 
 const pageSize=10;
 const displayId=id=>id.length>100?`${id.slice(0,97)}…`:id;
@@ -14,7 +15,8 @@ function authorized(update,ids) {
   const sender=event?.from?.id;
   return Number.isSafeInteger(sender)&&sender>0&&ids.includes(String(sender))&&chat?.type==='private'&&chat.id===sender?sender:null;
 }
-const controls=()=>({inline_keyboard:[[{text:'Утверждения Романа',callback_data:'panel:approvals:0'}],
+const controls=()=>({inline_keyboard:[[{text:'Кандидаты тем',callback_data:'panel:candidates:0'}],
+  [{text:'Утверждения Романа',callback_data:'panel:approvals:0'}],
   [{text:'Сейчас создаются',callback_data:'panel:production:0'}]]});
 const pageControls=(kind,page,total,size=pageSize)=>({inline_keyboard:[
   ...(page>0?[[{text:'Назад',callback_data:`panel:${kind}:${page-1}`}]]:[]),
@@ -22,7 +24,7 @@ const pageControls=(kind,page,total,size=pageSize)=>({inline_keyboard:[
   [{text:'Меню',callback_data:'panel:menu'}]]});
 function currentApproved(data){const items=validateManifest(data);if(items.length>180||items.some(i=>i.status!=='approved'||Date.parse(i.approved_at)>Date.now()))throw Error('Current approved queue required');return items;}
 
-export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,readCurrentApprovals,readReviewStatus}={}) {
+export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,readCurrentApprovals,readReviewStatus,readCandidates}={}) {
   if(!isVerifiedTelegramUpdate(update))throw Error('Authenticated Telegram transport required');
   const actor=authorized(update,allowedOperatorIds);if(!actor)return {ignored:true};
   if(typeof readCurrentApprovals!=='function')throw Error('Authenticated approval reader required');
@@ -37,7 +39,17 @@ export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,r
     await api.send(actor,`Добавлено в очередь: ${result.created}.\nВсего вариантов в этом запросе: ${result.jobs.length}.\nОжидают исходников. Генерация аватара и монтаж этой кнопкой пока не запускаются.`,controls());
     return {created:result.created,generationAllowed:false,renderAllowed:false};
   }
-  const match=/^panel:(approvals|production):(0|[1-9][0-9]{0,3})$/.exec(data);
+  const match=/^panel:(approvals|production|candidates):(0|[1-9][0-9]{0,3})$/.exec(data);
+  if(data==='/candidates'||match?.[1]==='candidates'){
+    let catalog;
+    try{if(typeof readCandidates!=='function')throw Error();catalog=validateCandidateCatalog(await readCandidates());}
+    catch{await api.send(actor,'Список кандидатов пока не подключён или не прошёл проверку. Утверждений и заданий это не создаёт.',controls());return {blocked:true};}
+    const page=match?Number(match[2]):0,total=catalog.topics.length;
+    if(page>Math.max(0,total-1))return {ignored:true};
+    const topic=catalog.topics[page];
+    await api.send(actor,topic?`Кандидат ${page+1} из ${total}\n${topic.title}\n\nОжидает просмотра Романом. Тема не согласована.\n\nЗадача бизнеса: ${topic.businessTask}\n\nРеференс: ${topic.referenceUrl}\n${topic.evidenceNote}\n\nГенерация текста и видео не запускается.`:'Кандидатов пока нет.',pageControls('candidates',page,total,1));
+    return {readOnly:true,candidates:total,reviewApprovalGranted:false};
+  }
   if(data==='/production'||match?.[1]==='production') {
     const page=match?Number(match[2]):0,total=queue.countJobs();
     if(page>Math.max(0,Math.ceil(total/pageSize)-1))return {ignored:true};
@@ -49,7 +61,7 @@ export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,r
   }
   const approvals=data==='/approvals'||match?.[1]==='approvals';
   const menu=['/start','/run','panel:menu'].includes(data);
-  if(!approvals&&!menu){await api.send(actor,'Открой /start, /approvals или /production.');return {ignored:true};}
+  if(!approvals&&!menu){await api.send(actor,'Открой /start, /candidates, /approvals или /production.');return {ignored:true};}
   if(approvals&&typeof readReviewStatus==='function'){
     let snapshot;
     try{snapshot=validateReviewStatusSnapshot(await readReviewStatus());}
@@ -68,7 +80,7 @@ export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,r
   }
   let current,items;
   try{current=await readCurrentApprovals();items=currentApproved(current);}
-  catch{await api.send(actor,'Google недоступен или ответ не прошёл проверку. Сохранённые данные не использую для запуска.');return {blocked:true};}
+  catch{await api.send(actor,'Google недоступен или ответ не прошёл проверку. Сохранённые данные не использую для запуска.',controls());return {blocked:true};}
   if(approvals) {
     const page=match?Number(match[2]):0;
     if(page>Math.max(0,Math.ceil(items.length/pageSize)-1))return {ignored:true};
