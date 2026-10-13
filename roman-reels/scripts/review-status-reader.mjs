@@ -2,11 +2,13 @@
 const exact=(x,fields)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===fields.length&&Object.keys(x).every(k=>fields.includes(k));
 const parts=['topic','body','hook1','hook2','hook3'];
 const states=['pending','approved','not_approved','unverified','binding_changed','not_created'];
+// Google's capture time can be slightly ahead of the coordinator clock (observed ~0.5 s on Windows).
+const CLOCK_SKEW_MS=30000;
 export function validateReviewStatusSnapshot(data,{now=Date.now()}={}){
   const captured=Date.parse(data?.capturedAt);
   if(!exact(data,['ok','snapshotVersion','source','capturedAt','enabled','topics','approvalWrites','productionAllowed'])||data.ok!==true||
     data.snapshotVersion!=='1.0.0'||data.source!=='apps_script_review_status'||typeof data.enabled!=='boolean'||
-    data.approvalWrites!==false||data.productionAllowed!==false||!Number.isFinite(now)||!Number.isFinite(captured)||captured>now||now-captured>300000||
+    data.approvalWrites!==false||data.productionAllowed!==false||!Number.isFinite(now)||!Number.isFinite(captured)||captured>now+CLOCK_SKEW_MS||now-captured>300000||
     !Array.isArray(data.topics)||data.topics.length>90||(!data.enabled&&data.topics.length))throw Error('Invalid current review status');
   const ids=new Set();
   for(const t of data.topics){

@@ -38,8 +38,10 @@ the new shared-body four-part worker. That integration remains separate.
 
 `telegram-bot-api.mjs` talks only to fixed `https://api.telegram.org` Bot API
 methods through POST, rejects redirects, bounds response bytes, and removes
-token-containing details from errors. Network failures stop without automatic
-retries. `getUpdates` allows only messages and callbacks, twenty per poll.
+token-containing details from errors. The transport does not retry its own calls.
+The candidate in TELEGRAM_RECOVERY.md retries whole polling cycles for transient
+errors in continuous mode, retaining cursor/queue guards; one-poll probes and
+terminal errors still stop. `getUpdates` allows only messages and callbacks, twenty per poll.
 
 Only objects actually returned by that authenticated polling instance gain local
 WeakSet provenance; copied objects or arbitrary HTTP JSON are rejected by the
