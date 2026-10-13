@@ -48,6 +48,7 @@ jobs:
           node roman-reels/scripts/approved-four-part-jobs.test.mjs
           node roman-reels/scripts/production-queue.test.mjs
           node roman-reels/scripts/telegram-panel.test.mjs
+          node roman-reels/scripts/telegram-poll-recovery.test.mjs
           node roman-reels/scripts/review-status.test.mjs
           node roman-reels/scripts/shared-review.test.mjs
           node roman-reels/scripts/topic-only-review.test.mjs
@@ -79,6 +80,8 @@ jobs:
           node roman-reels/scripts/production-queue.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/telegram-panel.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/telegram-poll-recovery.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-telegram-config.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

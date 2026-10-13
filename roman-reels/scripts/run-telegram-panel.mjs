@@ -6,10 +6,11 @@ import {mkdir,chmod} from 'node:fs/promises';
 import {ProductionQueue} from './production-queue.mjs';
 import {withLock} from './source-uploader.mjs';
 import {readApprovedQueue} from './approved-four-part-jobs.mjs';
-import {telegramApi} from './telegram-bot-api.mjs';
+import {telegramApi,safeTelegramError} from './telegram-bot-api.mjs';
 import {pollTelegramPanelOnce} from './telegram-panel.mjs';
 import {loadWindowsTelegramConfig} from './windows-telegram-config.mjs';
 import {readReviewStatuses} from './review-status-reader.mjs';
+import {runTelegramPoller} from './telegram-poll-recovery.mjs';
 
 async function main(){
   const mode=process.argv[2],windows=mode?.startsWith('--windows-');
@@ -33,13 +34,11 @@ async function main(){
   await withLock(`${file}.lock`,async()=>{
     const queue=new ProductionQueue(file);await chmod(file,0o600);
     try{
-      const botId=await api.identity(config?.botUsername);
-      do{
-        const result=await pollTelegramPanelOnce({api,botId,queue,allowedOperatorIds:ids,
-          readCurrentApprovals:()=>readApprovedQueue({url,token}),readReviewStatus:()=>readReviewStatuses({url,token})});
-        console.log(JSON.stringify(result));
-      }while(['--serve','--windows-serve'].includes(mode));
+      await runTelegramPoller({identify:()=>api.identity(config?.botUsername),
+        poll:botId=>pollTelegramPanelOnce({api,botId,queue,allowedOperatorIds:ids,
+          readCurrentApprovals:()=>readApprovedQueue({url,token}),readReviewStatus:()=>readReviewStatuses({url,token})}),
+        continuous:['--serve','--windows-serve'].includes(mode),log:record=>console.log(JSON.stringify(record))});
     }finally{queue.close();}
   });
 }
-main().catch(()=>{console.error('Telegram panel stopped; inspect configuration privately. No avatar generation or rendering performed.');process.exitCode=1;});
+main().catch(error=>{console.error(JSON.stringify({event:'telegram_stopped',...safeTelegramError(error),generationAllowed:false,renderAllowed:false}));process.exitCode=1;});
