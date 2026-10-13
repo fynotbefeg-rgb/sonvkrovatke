@@ -72,7 +72,26 @@ function metadataOk(file,config) {
     file.parents?.includes(config.folderId) && Number(file.size)>0 && Number(file.size)<=MAX_DELIVERY_BYTES && /^[a-f0-9]{32}$/.test(file.md5Checksum);
 }
 
-export async function receiveDelivery({drive,config,inbox,now=Date.now}) {
+// Re-reads every staged file from disk and checks it against the verified delivery.
+export async function verifyStaged(destination,data) {
+  const old=JSON.parse(await fs.readFile(path.join(destination,'payload.json'),'utf8'));
+  require(digest(old)===data.deliveryId,'Existing staged data changed');
+  const packet=JSON.parse(await fs.readFile(path.join(destination,'packet.json'),'utf8'));
+  require(digest(packet)===digest(data.payload.packet),'Staged packet changed');
+  const entries=await fs.readdir(path.join(destination,'jobs'));
+  require(entries.length===4 && entries.every(name=>roles.some(role=>name===`${role}.json`)), 'Staged jobs changed');
+  for(const job of data.payload.jobs) {
+    const saved=JSON.parse(await fs.readFile(path.join(destination,'jobs',`${job.role}.json`),'utf8'));
+    require(digest(saved)===digest(job),'Staged job changed');
+  }
+  const receipt=JSON.parse(await fs.readFile(path.join(destination,'delivery.json'),'utf8'));
+  require(receipt.deliveryId===data.deliveryId && receipt.generationAllowed===false && receipt.renderAllowed===false &&
+    receipt.currentApprovalRecheckRequired===true,'Staged safety flags changed');
+}
+
+// afterVerified({data,contentSha256,destination}) runs under the receive lock only once the whole
+// staged package has been saved and re-read successfully (used by the acknowledgement step).
+export async function receiveDelivery({drive,config,inbox,now=Date.now,afterVerified=null}) {
   const clock=typeof now==='function'?now:()=>now;
   require(exact(config,['fileId','folderId']) && [config.fileId,config.folderId].every(s=>typeof s==='string' && /^[A-Za-z0-9_-]{10,100}$/.test(s)), 'Pinned mailbox file/folder config required');
   const folder=await drive.get(config.folderId);
@@ -91,21 +110,14 @@ export async function receiveDelivery({drive,config,inbox,now=Date.now}) {
     let exists=false;
     try {const stat=await fs.lstat(destination);require(stat.isDirectory()&&!stat.isSymbolicLink(),'Unsafe staged directory');exists=true;}
     catch(error){if(error.code!=='ENOENT')throw error;}
+    const contentSha256=hash(bytes);
+    const finish=async status=>{
+      const extra=afterVerified?await afterVerified({data,contentSha256,destination}):{};
+      return {...result,status,deliveryId:data.deliveryId,...(status==='received'?{jobs:4}:{}),...extra};
+    };
     if(exists) {
-      const old=JSON.parse(await fs.readFile(path.join(destination,'payload.json'),'utf8'));
-      require(digest(old)===data.deliveryId,'Existing staged data changed');
-      const packet=JSON.parse(await fs.readFile(path.join(destination,'packet.json'),'utf8'));
-      require(digest(packet)===digest(data.payload.packet),'Staged packet changed');
-      const entries=await fs.readdir(path.join(destination,'jobs'));
-      require(entries.length===4 && entries.every(name=>roles.some(role=>name===`${role}.json`)), 'Staged jobs changed');
-      for(const job of data.payload.jobs) {
-        const saved=JSON.parse(await fs.readFile(path.join(destination,'jobs',`${job.role}.json`),'utf8'));
-        require(digest(saved)===digest(job),'Staged job changed');
-      }
-      const receipt=JSON.parse(await fs.readFile(path.join(destination,'delivery.json'),'utf8'));
-      require(receipt.deliveryId===data.deliveryId && receipt.generationAllowed===false && receipt.renderAllowed===false &&
-        receipt.currentApprovalRecheckRequired===true,'Staged safety flags changed');
-      return {...result,status:'already_received',deliveryId:data.deliveryId};
+      await verifyStaged(destination,data);
+      return finish('already_received');
     }
     // A previous crash remains visible; never overwrite or silently clear partial data.
     await fs.mkdir(pending,{recursive:false,mode:0o700});
@@ -117,6 +129,7 @@ export async function receiveDelivery({drive,config,inbox,now=Date.now}) {
       generationAllowed:false,renderAllowed:false,currentApprovalRecheckRequired:true});
     require(clock()<data.expiresAt,'Delivery expired before staging completed');
     await fs.rename(pending,destination);
-    return {...result,status:'received',deliveryId:data.deliveryId,jobs:4};
+    await verifyStaged(destination,data);
+    return finish('received');
   });
 }

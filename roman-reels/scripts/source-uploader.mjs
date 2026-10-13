@@ -412,6 +412,11 @@ export function driveClient({getToken, fetchImpl = fetch}) {
       }
       return Buffer.concat(chunks);
     },
+    // Replace the bytes of one existing pinned JSON file (acknowledgement slot); never creates files.
+    async updateJsonBytes(id, bytes) {
+      return json('updateJsonBytes', await call('updateJsonBytes', `${upload}files/${encodeURIComponent(id)}?uploadType=media&fields=${fields}&supportsAllDrives=true`,
+        {method: 'PATCH', redirect: 'error', headers: {'content-type': 'application/json'}, body: bytes}, {replayable: false}));
+    },
     async generateId() {
       const data = await json('generateIds', await call('generateIds', `${api}files/generateIds?count=1&space=drive&type=files`));
       return data.ids[0];
