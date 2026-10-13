@@ -57,6 +57,7 @@ jobs:
           node roman-reels/scripts/windows-telegram-config.test.mjs
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           node roman-reels/scripts/windows-plan-ack.test.mjs
+          node roman-reels/scripts/windows-outbox-channel.test.mjs
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py
           python roman-reels/scripts/windows-delivery-probe.test.py
