@@ -6,7 +6,8 @@ on:
     branches: [automation/roman-reels-v1, feature/codex-pipeline]
     paths:
       - 'roman-reels/scripts/**'
-      - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
+      - 'roman-reels/docs/**'
+      - 'CLAUDE.md'
       - 'roman-reels/schemas/**'
       - 'roman-reels/research/platform-ending-drafts-v2.json'
       - 'roman-reels/research/gemini-revision-seo/**'
