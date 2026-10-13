@@ -72,6 +72,7 @@ jobs:
           node --test roman-reels/scripts/shared-body-drafts.test.mjs
           node --test roman-reels/scripts/researched-gemini-drafts.test.mjs
           node --test roman-reels/scripts/gemini-bounded-client.test.mjs
+          node --test roman-reels/scripts/gemini-editorial-cli.test.mjs
           node --test roman-reels/scripts/source-uploader.test.mjs
           node --test roman-reels/scripts/four-part-receipt-upload.test.mjs
 
@@ -119,6 +120,8 @@ jobs:
           node roman-reels/scripts/recovery-drills.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node --test roman-reels/scripts/gemini-bounded-client.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test roman-reels/scripts/gemini-editorial-cli.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $parseErrors = $null
           $tokens = $null
