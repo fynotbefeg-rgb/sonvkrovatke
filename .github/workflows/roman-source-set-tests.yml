@@ -58,6 +58,7 @@ jobs:
           node roman-reels/scripts/windows-telegram-config.test.mjs
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           node roman-reels/scripts/windows-plan-ack.test.mjs
+          node roman-reels/scripts/windows-outbox-channel.test.mjs
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
           node roman-reels/scripts/recovery-drills.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py
@@ -109,6 +110,8 @@ jobs:
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-plan-ack.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-outbox-channel.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
