@@ -109,14 +109,18 @@ test('server controls provider; callback cannot choose Windows or API', async t 
 test('file queue survives reopen and separate connections cannot create duplicate jobs', t => {
   const dir=mkdtempSync(join(tmpdir(),'roman-queue-'));
   const file=join(dir,'queue.sqlite');
-  t.after(()=>rmSync(dir,{recursive:true,force:true}));
+  const opened=new Set();
+  // Node after hooks are not a stack: close every SQLite handle in this same
+  // hook BEFORE removing its directory (Windows refuses deleting open files).
+  t.after(()=>{for(const queue of opened)queue.close();rmSync(dir,{recursive:true,force:true});});
+  const open=()=>{const queue=new ProductionQueue(file);opened.add(queue);return queue;};
   const snapshot=fixture();
-  let first=new ProductionQueue(file);
+  let first=open();
   const ticket=first.createTicket(snapshot,['R-queue-test-h1'],'123');
   first.startTicket(ticket.ticket_id,'cb_1','123',snapshot);
   first.close();
-  first=new ProductionQueue(file); const second=new ProductionQueue(file);
-  t.after(()=>{first.close();second.close();});
+  opened.delete(first);
+  first=open(); const second=open();
   assert.equal(second.startTicket(ticket.ticket_id,'cb_2','123',snapshot).created,0);
   assert.equal(first.countJobs(),1);
   assert.equal(second.getJob(productionKey(snapshot.items[0])).state,'waiting_for_manual_upload');

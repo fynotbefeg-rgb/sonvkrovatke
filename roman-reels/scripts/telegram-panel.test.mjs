@@ -13,8 +13,8 @@ function approvals(n=1){return {items:Array.from({length:n},(_,i)=>{const x={top
  hook_text:'Тестовый хук',script_text:'Приватная тестовая речь',status:'approved',approved_by:'example@example.test',approved_at:'2026-10-10T00:00:00Z'};x.script_hash=scriptHash(x);return x;})};}
 const message=(id=1,actor=123)=>({update_id:id,message:{from:{id:actor},chat:{id:actor,type:'private'},text:'/start'}});
 const callback=(data,id=2)=>({update_id:id,callback_query:{id:`cb_${id}`,from:{id:123},message:{chat:{id:123,type:'private'}},data}});
-function setup(t,{db=':memory:',snapshot=approvals()}={}){
- const queue=new ProductionQueue(db);t.after(()=>queue.close());const sent=[],calls=[];let batch=[],failSend=false;
+function setup(t,{db=':memory:',snapshot=approvals(),closeAfter=true}={}){
+ const queue=new ProductionQueue(db);if(closeAfter)t.after(()=>queue.close());const sent=[],calls=[];let batch=[],failSend=false;
  const api=telegramApi({token,fetchImpl:async(url,options)=>{
   assert.equal(options.redirect,'error');assert.ok(url.startsWith(`https://api.telegram.org/bot${token}/`));
   const method=url.split('/').at(-1),body=JSON.parse(options.body);calls.push({method,body});
@@ -68,12 +68,15 @@ test('production view reports actual waiting jobs, never invented generation or 
  assert.match(h.sent.at(-1).text,/ожидает исходников/);assert.match(h.sent.at(-1).text,/не считаются создающимися/);
 });
 test('cursor survives SQLite restart; jobs do not duplicate after lost send response',async t=>{
- const dir=mkdtempSync(join(tmpdir(),'telegram-panel-'));t.after(()=>rmSync(dir,{recursive:true,force:true}));
- const db=join(dir,'queue.sqlite'),h=setup(t,{db});await handleTelegramPanel(await h.verified(message()),h.options);
+ const dir=mkdtempSync(join(tmpdir(),'telegram-panel-')),opened=[];
+ t.after(()=>{for(const queue of opened)queue.close();rmSync(dir,{recursive:true,force:true});});
+ const db=join(dir,'queue.sqlite'),h=setup(t,{db,closeAfter:false});opened.push(h.queue);
+ await handleTelegramPanel(await h.verified(message()),h.options);
  const u=callback(h.sent[0].reply_markup.inline_keyboard[0][0].callback_data,10);
  h.setBatch([u]);h.failSend();await assert.rejects(pollTelegramPanelOnce({...h.options,botId:'321'}),/Telegram request failed/);
  assert.equal(h.queue.countJobs(),1);assert.equal(h.queue.telegramOffset('321'),0);
- const restarted=setup(t,{db});restarted.setBatch([u]);await pollTelegramPanelOnce({...restarted.options,botId:'321'});
+ const restarted=setup(t,{db,closeAfter:false});opened.push(restarted.queue);
+ restarted.setBatch([u]);await pollTelegramPanelOnce({...restarted.options,botId:'321'});
  assert.equal(restarted.queue.countJobs(),1);assert.equal(h.queue.telegramOffset('321'),11);
  h.queue.advanceTelegramOffset('321',2);assert.equal(h.queue.telegramOffset('321'),11);
 });

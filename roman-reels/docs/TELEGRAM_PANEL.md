@@ -102,3 +102,53 @@ lost responses and bounded/sanitized API failures. Twelve existing queue tests
 still pass. Both are registered in the existing offline source CI, with no bot
 token or live service credentials. Live Telegram login, polling, coordinator
 deployment, full review statuses and video execution remain untested.
+
+## Windows preparation (2026-10-13)
+
+Use the owner's existing unattended laptop as the intended coordinator. Hosting
+is no longer an open choice; live configuration and bot deployment are still
+separate steps. The owner reported no locally configured protected queue access.
+Uploader OAuth is not that access. Do not extract secrets from backups, snapshots,
+GitHub or browser storage, and do not reset the Google webhook token.
+
+`setup-windows-telegram.ps1` opens a local form for the owner to enter four fields:
+the BotFather token, the owner's numeric Telegram ID, the existing Apps Script
+deployment URL and its existing webhook token. The Google values must be supplied
+by the owner from the live project's Manage deployments / Project settings →
+Script properties (`ROMAN_REELS_WEBHOOK_TOKEN`). They must not be copied from
+GitHub or placed in Claude/ChatGPT messages, command arguments or screenshots.
+No permission to read or copy those values on the owner's behalf is inferred.
+
+```powershell
+powershell.exe -NoProfile -STA -File scripts/setup-windows-telegram.ps1
+```
+
+Run from `roman-reels`. Do not weaken execution policy if the script is blocked;
+report the blocker. Claude must not inspect or screenshot a populated form.
+Secret fields are masked. The form makes no network requests and writes only
+DPAPI CurrentUser ciphertext to
+`%LOCALAPPDATA%\RomanReels\telegram-panel\config.dpapi`; an existing config is
+not overwritten. Closing without saving makes no config. The bot token is pinned
+to the public identity `Factory_reels_bot` when getMe is eventually called.
+
+The Node runtime can load this file directly without persisting secrets in
+process/user/system environment variables. Same Windows user as setup is needed.
+
+```powershell
+node scripts/run-telegram-panel.mjs --windows-check-config
+node scripts/run-telegram-panel.mjs --windows-check-access
+```
+
+The first command performs local validation only. The second only reads the
+protected Google queue; neither calls Telegram, polls, creates the production DB,
+changes Google, or activates execution. Output is counts/flags only.
+After separate bot deployment approval, `--windows-once` / `--windows-serve`
+use this config and a private local SQLite DB. They retain the explicit
+`ROMAN_TELEGRAM_DEPLOYMENT_APPROVED=true` gate. No startup task is installed.
+
+Windows test cleanup now closes all SQLite handles in one teardown before
+deleting its temporary folder. Old temporary folders reported by the owner are
+not deleted by this change. Dedicated Windows CI covers both affected tests,
+configuration validation, a real DPAPI roundtrip using fake credentials, and
+PowerShell syntax parsing. Real form interaction and owner credentials are not
+tested by CI.
