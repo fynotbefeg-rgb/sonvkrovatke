@@ -59,6 +59,7 @@ jobs:
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           node roman-reels/scripts/windows-plan-ack.test.mjs
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
+          node roman-reels/scripts/recovery-drills.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py
           python roman-reels/scripts/windows-delivery-probe.test.py
           python roman-reels/scripts/source-set.test.py
@@ -110,6 +111,8 @@ jobs:
           node roman-reels/scripts/windows-plan-ack.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/recovery-drills.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $parseErrors = $null
           $tokens = $null
