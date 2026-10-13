@@ -26,16 +26,21 @@
 | Почтовый ящик заданий | `_windows-jobs/source-plan-v1.json` пуст (`status=empty`); `delivery-config.json` вне Git |
 | Слот подтверждений | `_windows-jobs/source-plan-ack-v1.json` создан, `{"ackVersion":"1.0.0","status":"empty"}`, права: владелец + один читатель, без публичного доступа; `delivery-ack-config.json` вне Git; `ack-windows-plan.mjs` → `waiting` |
 
-## Ветки этой недели (PR не созданы — в этой среде нет инструментов GitHub; дубликатов не найдено)
+## Подготовленные PR (не слиты без разрешения владельца)
 
-| Этап | Ветка | Коммит | Ссылка для PR |
-|---|---|---|---|
-| 0. Этот документ | `feature/windows-week-handoff-20261013` | — | https://github.com/fynotbefeg-rgb/sonvkrovatke/compare/feature/codex-pipeline...feature/windows-week-handoff-20261013?expand=1 |
-| 3. Устойчивый запуск | `feature/windows-runtime-supervisor-20261013` | `da08a24` | https://github.com/fynotbefeg-rgb/sonvkrovatke/compare/feature/codex-pipeline...feature/windows-runtime-supervisor-20261013?expand=1 |
-| 4. Очередь → передача | `feature/windows-queue-delivery-bridge-20261013` | `87967ce` | https://github.com/fynotbefeg-rgb/sonvkrovatke/compare/feature/codex-pipeline...feature/windows-queue-delivery-bridge-20261013?expand=1 |
+Codex создал PR и независимо проверил код. Живые настройки не менялись.
 
-Ветки 3 и 4 добавляют по строке в одно место `.github/workflows/roman-source-set-tests.yml`. После слияния
-первой во второй будет простой конфликт: оставить обе строки тестов.
+| Этап | Ветка | PR |
+|---|---|---|
+| Этот документ | `feature/windows-week-handoff-20261013` | https://github.com/fynotbefeg-rgb/sonvkrovatke/pull/37 |
+| Устойчивый запуск | `feature/windows-runtime-supervisor-20261013` | https://github.com/fynotbefeg-rgb/sonvkrovatke/pull/38 |
+| Очередь → подготовка пакета | `feature/windows-queue-delivery-bridge-20261013` | https://github.com/fynotbefeg-rgb/sonvkrovatke/pull/39 |
+| Ручной облачный тестовый обмен | `feature/codex-windows-delivery-probe` | https://github.com/fynotbefeg-rgb/sonvkrovatke/pull/40 |
+
+Предполагаемый конфликт строк CI устранён: обе проверки остаются в workflow, пробные слияния чистые.
+В мост добавлен тест подмены корректного конверта под ожидаемым именем: повтор сверяет deliveryId.
+Автономные проверки Codex: супервизор 9/9, мост 7/7, облачный probe 8/8, Python-издатель 12/12.
+Перед слиянием проверять CI и точный head каждого PR; после слияния обновлять Windows только fast-forward.
 
 Старые ветки `feature/windows-plan-ack-20261013` и `feature/windows-review-status-clock-skew-20261013` уже
 вошли в `feature/codex-pipeline` (PR №32–36).
@@ -45,15 +50,25 @@
 ### 1. Настройка подтверждений получения — ВЫПОЛНЕНО
 Критерий: слот создан и проверен, конфиг сохранён, пустой ящик → `waiting` без записи. Выполнено (см. таблицу).
 
-### 2. Один вымышленный пакет: передача, подтверждение, повтор без дублей — ЗАБЛОКИРОВАНО
-Блокер: в репозитории нет workflow, который запускает `publish-windows-plan.py` (сериализованный облачный
-писатель с `GDRIVE_SA_JSON` и `ROMAN_WINDOWS_DELIVERY_*`). Писать ящик OAuth владельца с ноутбука — отступление
-от принятой модели «один облачный писатель», без разрешения не делается.
-Действие владельца: выбрать одно — (а) поручить Codex настроить workflow публикации; (б) разрешить одноразовую
-публикацию вымышленного пакета OAuth владельца с ноутбука.
-Критерий завершения: ящик содержит вымышленный `staging_only` пакет; `ack-windows-plan.mjs` → `received` +
-`acknowledged`; повтор новым процессом → `already_received` + `already_acknowledged`, без новой записи;
-`isAcknowledged` = true; затем ящик возвращён в `empty` тем же писателем; генерации и загрузки нет.
+### 2. Один вымышленный пакет: передача, подтверждение, повтор без дублей — КАНДИДАТ В PR40
+Ручной режим `windows_delivery_probe` подготовлен в существующем зарегистрированном
+`roman-reels-check.yml`. Значение по умолчанию false; выбранный режим отключает все остальные jobs.
+Он принимает только фиксированный вымышленный пакет, не произвольные тексты/outbox. Ни workflow,
+ни реальные записи/чтения этим новым режимом ещё не запускались.
+
+После разрешения владельца и слияния PR40:
+1. Приватно настроить три закреплённых ID из проверенных локальных configs как repository variables
+   `ROMAN_WINDOWS_DELIVERY_FILE_ID`, `ROMAN_WINDOWS_DELIVERY_FOLDER_ID`, `ROMAN_WINDOWS_DELIVERY_ACK_FILE_ID`.
+   Существующий `GDRIVE_SA_JSON` остаётся в Actions. Не копировать секреты или configs в Git/логи.
+2. Следовать `WINDOWS_DELIVERY_PROBE.md`: inspect → publish_fixture → один запуск ack на Windows
+   в течение 15 минут → повтор новым процессом → inspect (acknowledged=true).
+3. Только после точного подтверждения выполнить clear_acknowledged_fixture тем же облачным писателем.
+   Ящик станет empty; подтверждение и локальные файлы остаются. Не удалять их автоматически.
+
+Критерий: received/acknowledged, затем already_received/already_acknowledged, одна локальная запись;
+облачная проверка exact receipt и проверенное возвращение ящика в empty. Все разрешения исполнения false.
+При чужом/реальном пакете, повреждении, отказе доступа или неоднозначной записи — остановиться и прочитать
+состояние, не выполнять слепой повтор записи. За пределами разрешения владельца живой тест не запускать.
 
 ### 3. Устойчивый запуск бота и приёмщика — КОД ГОТОВ (ветка выше)
 Сделано: `run-windows-supervisor.mjs`, `windows-runtime-supervisor.mjs`, `windows/ensure-roman-runtime.ps1`,
@@ -68,7 +83,7 @@
 Сделано: `queue-delivery-bridge.mjs`, `QUEUE_DELIVERY_BRIDGE.md`, 6 тестов. База бота открывается только для
 чтения, согласования перечитываются, конверт пишется в outbox без дублей, неподтверждённый предыдущий пакет
 блокирует следующий.
-Осталось: решить транспорт outbox → почтовый ящик (см. документ, варианты а/б/в) и источник пакета
+Осталось: решить транспорт outbox → почтовый ящик (см. QUEUE_DELIVERY_BRIDGE.md); PR40 передаёт только вымышленный пакет и этот канал не реализует и источник пакета
 `shared-review`; живых данных нет, пока Роман не выбрал и не утвердил тему.
 
 ### 5. Независимые задачи, если всё выше ждёт решения
