@@ -899,3 +899,21 @@ matching receipt; preserve ack/local records, refuse real or modified plans. Exi
 remains in Actions; three pinned file/folder IDs are private vars and have NOT been configured.
 Eight offline probe tests passed. CI covers Python publisher/probe on Windows and Linux. No live
 dispatch, Drive file, bot, Google or scheduler changes. This does not connect the local outbox to cloud.
+
+## 2026-10-13 — current Roman feedback, three replacement SEO hooks preserved
+
+Owner relays Roman's conversation: body liked, original hooks rejected; new hooks requested with Claude
+and the vibecoded-site/no-search-traffic angle. The owner then explicitly clarified that acceptance
+of the three final replacement texts is Roman's decision, not merely the owner's draft preference.
+This updates conversation-level editorial state; no e.user/server receipt is fabricated or verified.
+
+New research/seo-hooks-owner-relay-20261013 stores exact three accepted texts and the unchanged
+repository v5 body only as a hashed candidate. On clarification the owner said to await Roman's reply
+on the exact body. bodyBindingConfirmed=false, serverApprovalReceiptVerified=false, execution flags
+false. No complete speech packet, platform endings consent, Google edit, registration, queue job,
+Gemini request, HeyGen, video or render created. Preserve new hooks while waiting; do not rewrite a
+possibly different liked body or mistake editorial source version5 for Google review revision.
+
+Latest relayed token state: new credential works on laptop, old Unauthorized, botPID21944 and task
+restored; Github webhook secret update remains unconfirmed, no credential value read or logged here.
+Gemini offload goal persists; PR44 parallel budget blocker still needs correction before live requests.
