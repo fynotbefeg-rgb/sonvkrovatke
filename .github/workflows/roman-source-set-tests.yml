@@ -48,6 +48,9 @@ jobs:
           node roman-reels/scripts/approved-four-part-jobs.test.mjs
           node roman-reels/scripts/production-queue.test.mjs
           node roman-reels/scripts/telegram-panel.test.mjs
+          node roman-reels/scripts/review-status.test.mjs
+          node roman-reels/scripts/shared-review.test.mjs
+          node roman-reels/scripts/topic-only-review.test.mjs
           node roman-reels/scripts/windows-telegram-config.test.mjs
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py

@@ -9,6 +9,7 @@ import {readApprovedQueue} from './approved-four-part-jobs.mjs';
 import {telegramApi} from './telegram-bot-api.mjs';
 import {pollTelegramPanelOnce} from './telegram-panel.mjs';
 import {loadWindowsTelegramConfig} from './windows-telegram-config.mjs';
+import {readReviewStatuses} from './review-status-reader.mjs';
 
 async function main(){
   const mode=process.argv[2],windows=mode?.startsWith('--windows-');
@@ -35,7 +36,7 @@ async function main(){
       const botId=await api.identity(config?.botUsername);
       do{
         const result=await pollTelegramPanelOnce({api,botId,queue,allowedOperatorIds:ids,
-          readCurrentApprovals:()=>readApprovedQueue({url,token})});
+          readCurrentApprovals:()=>readApprovedQueue({url,token}),readReviewStatus:()=>readReviewStatuses({url,token})});
         console.log(JSON.stringify(result));
       }while(['--serve','--windows-serve'].includes(mode));
     }finally{queue.close();}

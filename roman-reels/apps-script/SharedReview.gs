@@ -307,6 +307,62 @@ const RomanSharedReview = (function() {
         scriptApprovalGranted: false, productionAllowed: false};
     });
   }
+  // Display-only metadata. Never a production approval manifest; no speech,
+  // identities, receipts, hashes, row locations or Script Properties exported.
+  function reviewStatusSnapshot(approvers, withLock) {
+    return withLock(function() {
+      const capturedAt = new Date().toISOString(), currentEnabled = enabled();
+      const result = {ok: true, snapshotVersion: '1.0.0', source: 'apps_script_review_status',
+        capturedAt: capturedAt, enabled: currentEnabled, topics: [], approvalWrites: false, productionAllowed: false};
+      if (!currentEnabled) return result;
+      const standalone = topicConfigs(), shared = configs(), ids = new Set();
+      standalone.concat(shared).forEach(function(c) { ids.add(c.packet.topicId); });
+      if (ids.size > 90) throw Error('Review status exceeds bound');
+      function decisionStatus(decision, receipt) {
+        if (decision === '') return 'pending';
+        // Negative dropdowns are reported as table decisions, not verified
+        // rejection by a named approver (there is no rejection receipt).
+        if (decision === 'Не утверждено') return 'not_approved';
+        if (decision !== approved || !receipt || Date.parse(receipt.approvedAt) > Date.parse(capturedAt)) return 'unverified';
+        return 'approved';
+      }
+      function title(c) { return c.packet.topicText.slice(0, 160).replace(/[\u0000-\u001f]/g, ' '); }
+      function standaloneStatus(c) {
+        if (!topicMatches(c)) return 'binding_changed';
+        return decisionStatus(sheetFor(c).getRange(c.firstRow, 2).getValues()[0][0], topicReceipt(c, approvers));
+      }
+      Array.from(ids).sort().forEach(function(id) {
+        const t = standalone.filter(function(c) { return c.packet.topicId === id; })[0];
+        const c = shared.filter(function(c) { return c.packet.topicId === id; })[0];
+        if (!c || (t && t.packet.revision > c.packet.revision)) {
+          result.topics.push({topicId: id, title: title(t), reviewRevision: t.packet.revision, kind: 'topic_only',
+            components: {topic: standaloneStatus(t), body: 'not_created', hook1: 'not_created', hook2: 'not_created', hook3: 'not_created'}});
+          return;
+        }
+        const states = {}, parts = ['topic', 'body', 'hook1', 'hook2', 'hook3'];
+        const before = sheetFor(c).getRange(c.firstRow, 1, 4, 4).getValues();
+        if (!matches(c)) parts.forEach(function(part) { states[part] = 'binding_changed'; });
+        else {
+          const r = receipts(c, approvers);
+          parts.forEach(function(part) {
+            const decision = part === 'topic' ? before[0][1] : before[part === 'body' ? 0 : Number(part.slice(4))][3];
+            states[part] = decisionStatus(decision, r[part]);
+          });
+          if (t) {
+            const selected = standaloneStatus(t);
+            if (t.packet.revision !== c.packet.revision || topicHash(t.packet) !== components(c.packet).topic) states.topic = 'binding_changed';
+            else if (selected !== 'approved') states.topic = selected;
+          }
+          // A concurrent cell edit must not yield an apparently consistent panel.
+          const after = sheetFor(c).getRange(c.firstRow, 1, 4, 4).getValues();
+          if (JSON.stringify(before) !== JSON.stringify(after)) parts.forEach(function(part) { states[part] = 'binding_changed'; });
+        }
+        result.topics.push({topicId: id, title: title(c), reviewRevision: c.packet.revision, kind: 'shared', components: states});
+      });
+      if (Utilities.newBlob(JSON.stringify(result)).getBytes().length > 200000) throw Error('Review status bytes exceed bound');
+      return result;
+    });
+  }
   function queue(legacy, approvers) {
     const current = configs(), managed = new Set();
     const standaloneTopics = topicConfigs();
@@ -354,5 +410,5 @@ const RomanSharedReview = (function() {
     if (new Set(result.map(function(x) { return x.version_id; })).size !== result.length) throw Error('Ambiguous queue versions');
     return result;
   }
-  return {enabled: enabled, handles: handles, edit: edit, register: register, registerTopic: registerTopic, queue: queue, topicSnapshot: topicSnapshot};
+  return {enabled: enabled, handles: handles, edit: edit, register: register, registerTopic: registerTopic, queue: queue, topicSnapshot: topicSnapshot, reviewStatusSnapshot: reviewStatusSnapshot};
 })();
