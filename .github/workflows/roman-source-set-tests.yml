@@ -56,6 +56,7 @@ jobs:
           node roman-reels/scripts/windows-telegram-config.test.mjs
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           node roman-reels/scripts/windows-plan-ack.test.mjs
+          node roman-reels/scripts/queue-delivery-bridge.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py
           python roman-reels/scripts/source-set.test.py
           python roman-reels/scripts/assembled-jobs.test.py
@@ -92,6 +93,8 @@ jobs:
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-plan-ack.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/queue-delivery-bridge.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $parseErrors = $null
           $tokens = $null
