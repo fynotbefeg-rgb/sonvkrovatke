@@ -1,0 +1,36 @@
+{
+  "artifactType": "editorial_hook_feedback",
+  "artifactVersion": "1.0.0",
+  "topicId": "roman-topic-seo-20261013",
+  "reviewRevisionCandidate": 1,
+  "decisionSource": "owner_relays_Roman_conversation",
+  "hookDecision": "accepted_in_conversation",
+  "serverApprovalReceiptVerified": false,
+  "productionAllowed": false,
+  "generationAllowed": false,
+  "renderAllowed": false,
+  "hooks": [
+    {
+      "id": 1,
+      "text": "Как с помощью Claude найти SEO-ошибки на своём сайте?"
+    },
+    {
+      "id": 2,
+      "text": "Сайт навайбкодил, а из поиска никто не приходит? Покажу, как проверить, что мешает Google находить твои страницы."
+    },
+    {
+      "id": 3,
+      "text": "Не знаешь, с чего начать SEO своего сайта? Покажу, какие ошибки проверить в первую очередь."
+    }
+  ],
+  "bodyBindingConfirmed": false,
+  "bodyCandidate": {
+    "sourcePath": "roman-reels/docs/ROMAN_RECORDING_TEXTS.md",
+    "sourceEditorialVersion": 5,
+    "sourceFileSha256": "e241c2314bbda487c32d6328eaa8a377cd2173fa6aa8029105240f099d8ae3a2",
+    "bodyTextSha256": "87506ccab9abc703429af40cf37338140cde0bdecebb174282c912fe6633ab00",
+    "bodyText": "Для аудита сайта нужны два блока: техническое SEO и путь клиента до заявки. Покажу учебный пример. Наш скрипт проверяет страницы, запреты обхода и индексации, карту сайта, canonical-ссылки и редиректы. На главной нашли noindex — запрет индексации. Страница услуг указывала главную как предпочтительный адрес. В отчёте есть адрес, наблюдение, ожидаемое состояние и приоритет исправления. После правок прошли все десять проверок. Отдельно проверили мобильное меню, форму и получение учебной заявки. Отчёты можно передать ИИ с задачей: «Объясни подтверждённые проблемы и подготовь задачи разработчику, сохрани адреса и доказательства». Проверки написали мы; автономный аудит ИИ не тестировали. Для полной картины нужны данные Search Console, измерения скорости и анализ содержания. Рост позиций этим тестом не доказан.",
+    "state": "awaiting_Roman_exact_body_reply"
+  },
+  "platformEndingsConfirmed": false
+}
