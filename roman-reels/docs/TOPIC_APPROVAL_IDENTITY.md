@@ -83,3 +83,13 @@ deployment. До установки никто не должен считать 
 26/26 offline self-approval tests (10 imported baseline + 16 topic/part tests),
 shared review25/25 и topic-only24/24; self suite зарегистрирован в Linux и Windows.
 Google OAuth/HtmlService-RPC в реальном браузере пока не проверены.
+
+## Установка 2026-10-14 (по разрешению владельца)
+
+- Свежий приватный backup живых файлов (= V6: Code.gs `01723065…`, RomanApproval.gs `fd4ac449…`, SharedReview.gs `a57b6567…`) — вне Git.
+- Заменены только RomanApproval.gs → `880be758…` и SharedReview.gs → `8ccca63a…` (= `23c53ee`); Code.gs не изменился; хеши сверены после перезагрузки редактора.
+- Существующий deployment (Execute as Me, Anyone): **Version 6 → Version 7**, URL и настройки прежние, повторной авторизации не было. Проверка: авторизованное чтение очереди — 0 утверждённых, статусы тем прежние (SEO rev 2 `pending`).
+- Новое отдельное развёртывание: Web app, Execute as «User accessing the web app», Who has access «Anyone with Google account», **Version 8** (описание «Roman self-approval (execute as user, PR55)»). Ссылка передана владельцу вне Git.
+- Без входа `?view=topics`, `?view=review` и обычный GET → 302 на вход Google. Аккаунт владельца (не в allowlist) → экран Google «Authorization needed» для непроверенного приложения; согласие за владельца не давалось, поэтому живой ответ страницы чужому аккаунту не наблюдался (покрыт офлайн-тестами 26/26).
+- Allowlist, триггеры, тексты, бот, утверждения не менялись; за Романа ничего не подтверждалось.
+- Откат: архивировать развёртывание Version 8, затем вернуть два файла из backup и выбрать Version 6 в существующем deployment.
