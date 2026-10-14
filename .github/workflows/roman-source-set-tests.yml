@@ -59,10 +59,12 @@ jobs:
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           node roman-reels/scripts/windows-plan-ack.test.mjs
           node roman-reels/scripts/windows-outbox-channel.test.mjs
+          node roman-reels/scripts/relay-windows-outbox.test.mjs
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
           node roman-reels/scripts/recovery-drills.test.mjs
           python roman-reels/scripts/windows-plan-publisher.test.py
           python roman-reels/scripts/windows-delivery-probe.test.py
+          python roman-reels/scripts/windows-outbox-relay.test.py
           python roman-reels/scripts/source-set.test.py
           python roman-reels/scripts/assembled-jobs.test.py
           python roman-reels/scripts/shared-body-development.test.py
@@ -94,6 +96,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python roman-reels/scripts/windows-delivery-probe.test.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/windows-outbox-relay.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: SQLite cleanup and Telegram offline checks on Windows
         shell: pwsh
         run: |
@@ -114,6 +118,8 @@ jobs:
           node roman-reels/scripts/windows-plan-ack.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-outbox-channel.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/relay-windows-outbox.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/windows-runtime-supervisor.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

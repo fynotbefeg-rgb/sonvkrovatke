@@ -184,6 +184,12 @@ node scripts/receive-windows-plan.mjs
 и (после слияния этапа 3) `node scripts/run-windows-supervisor.mjs --status`.
 Ожидается: `authenticatedRead=true`, `waiting`, `running`; все флаги генерации и рендера false.
 
+## 2026-10-13 — CLI outbox и облачная обвязка релея (CLAUDE_NEXT_AUTOMATION_TASK, задача 1)
+
+Ветка `feature/windows-outbox-relay-20261013`: `push-windows-outbox.mjs`, `relay-windows-outbox.mjs`, `relay_windows_outbox.py`,
+режим `windows_outbox_relay` в `roman-reels-check.yml`. Node 6/6 локально; Python 9 тестов — только в CI (Python на
+ноутбуке нет). Живой запуск не выполнялся: нужны слот outbox, переменная `ROMAN_WINDOWS_OUTBOX_FILE_ID` и утверждённая
+Романом тема. Gemini-адаптер уже подключён в PR52; его живой запуск остаётся отдельно заблокированным.
 ## 2026-10-13 — Gemini подключён к редакторскому CLI (CLAUDE_NEXT_AUTOMATION_TASK, задача 2)
 
 Ветка `feature/gemini-editorial-cli-20261013`: `run-researched-gemini.mjs` использует `createGeminiClient`, требует
