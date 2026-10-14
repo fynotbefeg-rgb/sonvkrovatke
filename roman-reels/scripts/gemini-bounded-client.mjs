@@ -151,3 +151,26 @@ export async function ledgerSummary(ledgerFile, now = Date.now()) {
   const ledger = await loadLedger(ledgerFile);
   return {lastDay: ledger.requests.filter(r => now - r.at < DAY).length, lastWeek: ledger.requests.filter(r => now - r.at < WEEK).length};
 }
+
+// Read-only access check: model catalogue, one model's detail and countTokens for a sample prompt. It never calls
+// generateContent, so it consumes no generation quota. It CANNOT prove free-tier eligibility or billing state:
+// the API exposes neither; that stays an explicit owner check in Google AI Studio.
+export async function checkGeminiAccess({apiKey, model = DEFAULT_MODELS[0], samplePrompt = 'Проверка доступа без генерации.', fetchImpl = fetch}) {
+  if (!apiKey) fail('missing_key', 'GEMINI_API_KEY not configured; nothing sent');
+  if (!DEFAULT_MODELS.includes(model)) fail('model_not_allowed', 'Model is not in the explicit allowlist');
+  const base = 'https://generativelanguage.googleapis.com/v1beta/', headers = {'x-goog-api-key': apiKey};
+  const get = async (url, init = {}) => {
+    let r;
+    try { r = await fetchImpl(url, {redirect: 'error', signal: AbortSignal.timeout(30000), ...init, headers: {...headers, ...(init.headers || {})}}); }
+    catch { fail('network_ambiguous', 'Gemini access check: connection failed'); }
+    if (!r.ok) return {status: r.status, data: null};
+    return {status: r.status, data: JSON.parse(await boundedText(r, 1048576))};
+  };
+  const list = await get(`${base}models?pageSize=100`);
+  const listed = (list.data?.models || []).some(m => m.name === `models/${model}` && m.supportedGenerationMethods?.includes('generateContent'));
+  const count = await get(`${base}models/${encodeURIComponent(model)}:countTokens`, {method: 'POST',
+    headers: {'content-type': 'application/json'}, body: JSON.stringify({contents: [{parts: [{text: samplePrompt}]}]})});
+  return {model, catalogueHttpStatus: list.status, modelListed: listed, countTokensHttpStatus: count.status,
+    sampleTokens: Number.isSafeInteger(count.data?.totalTokens) ? count.data.totalTokens : null,
+    generationCalls: 0, freeTierAndBilling: 'not_determinable_via_api', approvalAuthority: false, productionAllowed: false};
+}

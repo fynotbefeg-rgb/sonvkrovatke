@@ -1,47 +1,79 @@
 #!/usr/bin/env node
-// One bounded generation, no retries/fallback, no Sheet/Drive/HeyGen writes.
-import {readFileSync,writeFileSync,existsSync} from 'node:fs';
-import {dirname,join} from 'node:path';
+// One bounded generation through the shared createGeminiClient: durable request ledger, no retries, no fallback model,
+// no Sheet/Drive/HeyGen writes. Drafts are always pending editorial review and Roman's approval.
+import {readFileSync,writeFileSync,existsSync,statSync} from 'node:fs';
+import {dirname,join,isAbsolute,resolve,sep} from 'node:path';
+import {tmpdir} from 'node:os';
+import {fileURLToPath} from 'node:url';
 import {researchPrompt,researchedDrafts} from './researched-gemini-drafts.mjs';
 import {editorialRulesVersion,editorialRulesSha256} from './editorial-rules.mjs';
-const [mode,input,output]=process.argv.slice(2);
-if(!['prepare','generate'].includes(mode)||!input||!output)throw Error('Usage: run-researched-gemini.mjs prepare|generate brief.json output.json');
-if(existsSync(output))throw Error('Output already exists; no request or overwrite allowed');
-const brief=JSON.parse(readFileSync(input,'utf8')),prompt=researchPrompt(brief);
-if(prompt.length>16000)throw Error('Prompt exceeds input character cap');
-if(mode==='prepare'){
- writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model:'gemini-3-flash-preview',prompt,
-  maxOutputTokens:4096,maxGenerateCalls:1,timeoutSeconds:90,sendsToSheets:false,productionReady:false,
-  editorialReviewRequired:true,editorialRulesVersion,editorialRulesSha256},null,2)+'\n',{flag:'wx'});
- console.log('Prepared one request; no API calls.');
-}else{
- if(process.env.ROMAN_GEMINI_ALLOW_GENERATE!=='true')throw Error('Explicit single-call authorization required');
- const key=process.env.GEMINI_API_KEY;if(!key)throw Error('Missing existing GEMINI_API_KEY');
- const model='gemini-3-flash-preview';
+import {createGeminiClient} from './gemini-bounded-client.mjs';
+
+export const LEDGER_STORE_MARKER='gemini-ledger-store.json';
+const MODEL='gemini-3-flash-preview';
+// Codes raised before any generation request leaves the machine.
+const PRE_NETWORK=new Set(['task_not_allowed','generation_not_authorized','missing_key','model_not_allowed','prompt_invalid','invalid_mime',
+ 'invalid_limits','invalid_ledger','ledger_invalid','ledger_locked','ledger_lock_stale','run_budget_exhausted','day_budget_exhausted',
+ 'week_budget_exhausted','invalid_clock']);
+
+// The weekly budget is only meaningful in one persistent shared ledger. A fresh temp or Actions folder would silently
+// grant a new budget, so generation requires: explicit absolute path outside any Git work tree, in a directory that
+// the operator deliberately initialised with a store marker, and never on a GitHub Actions runner until a persistent
+// serialized store is chosen there.
+export function assertDurableLedger(file,env=process.env){
+ if(env.GITHUB_ACTIONS==='true')throw Error('Persistent shared Gemini ledger for Actions is not configured; generation blocked');
+ if(typeof file!=='string'||!isAbsolute(file)||!file.endsWith('.json'))throw Error('ROMAN_GEMINI_LEDGER must be an explicit absolute .json path');
+ const dir=dirname(resolve(file));
+ for(let d=dir;;d=dirname(d)){ if(existsSync(join(d,'.git')))throw Error('Gemini ledger must live outside any Git work tree'); if(dirname(d)===d)break; }
+ let marker;
+ try{marker=JSON.parse(readFileSync(join(dir,LEDGER_STORE_MARKER),'utf8'));}catch{throw Error('Gemini ledger store is not initialised (missing store marker)');}
+ if(marker?.storeVersion!=='1.0.0'||marker.purpose!=='roman-gemini-weekly-budget'||!statSync(dir).isDirectory())
+  throw Error('Gemini ledger store marker invalid');
+ const temp=resolve(tmpdir())+sep;
+ if((resolve(dir)+sep).startsWith(temp)&&marker.allowTemporaryLocation!==true)throw Error('Gemini ledger store inside a temporary folder is refused');
+ return resolve(file);
+}
+
+export async function runResearched({mode,input,output,env=process.env,now=()=>new Date()}){
+ if(!['prepare','generate'].includes(mode)||!input||!output)throw Error('Usage: run-researched-gemini.mjs prepare|generate brief.json output.json');
+ if(existsSync(output))throw Error('Output already exists; no request or overwrite allowed');
+ const brief=JSON.parse(readFileSync(input,'utf8')),prompt=researchPrompt(brief);
+ if(prompt.length>16000)throw Error('Prompt exceeds input character cap');
+ if(mode==='prepare'){
+  writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model:MODEL,prompt,
+   maxOutputTokens:4096,maxGenerateCalls:1,timeoutSeconds:90,sendsToSheets:false,productionReady:false,
+   editorialReviewRequired:true,editorialRulesVersion,editorialRulesSha256},null,2)+'\n',{flag:'wx'});
+  return 'Prepared one request; no API calls.';
+ }
+ if(env.ROMAN_GEMINI_ALLOW_GENERATE!=='true')throw Error('Explicit single-call authorization required');
+ const ledgerFile=assertDurableLedger(env.ROMAN_GEMINI_LEDGER,env);
+ const key=env.GEMINI_API_KEY;if(!key)throw Error('Missing existing GEMINI_API_KEY');
  const list=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{headers:{'x-goog-api-key':key},signal:AbortSignal.timeout(30000)});
  if(!list.ok)throw Error(`Gemini models HTTP ${list.status}; no generation attempted`);
  const models=await list.json();
- if(!models.models?.some(m=>m.name===`models/${model}`&&m.supportedGenerationMethods?.includes('generateContent')))throw Error('Selected model unavailable; no fallback generation');
- const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
-  method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:AbortSignal.timeout(90000),
-  body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.4,maxOutputTokens:4096}})});
- if(!response.ok){
-  // Preserve a bounded, redacted provider message; never log the key or headers.
-  let errorCode=null,errorMessage='Provider error details unavailable';
-  try{
-   const failure=await response.json();errorCode=failure.error?.status||null;
-   errorMessage=String(failure.error?.message||errorMessage).split(key).join('[REDACTED]').slice(0,1200);
-  }catch{}
-  writeFileSync(join(dirname(output),'gemini-generation-report.json'),JSON.stringify({
-   model,checkedAt:new Date().toISOString(),generationCalls:1,httpStatus:response.status,
-   providerErrorCode:errorCode,providerMessage:errorMessage,newDraftGenerated:false,
-   retryAttempted:false,actualCostUsd:null},null,2)+'\n',{flag:'wx'});
-  throw Error(`Gemini generation HTTP ${response.status}; no automatic retry`);
+ if(!models.models?.some(m=>m.name===`models/${MODEL}`&&m.supportedGenerationMethods?.includes('generateContent')))throw Error('Selected model unavailable; no fallback generation');
+ const client=createGeminiClient({apiKey:key,ledgerFile,allowGenerate:true,models:[MODEL],
+  limits:{maxRequestsPerRun:1,maxRetries:0,maxOutputTokens:4096,timeoutMs:90000,maxPromptChars:16000}});
+ let answer;
+ try{answer=await client.generate({task:'draft_suggestion',model:MODEL,prompt,responseMimeType:'application/json',temperature:0.4});}
+ catch(error){
+  // Bounded, redacted diagnostic; the client already strips the key from its messages.
+  const report=JSON.stringify({
+   model:MODEL,checkedAt:now().toISOString(),generationCalls:PRE_NETWORK.has(error.code)?0:1,errorCode:error.code||'unexpected',
+   providerMessage:String(error.message||'').split(key).join('[REDACTED]').slice(0,600),newDraftGenerated:false,
+   retryAttempted:false,actualCostUsd:null},null,2)+'\n';
+  // Never overwrite an earlier report and never let a report collision hide the original error.
+  for(const name of ['gemini-generation-report.json',`gemini-generation-report-${process.pid}-${Date.now()}.json`]){
+   try{writeFileSync(join(dirname(output),name),report,{flag:'wx'});break;}catch(writeError){if(writeError.code!=='EEXIST')break;}
+  }
+  throw Error(`Gemini generation not completed (${error.code||'unexpected'}); no automatic retry`);
  }
- const data=await response.json();
- if(data.candidates?.[0]?.finishReason!=='STOP')throw Error('Incomplete or blocked generation; no automatic retry');
- const raw=data.candidates[0].content?.parts?.filter(p=>!p.thought).map(p=>p.text||'').join('');
- const result=researchedDrafts(brief,JSON.parse(raw),{model,generatedAt:new Date().toISOString(),usageMetadata:data.usageMetadata||null,actualCostUsd:null});
+ const result=researchedDrafts(brief,JSON.parse(answer.text),{model:MODEL,generatedAt:now().toISOString(),usageMetadata:answer.usage||null,actualCostUsd:null});
  writeFileSync(output,JSON.stringify(result,null,2)+'\n',{flag:'wx'});
- console.log(`Generated 3 pending revision-${brief.scriptRevision} drafts; editorial review required; nothing sent to Sheets.`);
+ return `Generated 3 pending revision-${brief.scriptRevision} drafts; editorial review required; nothing sent to Sheets.`;
+}
+
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ const [mode,input,output]=process.argv.slice(2);
+ runResearched({mode,input,output}).then(message=>console.log(message),error=>{console.error(String(error.message).slice(0,300));process.exitCode=1;});
 }

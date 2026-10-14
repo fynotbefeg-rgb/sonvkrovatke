@@ -183,3 +183,10 @@ node scripts/receive-windows-plan.mjs
 ```
 и (после слияния этапа 3) `node scripts/run-windows-supervisor.mjs --status`.
 Ожидается: `authenticatedRead=true`, `waiting`, `running`; все флаги генерации и рендера false.
+
+## 2026-10-13 — Gemini подключён к редакторскому CLI (CLAUDE_NEXT_AUTOMATION_TASK, задача 2)
+
+Ветка `feature/gemini-editorial-cli-20261013`: `run-researched-gemini.mjs` использует `createGeminiClient`, требует
+инициализированное долговременное хранилище журнала вне Git, в Actions generate заблокирован до выбора постоянного
+хранилища. Новые тесты 4/4 локально и в обоих CI jobs. Настоящих запросов нет. Решение владельца: где хранить общий журнал
+(ноутбук или закреплённый файл Drive с одним писателем).
