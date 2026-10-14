@@ -41,10 +41,12 @@ test('CLI refuses unapproved calls and makes exactly one generation POST without
  const dir=mkdtempSync(join(tmpdir(),'roman-gemini-test-'));
  try{
   const stub=join(dir,'mock.mjs'),trace=join(dir,'trace.json'),output=join(dir,'draft.json');
-  writeFileSync(stub,`import {writeFileSync} from 'node:fs';const calls=[];globalThis.fetch=async(url,options={})=>{calls.push({url,method:options.method||'GET',body:options.body?JSON.parse(options.body):null});writeFileSync(process.env.TEST_TRACE,JSON.stringify(calls));if(!options.method)return {ok:true,json:async()=>({models:[{name:'models/gemini-3-flash-preview',supportedGenerationMethods:['generateContent']}]})};if(process.env.TEST_HTTP_ERROR)return {ok:false,status:503,json:async()=>({error:{status:'UNAVAILABLE',message:'mock-only provider failure'}})};return {ok:true,json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(${JSON.stringify(answer())})}]}}],usageMetadata:{promptTokenCount:1}})};};`);
+  writeFileSync(stub,`import {writeFileSync} from 'node:fs';const calls=[];globalThis.fetch=async(url,options={})=>{calls.push({url,method:options.method||'GET',body:options.body?JSON.parse(options.body):null});writeFileSync(process.env.TEST_TRACE,JSON.stringify(calls));if(!options.method)return {ok:true,json:async()=>({models:[{name:'models/gemini-3-flash-preview',supportedGenerationMethods:['generateContent']}]})};if(process.env.TEST_HTTP_ERROR)return Response.json({error:{status:'UNAVAILABLE',message:'mock-only provider failure'}},{status:503});return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(${JSON.stringify(answer())})}]}}],usageMetadata:{promptTokenCount:1}});};`);
   const runner=fileURLToPath(new URL('./run-researched-gemini.mjs',import.meta.url));
+  const ledger=join(dir,'gemini-ledger.json'),cleanEnv={...process.env};delete cleanEnv.GITHUB_ACTIONS;
+  writeFileSync(join(dir,'gemini-ledger-store.json'),JSON.stringify({storeVersion:'1.0.0',purpose:'roman-gemini-weekly-budget',allowTemporaryLocation:true}));
   const run=(extra={})=>spawnSync(process.execPath,['--import',stub,runner,'generate',briefPath,output],{
-   encoding:'utf8',env:{...process.env,GEMINI_API_KEY:'mock-only',TEST_TRACE:trace,ROMAN_GEMINI_ALLOW_GENERATE:'false',...extra}});
+   encoding:'utf8',env:{...cleanEnv,GEMINI_API_KEY:'mock-only',TEST_TRACE:trace,ROMAN_GEMINI_ALLOW_GENERATE:'false',ROMAN_GEMINI_LEDGER:ledger,...extra}});
   assert.notEqual(run().status,0);assert.equal(existsSync(trace),false);
   assert.equal(run({ROMAN_GEMINI_ALLOW_GENERATE:'true'}).status,0);
   let calls=JSON.parse(readFileSync(trace));assert.equal(calls.filter(c=>c.method==='POST').length,1);
@@ -55,8 +57,8 @@ test('CLI refuses unapproved calls and makes exactly one generation POST without
   rmSync(output);assert.notEqual(run({ROMAN_GEMINI_ALLOW_GENERATE:'true',TEST_HTTP_ERROR:'true'}).status,0);
   calls=JSON.parse(readFileSync(trace));assert.equal(calls.length,2);assert.equal(existsSync(output),false);
   const diagnostic=JSON.parse(readFileSync(join(dir,'gemini-generation-report.json')));
-  assert.equal(diagnostic.generationCalls,1);assert.equal(diagnostic.httpStatus,503);
-  assert.equal(diagnostic.providerErrorCode,'UNAVAILABLE');assert.equal(diagnostic.providerMessage,'[REDACTED] provider failure');
+  assert.equal(diagnostic.generationCalls,1);assert.equal(diagnostic.errorCode,'http_503');
+  assert.ok(!diagnostic.providerMessage.includes('mock-only'));
   assert.equal(diagnostic.retryAttempted,false);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
