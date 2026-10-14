@@ -919,3 +919,6 @@ HeyGen, real video, approvals, montage or production. No source script imported/
 
 
 2026-10-14: owner explicitly identifies the approval of the SEO_PLUGIN_VIDEO_BRIEF.md discussion body as Roman’s decision. Exact body and SHA-256 recorded in research/seo-hooks-owner-relay-20261013/body-decision.json. Editorial accepted_in_conversation only; no forged server identity/timestamp/receipt, no Google write, no R06 waiver or production permission. Earlier exact-body waiting status is superseded for this draft.
+
+
+2026-10-14: SEO_ROMAN_ACCEPTED_TEXTS.md and accepted-texts.json combine the exact three accepted PR49 hooks with the explicitly chosen plugin-overview body. Historical v5 body candidate is superseded; do not request a new topic choice. This is editorial evidence only, not a shared-review packet or Google receipt. Component bytes verified unchanged. Final CTA, live Google registration/receipts and factual/free-cost release gates remain separate.
