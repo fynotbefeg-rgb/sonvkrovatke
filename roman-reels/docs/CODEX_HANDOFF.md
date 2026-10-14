@@ -899,3 +899,6 @@ matching receipt; preserve ack/local records, refuse real or modified plans. Exi
 remains in Actions; three pinned file/folder IDs are private vars and have NOT been configured.
 Eight offline probe tests passed. CI covers Python publisher/probe on Windows and Linux. No live
 dispatch, Drive file, bot, Google or scheduler changes. This does not connect the local outbox to cloud.
+
+
+2026-10-14: PR55 expanded from topic-only Google Session self-approval to separate body/hook confirmations. view=review displays exact body/endings, then individual hooks; server checks active/effective allowlisted identity, pinned revision/component hash, unchanged packet and live topic/body receipts. Replay preserves original receipt. Self suite26/26, shared25/25, topic-only24/24 offline; addon regeneration matched, suite added Windows. No live Google, registrations, approval writes or deployment. Installation/OAuth real identity remains separate; new deployment must be archived on rollback.

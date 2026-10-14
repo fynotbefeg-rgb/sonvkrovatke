@@ -78,3 +78,73 @@ for (const [name, source] of [['standalone Code.gs', undefined], ['generated Rom
     assert.equal(snapshot(h).topics.length, 0);
   });
 }
+
+// Full speech approvals remain separate; only a live Google-authenticated visitor can confirm a part.
+const vm = await import('node:vm');
+const {createHash}=await import('node:crypto');
+const choicesFor = h => JSON.parse(vm.runInContext('JSON.stringify(RomanSharedReview.selfReviewChoices(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(), ["roman@example.test"]))', h.context));
+function speechSetup(source) {
+  const h = setup({source});
+  assert.equal(h.context.romanSelfApproveTopic('self-approval-test', 1, hashOf(h)).ok, true);
+  const p = {schemaVersion: '1.0.0', topicId: 'self-approval-test', topicText: packet().topicText, revision: 1,
+    bodyText: 'Проверенная основа <script>alert(1)</script>', hooks: [1,2,3].map(id => ({id, text: 'Хук ' + id})),
+    endings: [{platform: 'instagram', text: 'Отдельное окончание'}, {platform: 'tiktok', text: 'Напиши в личные сообщения'}]};
+  const r = h.post({token, action: 'add_shared_review', packet: p});
+  assert.equal(r.ok, true, JSON.stringify(r)); h.speechRow = r.firstRow; return h;
+}
+const confirm = (h, c) => h.context.romanSelfApprovePart(c.topicId, c.revision, c.part, c.hash);
+for (const [name, source] of [['standalone', undefined], ['addon', addon]]) {
+  test(`${name}: separate body including ending then three hooks yield only their exact approved variants`, () => {
+    const h = speechSetup(source);
+    const before = choicesFor(h); assert.deepEqual(before.map(c => c.part), ['body']);
+    assert.ok(before[0].text.includes('Отдельное окончание')); assert.ok(before[0].text.endsWith('Напиши в личные сообщения'));
+    const html = h.context.doGet({parameter: {view: 'review'}}).html;
+    assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;')); assert.ok(!html.includes('<script>alert(1)</script>'));
+    assert.equal(confirm(h, before[0]).ok, true);
+    const key = 'ROMAN_SHARED_RECEIPT:self-approval-test:body', original = h.properties.get(key);
+    assert.equal(confirm(h, before[0]).alreadyApproved, true); assert.equal(h.properties.get(key), original);
+    const hooks = choicesFor(h); assert.deepEqual(hooks.map(c => c.part), ['hook1','hook2','hook3']);
+    assert.equal(h.post({token, action: 'get_production_queue'}).items.length, 0);
+    assert.equal(confirm(h, hooks[0]).ok, true); assert.equal(h.post({token, action: 'get_production_queue'}).items.length, 2);
+    assert.equal(confirm(h, hooks[1]).ok, true); assert.equal(confirm(h, hooks[2]).ok, true);
+    assert.equal(h.post({token, action: 'get_production_queue'}).items.length, 6);
+    assert.equal(choicesFor(h).length, 0);
+  });
+  test(`${name}: forged identity, stale revision/hash, unsupported part and premature hook never approve`, () => {
+    const h = speechSetup(source), body = choicesFor(h)[0];
+    assert.equal(confirm(h, {...body, part: 'topic'}).ok, false);
+    assert.equal(confirm(h, {...body, part: 'hook4'}).ok, false);
+    assert.equal(confirm(h, {...body, revision: 2}).ok, false);
+    assert.equal(confirm(h, {...body, hash: '0'.repeat(64)}).ok, false);
+    // A real hook hash is insufficient before the body receipt exists.
+    const hash = vm.runInContext('JSON.parse(PropertiesService.getScriptProperties().getProperty("ROMAN_SHARED_REVIEW:self-approval-test"))', h.context);
+    assert.ok(hash.packet);
+    const digest=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
+    const p=hash.packet, display=p.bodyText+p.endings.map(e=>'\n\nОкончание '+e.platform+':\n'+e.text).join('');
+    const bh=digest(['shared-review-v1',p.topicId,p.revision,'body',display]);
+    const hh=digest(['shared-review-v1',p.topicId,p.revision,'hook',1,p.hooks.find(x=>x.id===1).text,bh]);
+    assert.equal(confirm(h,{...body,part:'hook1',hash:hh}).ok,false);
+    for (const id of [{active:'',effective:''},{active:ROMAN,effective:'owner@example.test'}, {active:'owner@example.test',effective:'owner@example.test'}]) {
+      Object.assign(h.identity,id); assert.equal(confirm(h,body).ok,false); assert.equal(choicesFor(h).length,0);
+    }
+    assert.equal(h.reviewRows[h.speechRow-1][3], '');
+  });
+  test(`${name}: withdrawn topic, changed body/ending, formula and disabled review invalidate stale forms`, () => {
+    for (const kind of ['topic','body','ending','formula','disabled']) {
+      const h = speechSetup(source), body = choicesFor(h)[0];
+      if(kind==='topic') {h.reviewRows[1][1]='Не утверждено';h.editReview(2,2,ROMAN);}
+      if(kind==='body'||kind==='ending')h.reviewRows[h.speechRow-1][2]+=' changed '+kind;
+      if(kind==='formula')h.reviewRows[h.speechRow-1][2]='=1';
+      if(kind==='disabled')h.properties.set('ROMAN_SHARED_REVIEW_ENABLED','false');
+      assert.equal(confirm(h,body).ok,false,kind); assert.equal(h.post({token,action:'get_production_queue'}).items.length,0);
+    }
+  });
+  test(`${name}: body and topic rejection stop saved hook form`, () => {
+    const h = speechSetup(source), body=choicesFor(h)[0]; assert.equal(confirm(h,body).ok,true);
+    const hook=choicesFor(h)[0];h.reviewRows[h.speechRow-1][3]='Не утверждено';h.editReview(h.speechRow,4,ROMAN);
+    assert.equal(confirm(h,hook).ok,false);
+    const other=speechSetup(source);const ob=choicesFor(other)[0];assert.equal(confirm(other,ob).ok,true);const oh=choicesFor(other)[0];
+    other.reviewRows[1][1]='Не утверждено'; other.editReview(2,2,ROMAN);
+    assert.equal(confirm(other,oh).ok,false);
+  });
+}

@@ -237,6 +237,7 @@ function romanHtml_(value) {
 // Topic choice page: only meaningful in a separate deployment that executes as the user accessing the web app,
 // where Google authenticates the visitor. Every other GET keeps the previous refusal.
 function doGet(e) {
+  if (e && e.parameter && e.parameter.view === 'review' && typeof RomanSharedReview !== 'undefined') return romanReviewPage_();
   if (!(e && e.parameter && e.parameter.view === 'topics') || typeof RomanSharedReview === 'undefined') {
     return romanJson_({ok: false, error: 'Use authenticated POST'});
   }
@@ -261,6 +262,28 @@ function selfApproveTopic(topicId, revision, hash) {
 }
 function romanSelfApproveTopic(topicId, revision, hash) { return selfApproveTopic(topicId, revision, hash); }
 
+function romanReviewPage_() {
+  const choices = RomanSharedReview.selfReviewChoices(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(), romanApprovers_());
+  const items = choices.map(function(c) {
+    const label = c.part === 'body' ? 'основу' : 'хук ' + c.part.slice(4);
+    return '<li><h3>' + romanHtml_(c.title) + '</h3><p style="white-space:pre-wrap">' + romanHtml_(c.text) +
+      '</p><button onclick="confirmPart(' + romanHtml_(JSON.stringify([c.topicId, c.revision, c.part, c.hash])) +
+      ')">Подтвердить ' + label + '</button></li>';
+  }).join('');
+  return HtmlService.createHtmlOutput('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<body style="font-family:sans-serif;max-width:640px;margin:16px"><h2>Основа и хуки</h2>' +
+    (items ? '<ul>' + items + '</ul>' : '<p>Нет доступных текстов. Сначала подтвердите тему; затем основа и каждый хук подтверждаются отдельно.</p>') +
+    '<p id="r"></p><script>function confirmPart(a){document.getElementById("r").textContent="Сохраняю…";' +
+    'google.script.run.withSuccessHandler(function(x){document.getElementById("r").textContent=x.ok?"Подтверждение сохранено. Обновите страницу для следующего текста.":"Не сохранено: "+x.error;})' +
+    '.withFailureHandler(function(){document.getElementById("r").textContent="Ошибка. Обновите страницу.";}).romanSelfApprovePart(a[0],a[1],a[2],a[3]);}</script></body>').setTitle('Основа и хуки');
+}
+function selfApprovePart(topicId, revision, part, hash) {
+  if (typeof RomanSharedReview === 'undefined') return {ok: false, error: 'Shared review unavailable'};
+  return RomanSharedReview.selfApprovePart(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(),
+    romanApprovers_(), topicId, revision, part, hash, romanLock_);
+}
+function romanSelfApprovePart(topicId, revision, part, hash) { return selfApprovePart(topicId, revision, part, hash); }
+
 // Run once after setting ROMAN_APPROVER_EMAILS in Script Properties.
 // Retains existing time triggers and does not change sharing or sheet protection.
 function setupRomanApproval() {
@@ -271,7 +294,7 @@ function setupRomanApproval() {
   Logger.log('Approval edit trigger ready. Redeploy the web app as a new version separately.');
 }
 
-return {doPost: doPost, doGet: doGet, selfApproveTopic: selfApproveTopic, onRomanApprovalEdit: onRomanApprovalEdit,
+return {doPost: doPost, doGet: doGet, selfApproveTopic: selfApproveTopic, selfApprovePart: selfApprovePart, onRomanApprovalEdit: onRomanApprovalEdit,
   setupRomanApproval: setupRomanApproval, queue: getApprovedProductionQueue,
   safety: checkProductionSafety};
 })();
@@ -279,6 +302,7 @@ return {doPost: doPost, doGet: doGet, selfApproveTopic: selfApproveTopic, onRoma
 function doPost(e) { return RomanApprovalV1.doPost(e); }
 function doGet(e) { return RomanApprovalV1.doGet(e); }
 function romanSelfApproveTopic(topicId, revision, hash) { return RomanApprovalV1.selfApproveTopic(topicId, revision, hash); }
+function romanSelfApprovePart(topicId, revision, part, hash) { return RomanApprovalV1.selfApprovePart(topicId, revision, part, hash); }
 function onRomanApprovalEdit(e) { return RomanApprovalV1.onRomanApprovalEdit(e); }
 function setupRomanApproval() { return RomanApprovalV1.setupRomanApproval(); }
 function romanApprovalQueueV1() { return RomanApprovalV1.queue(); }
