@@ -1,0 +1,30 @@
+{
+  "artifactType": "combined_editorial_selection",
+  "artifactVersion": 1,
+  "topicAngle": "SEO с Claude: возможности инструментов, расходы и ограничения",
+  "decisionSource": "owner_relays_Roman_conversation",
+  "topicDecision": "accepted_in_conversation",
+  "bodyDecision": "accepted_in_conversation",
+  "hookDecision": "accepted_in_conversation",
+  "bodyText": "Claude можно подключить к SEO-инструментам, но у каждого своя задача. Первый — GSC MCP: даёт доступ\nк данным твоего сайта в Search Console, чтобы разобрать запросы, показы и клики. Для этого нужно\nотдельно настроить доступ Google. Второй — OpenSEO: помогает работать с ключами, позициями и\nбэклинками. Код открытый, но данные DataForSEO оплачиваются отдельно. Третий — GEO Optimizer:\nпроверяет признаки доступности и понятности страницы для поисковых систем с ИИ. Его рекомендации\nнужно перепроверять, а высокий балл не гарантирует цитирование. Практический результат — выбрать\nстраницу по данным, подтвердить проблему и получить список действий. Установка плагинов сама\nпо себе не исправляет сайт и не гарантирует рост трафика.",
+  "bodySha256": "f7b44123ca3d3a867804aa578d537efc7d3a22e39cb855ef6a2c03a321367e80",
+  "hooks": [
+    {
+      "id": 1,
+      "text": "Как с помощью Claude найти SEO-ошибки на своём сайте?"
+    },
+    {
+      "id": 2,
+      "text": "Сайт навайбкодил, а из поиска никто не приходит? Покажу, как проверить, что мешает Google находить твои страницы."
+    },
+    {
+      "id": 3,
+      "text": "Не знаешь, с чего начать SEO своего сайта? Покажу, какие ошибки проверить в первую очередь."
+    }
+  ],
+  "serverApprovalReceiptVerified": false,
+  "generationAllowed": false,
+  "renderAllowed": false,
+  "productionAllowed": false,
+  "platformEndingsConfirmed": false
+}

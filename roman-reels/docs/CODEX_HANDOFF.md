@@ -899,3 +899,26 @@ matching receipt; preserve ack/local records, refuse real or modified plans. Exi
 remains in Actions; three pinned file/folder IDs are private vars and have NOT been configured.
 Eight offline probe tests passed. CI covers Python publisher/probe on Windows and Linux. No live
 dispatch, Drive file, bot, Google or scheduler changes. This does not connect the local outbox to cloud.
+
+## 2026-10-13 — owner clarifies SEO plugin theme, primary-source recheck
+
+Owner supplied Nick Saraev transcript and clarified the theme as GSC MCP / OpenSEO / GEO Optimizer,
+not merely the old technical-fixture audit body. Read existing research and refreshed public project
+README/documentation. The found OpenSEO requires paid DataForSEO for SEO data; GSC standard scope is
+webmasters and submit_sitemap is not disabled by ALLOW_DESTRUCTIVE=false (current blob0bc4b85f).
+GEO local audit vs provider-key citations and non-guaranteed score are separated. Google AI features
+need normal SEO, not special mandatory markup. Claude subscription is not a free viewer prerequisite.
+
+SEO_PLUGIN_VIDEO_BRIEF.md preserves source links, R06 blocker, a proposed honest overview angle,
+a clearly unapproved discussion-only body and screen evidence plan. No claim the repositories are
+proven identical to those shown in the Reel. Existing smoke evidence remains version4.19.0/Linux,
+not fresh runtime execution. Paid dependency/whole-free path unverified: do not send the draft through
+protected approval/recording flows or silently replace the body Roman liked. PR49 hooks stay exact;
+await Roman's exact body reply. No installs, Google accounts/rights, paid API/Gemini, site writes,
+HeyGen, real video, approvals, montage or production. No source script imported/executed.
+
+
+2026-10-14: owner explicitly identifies the approval of the SEO_PLUGIN_VIDEO_BRIEF.md discussion body as Roman’s decision. Exact body and SHA-256 recorded in research/seo-hooks-owner-relay-20261013/body-decision.json. Editorial accepted_in_conversation only; no forged server identity/timestamp/receipt, no Google write, no R06 waiver or production permission. Earlier exact-body waiting status is superseded for this draft.
+
+
+2026-10-14: SEO_ROMAN_ACCEPTED_TEXTS.md and accepted-texts.json combine the exact three accepted PR49 hooks with the explicitly chosen plugin-overview body. Historical v5 body candidate is superseded; do not request a new topic choice. This is editorial evidence only, not a shared-review packet or Google receipt. Component bytes verified unchanged. Final CTA, live Google registration/receipts and factual/free-cost release gates remain separate.
