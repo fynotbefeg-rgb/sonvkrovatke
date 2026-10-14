@@ -916,3 +916,6 @@ not fresh runtime execution. Paid dependency/whole-free path unverified: do not 
 protected approval/recording flows or silently replace the body Roman liked. PR49 hooks stay exact;
 await Roman's exact body reply. No installs, Google accounts/rights, paid API/Gemini, site writes,
 HeyGen, real video, approvals, montage or production. No source script imported/executed.
+
+
+2026-10-14: owner explicitly identifies the approval of the SEO_PLUGIN_VIDEO_BRIEF.md discussion body as Roman’s decision. Exact body and SHA-256 recorded in research/seo-hooks-owner-relay-20261013/body-decision.json. Editorial accepted_in_conversation only; no forged server identity/timestamp/receipt, no Google write, no R06 waiver or production permission. Earlier exact-body waiting status is superseded for this draft.
