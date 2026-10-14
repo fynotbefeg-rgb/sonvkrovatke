@@ -76,6 +76,36 @@ const RomanSharedReview = (function() {
         hash: topicHash(c.packet), approvedBy: email, approvedAt: new Date().toISOString()}));
     });
   }
+  // Self-approval through a web app deployment that executes AS THE VISITOR. In consumer Google accounts an
+  // installable edit trigger owned by the operator receives an empty e.user for other editors, so the sheet
+  // dropdown alone can never prove who chose. Here Google itself authenticates the visitor: the caller passes
+  // Session active + effective user, both must be the same allowlisted address (the script runs as that person).
+  function selfIdentity(active, effective, approvers) {
+    const email = String(active || '').trim().toLowerCase();
+    if (!enabled() || !email || email !== String(effective || '').trim().toLowerCase() || approvers.indexOf(email) < 0) return '';
+    return email;
+  }
+  function selfTopicChoices(active, effective, approvers) {
+    if (!selfIdentity(active, effective, approvers)) return [];
+    return topicConfigs().filter(function(c) { return topicMatches(c) && !topicReceipt(c, approvers); }).map(function(c) {
+      return {topicId: c.packet.topicId, revision: c.packet.revision, title: c.packet.topicText.slice(0, 300),
+        row: c.firstRow, topicHash: topicHash(c.packet)};
+    });
+  }
+  function selfApproveTopic(active, effective, approvers, topicId, revision, hash, withLock) {
+    const email = selfIdentity(active, effective, approvers);
+    if (!email) return {ok: false, error: 'Approver identity not confirmed by Google'};
+    return withLock(function() {
+      const c = topicConfigs().filter(function(x) { return x.packet.topicId === topicId; })[0];
+      if (!c || c.packet.revision !== revision || topicHash(c.packet) !== hash || !topicMatches(c)) return {ok: false, error: 'Topic changed; reload the page'};
+      // Script writes do not fire the edit trigger, so the receipt below is not revoked by it.
+      sheetFor(c).getRange(c.firstRow, 2).setValue(approved);
+      props().setProperty(topicReceiptKey(c), JSON.stringify({topicId: c.packet.topicId, part: 'topic',
+        hash: topicHash(c.packet), approvedBy: email, approvedAt: new Date().toISOString()}));
+      SpreadsheetApp.flush();
+      return {ok: true, topicId: c.packet.topicId, revision: c.packet.revision, row: c.firstRow, productionAllowed: false};
+    });
+  }
   function registerTopic(packet, withLock) {
     if (!enabled()) throw Error('Shared review disabled');
     validateTopic(packet);
@@ -410,5 +440,6 @@ const RomanSharedReview = (function() {
     if (new Set(result.map(function(x) { return x.version_id; })).size !== result.length) throw Error('Ambiguous queue versions');
     return result;
   }
-  return {enabled: enabled, handles: handles, edit: edit, register: register, registerTopic: registerTopic, queue: queue, topicSnapshot: topicSnapshot, reviewStatusSnapshot: reviewStatusSnapshot};
+  return {enabled: enabled, handles: handles, edit: edit, register: register, registerTopic: registerTopic, queue: queue, topicSnapshot: topicSnapshot, reviewStatusSnapshot: reviewStatusSnapshot,
+    selfTopicChoices: selfTopicChoices, selfApproveTopic: selfApproveTopic};
 })();

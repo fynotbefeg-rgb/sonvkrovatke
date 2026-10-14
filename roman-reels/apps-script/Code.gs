@@ -228,7 +228,35 @@ function doPost(e) {
   }
 }
 
-function doGet() { return romanJson_({ok: false, error: 'Use authenticated POST'}); }
+function romanHtml_(value) {
+  return String(value).replace(/[&<>"']/g, function(ch) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]; });
+}
+// Topic choice page: only meaningful in a separate deployment that executes as the user accessing the web app,
+// where Google authenticates the visitor. Every other GET keeps the previous refusal.
+function doGet(e) {
+  if (!(e && e.parameter && e.parameter.view === 'topics') || typeof RomanSharedReview === 'undefined') {
+    return romanJson_({ok: false, error: 'Use authenticated POST'});
+  }
+  const choices = RomanSharedReview.selfTopicChoices(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(), romanApprovers_());
+  const items = choices.map(function(c) {
+    return '<li><p>' + romanHtml_(c.title) + ' (строка ' + c.row + ')</p><button onclick="pick(' +
+      romanHtml_(JSON.stringify([c.topicId, c.revision, c.topicHash])) + ')">Утвердить эту тему</button></li>';
+  }).join('');
+  const html = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<body style="font-family:sans-serif;max-width:640px;margin:16px">' +
+    '<h2>Выбор темы</h2>' + (items ? '<ul>' + items + '</ul>' : '<p>Нет тем для выбора или Google не подтвердил аккаунт.</p>') +
+    '<p id="r"></p><script>function pick(a){document.getElementById("r").textContent="Сохраняю…";' +
+    'google.script.run.withSuccessHandler(function(x){document.getElementById("r").textContent=x.ok?"Тема утверждена. Строка "+x.row:"Не сохранено: "+x.error;})' +
+    '.withFailureHandler(function(){document.getElementById("r").textContent="Ошибка, обновите страницу";}).romanSelfApproveTopic(a[0],a[1],a[2]);}</script></body>';
+  return HtmlService.createHtmlOutput(html).setTitle('Выбор темы');
+}
+// Called from the page above; identity comes only from Google Session, never from parameters.
+function selfApproveTopic(topicId, revision, hash) {
+  if (typeof RomanSharedReview === 'undefined') return {ok: false, error: 'Shared review unavailable'};
+  return RomanSharedReview.selfApproveTopic(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(),
+    romanApprovers_(), topicId, revision, hash, romanLock_);
+}
+function romanSelfApproveTopic(topicId, revision, hash) { return selfApproveTopic(topicId, revision, hash); }
 
 // Run once after setting ROMAN_APPROVER_EMAILS in Script Properties.
 // Retains existing time triggers and does not change sharing or sheet protection.

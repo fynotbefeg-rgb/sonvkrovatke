@@ -198,7 +198,9 @@ test('additive file coexists with legacy globals while the POST queue enforces r
     function testConnection() { return 'old-test'; }`;
   const h = harness(legacy + '\n' + addon);
   assert.equal(h.context.legacyDoPost(), 'old-post');
-  assert.equal(h.context.doGet(), 'old-get-denies-scripts');
+  // The addon now owns doGet (topic self-approval page). The live legacy doGet only refused GET; the addon keeps
+  // that refusal for every request except ?view=topics.
+  assert.equal(JSON.parse(h.context.doGet().content).error, 'Use authenticated POST');
   assert.equal(h.context.checkProductionSafety(), 'old-safety');
   assert.equal(h.context.getApprovedProductionQueue()[0], 'old-unverified-queue');
   h.rows[1][6] = 'Утверждено';

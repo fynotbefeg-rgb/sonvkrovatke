@@ -55,6 +55,7 @@ jobs:
           node roman-reels/scripts/review-status.test.mjs
           node roman-reels/scripts/shared-review.test.mjs
           node roman-reels/scripts/topic-only-review.test.mjs
+          node roman-reels/scripts/topic-self-approval.test.mjs
           node roman-reels/scripts/windows-telegram-config.test.mjs
           node roman-reels/scripts/windows-plan-delivery.test.mjs
           node roman-reels/scripts/windows-plan-ack.test.mjs
