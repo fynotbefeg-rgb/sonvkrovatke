@@ -45,13 +45,13 @@ function fake(extra={}){
   const events=[];
   const options={platform:'win32',env:{LOCALAPPDATA:path.resolve('/fictional-owner')},
     load:async()=>{events.push('load');return config();},check:async()=>{events.push('check');return {lastDay:0,lastWeek:0};},
-    access:async x=>{events.push('access');assert.equal(x.apiKey,KEY);return {generationCalls:0};},
+    access:async x=>{events.push('access');assert.equal(x.apiKey,KEY);return {generationCalls:0,catalogueHttpStatus:200,modelListed:true,countTokensHttpStatus:200};},
     editorial:async x=>{events.push(x.mode);return x;},...extra};return {events,options};
 }
 test('check-config never calls API and returns no key; check-access cannot call generation',async()=>{
   const f=fake(),result=await runWindowsGemini({...f.options,args:['check-config']});
   assert.deepEqual(f.events,['load','check']);assert.ok(!JSON.stringify(result).includes(KEY));
-  const a=fake();assert.deepEqual(await runWindowsGemini({...a.options,args:['check-access']}),{generationCalls:0});
+  const a=fake();assert.deepEqual(await runWindowsGemini({...a.options,args:['check-access']}),{generationCalls:0,catalogueHttpStatus:200,modelListed:true,countTokensHttpStatus:200,accessAvailable:true});
   assert.deepEqual(a.events,['load','check','access']);
 });
 test('offline prepare needs no key, store or environment authorization',async()=>{
@@ -87,4 +87,14 @@ test('Windows DPAPI roundtrip with fictional key, no network or user config', {s
   const encrypted=await dpapi.protect(JSON.stringify(config()));
   assert.ok(!encrypted.includes(KEY));await writeFile(file,encrypted);
   assert.equal((await loadGeminiConfig(file)).apiKey,KEY);
+});
+
+test('HTTP quota/region refusal or missing model is not reported as available access',async()=>{
+  for(const data of [{catalogueHttpStatus:403,modelListed:false,countTokensHttpStatus:403},
+    {catalogueHttpStatus:200,modelListed:false,countTokensHttpStatus:404},
+    {catalogueHttpStatus:200,modelListed:true,countTokensHttpStatus:429}]){
+    const f=fake({access:async()=>({...data,generationCalls:0})});
+    const result=await runWindowsGemini({...f.options,args:['check-access']});
+    assert.equal(result.accessAvailable,false);assert.equal(result.generationCalls,0);assert.ok(!f.events.includes('generate'));
+  }
 });
