@@ -206,3 +206,13 @@ PR55 теперь охватывает тему, основу и каждый х
 ## 2026-10-15 — Windows Gemini private pilot candidate
 
 Prepared owner-only masked WinForms API-key entry, DPAPI CurrentUser storage outside Git, canonical persistent budget initialization/checks and Windows editorial wrapper. Owner reports Default Gemini Project Free tier; neither billing nor key inspected by Codex. Modes separate offline preparation, model catalogue/countTokens access check and explicitly double-gated one-shot generation. 9 offline tests plus Windows-only fictional DPAPI roundtrip; Linux/Windows CI entries and PowerShell syntax check. WINDOWS_GEMINI_PILOT.md contains installation task. No live API requests, Windows setup, secrets, Google/Drive/bot/scheduler, HeyGen or production changes. No automatic regeneration of Roman-approved texts. Next: green CI, owner-authorized merge, then owner enters key only in local form; report access before authorizing one fictional generation.
+
+
+## 2026-10-15 — GSC bounded read adapter, not a live MCP connection
+Audited upstream mcp-gsc at d49eea9. Prepared separate Node adapter with three
+read-only operations, fixed page/date/10-row query, returned-property binding,
+no redirects/retries, per-session reservation and bounded response. Seven offline
+tests include denied write-tools and broad/expired provider metadata. Auth scope
+metadata is a provider contract, not independent OAuth proof. No credentials,
+login, MCP transport or live data yet. See GSC_READONLY_CONNECTION.md for precise
+remaining OAuth/Windows storage/MCP steps. No installation or live changes.
