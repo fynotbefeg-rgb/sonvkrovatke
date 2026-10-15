@@ -902,3 +902,8 @@ dispatch, Drive file, bot, Google or scheduler changes. This does not connect th
 
 
 2026-10-14: PR55 expanded from topic-only Google Session self-approval to separate body/hook confirmations. view=review displays exact body/endings, then individual hooks; server checks active/effective allowlisted identity, pinned revision/component hash, unchanged packet and live topic/body receipts. Replay preserves original receipt. Self suite26/26, shared25/25, topic-only24/24 offline; addon regeneration matched, suite added Windows. No live Google, registrations, approval writes or deployment. Installation/OAuth real identity remains separate; new deployment must be archived on rollback.
+
+
+## 2026-10-15 — Windows Gemini private pilot candidate
+
+Prepared owner-only masked WinForms API-key entry, DPAPI CurrentUser storage outside Git, canonical persistent budget initialization/checks and Windows editorial wrapper. Owner reports Default Gemini Project Free tier; neither billing nor key inspected by Codex. Modes separate offline preparation, model catalogue/countTokens access check and explicitly double-gated one-shot generation. 9 offline tests plus Windows-only fictional DPAPI roundtrip; Linux/Windows CI entries and PowerShell syntax check. WINDOWS_GEMINI_PILOT.md contains installation task. No live API requests, Windows setup, secrets, Google/Drive/bot/scheduler, HeyGen or production changes. No automatic regeneration of Roman-approved texts. Next: green CI, owner-authorized merge, then owner enters key only in local form; report access before authorizing one fictional generation.

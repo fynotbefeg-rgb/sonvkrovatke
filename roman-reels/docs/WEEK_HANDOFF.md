@@ -201,3 +201,8 @@ node scripts/receive-windows-plan.mjs
 ## 2026-10-14 — единый кандидат исправления подтверждений
 
 PR55 теперь охватывает тему, основу и каждый хук через execute-as-user Google-вход. view=topics — тема; view=review — основа с окончаниями, затем три независимых хука. 26/26 self tests, 25/25 shared, 24/24 topic-only; без живой установки/согласований. После зелёного CI нужно отдельное разрешение на слияние/установку. Не переносить решение темы на тексты. Роман уже принял содержание в переписке; остаётся техническое оформление точного пакета и проверка реального Google-входа.
+
+
+## 2026-10-15 — Windows Gemini private pilot candidate
+
+Prepared owner-only masked WinForms API-key entry, DPAPI CurrentUser storage outside Git, canonical persistent budget initialization/checks and Windows editorial wrapper. Owner reports Default Gemini Project Free tier; neither billing nor key inspected by Codex. Modes separate offline preparation, model catalogue/countTokens access check and explicitly double-gated one-shot generation. 9 offline tests plus Windows-only fictional DPAPI roundtrip; Linux/Windows CI entries and PowerShell syntax check. WINDOWS_GEMINI_PILOT.md contains installation task. No live API requests, Windows setup, secrets, Google/Drive/bot/scheduler, HeyGen or production changes. No automatic regeneration of Roman-approved texts. Next: green CI, owner-authorized merge, then owner enters key only in local form; report access before authorizing one fictional generation.
