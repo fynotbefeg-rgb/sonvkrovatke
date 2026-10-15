@@ -206,3 +206,12 @@ PR55 теперь охватывает тему, основу и каждый х
 ## 2026-10-15 — Windows Gemini private pilot candidate
 
 Prepared owner-only masked WinForms API-key entry, DPAPI CurrentUser storage outside Git, canonical persistent budget initialization/checks and Windows editorial wrapper. Owner reports Default Gemini Project Free tier; neither billing nor key inspected by Codex. Modes separate offline preparation, model catalogue/countTokens access check and explicitly double-gated one-shot generation. 9 offline tests plus Windows-only fictional DPAPI roundtrip; Linux/Windows CI entries and PowerShell syntax check. WINDOWS_GEMINI_PILOT.md contains installation task. No live API requests, Windows setup, secrets, Google/Drive/bot/scheduler, HeyGen or production changes. No automatic regeneration of Roman-approved texts. Next: green CI, owner-authorized merge, then owner enters key only in local form; report access before authorizing one fictional generation.
+
+
+## 2026-10-15 — scoped disclosed SEO pricing policy
+Prepared version 1.3.0: only exact accepted topic/revision/three speech hashes
+may use seo_disclosed_costs_v1. All five cost layers, official fresh pricing,
+paid amount/currency/billing basis/minimum commitment and explicit disclosure
+remain mandatory. Other topics remain free-only; demo/reference/semantic gates
+unchanged. See SEO_RELEASE_STATUS.md. No Google writes, payments, generation,
+HeyGen or production. PR57 receipt probe verified the topic; speech stays pending.
