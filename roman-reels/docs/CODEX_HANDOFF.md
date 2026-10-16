@@ -921,3 +921,28 @@ paid amount/currency/billing basis/minimum commitment and explicit disclosure
 remain mandatory. Other topics remain free-only; demo/reference/semantic gates
 unchanged. See SEO_RELEASE_STATUS.md. No Google writes, payments, generation,
 HeyGen or production. PR57 receipt probe verified the topic; speech stays pending.
+
+
+## 2026-10-15 — GSC bounded read adapter, not a live MCP connection
+Audited upstream mcp-gsc at d49eea9. Prepared separate Node adapter with three
+read-only operations, fixed page/date/10-row query, returned-property binding,
+no redirects/retries, per-session reservation and bounded response. Seven offline
+tests include denied write-tools and broad/expired provider metadata. Auth scope
+metadata is a provider contract, not independent OAuth proof. No credentials,
+login, MCP transport or live data yet. See GSC_READONLY_CONNECTION.md for precise
+remaining OAuth/Windows storage/MCP steps. No installation or live changes.
+
+
+## 2026-10-16 — подготовка последовательного слияния PR57–59
+
+Проверены прежние точные head и зелёный CI; независимое ревью Luna не нашло
+блокирующих замечаний. В изолированной ветке сохранены обе стороны конфликтов
+handoff и все новые тесты Linux/Windows. PR58 включает изменения PR57; PR59
+включает PR57/58. CI нужно подтвердить на обновлённых head. Base не изменена.
+
+**Следующий шаг после разрешённого слияния — диагностика ноутбука и оставшиеся
+фактические проверки, не автоматическая регистрация Google-пакета.** Тема
+выбрана; точные основы/хуки pending. Демонстрация GSC/OpenSEO, текущий reference
+и semantic release остаются незавершёнными; новый режим стоимости их не отменяет.
+Материалы GEO/карточки подготовлены в облаке, на ноутбук не передавались.
+Ни Google, ни бот, ни секреты, ни HeyGen/генерация/монтаж не затронуты.
