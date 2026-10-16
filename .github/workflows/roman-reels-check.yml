@@ -6,6 +6,10 @@ name: Roman Reels — проверка (ручной запуск)
 on:
   workflow_dispatch:
     inputs:
+      topic_review_probe:
+        description: "Read one exact current SEO topic receipt; no writes or production"
+        type: boolean
+        default: false
       windows_outbox_relay:
         description: "Relay the laptop outbox slot to the mailbox after a fresh approval read; all other modes skipped"
         type: boolean
@@ -106,8 +110,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  topic-review-probe:
+    if: inputs.topic_review_probe && (github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/feature/codex-topic-review-probe-20261015')
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Read exact selected SEO topic without exposing approver identity
+        env:
+          ROMAN_REELS_WEBHOOK_URL: ${{ secrets.ROMAN_REELS_WEBHOOK_URL }}
+          ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
+        run: |
+          node roman-reels/scripts/check-selected-topic.mjs roman-topic-seo-20261013 2 "SEO с Claude: возможности инструментов, расходы и ограничения"
   windows-outbox-relay:
-    if: inputs.windows_outbox_relay && !inputs.windows_delivery_probe && github.ref == 'refs/heads/feature/codex-pipeline'
+    if: ${{ !inputs.topic_review_probe && (inputs.windows_outbox_relay && !inputs.windows_delivery_probe && github.ref == 'refs/heads/feature/codex-pipeline') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:
@@ -136,7 +155,7 @@ jobs:
           ROMAN_WINDOWS_OUTBOX_RELAY_APPROVED: 'true'
         run: python roman-reels/scripts/relay_windows_outbox.py
   windows-delivery-probe:
-    if: inputs.windows_delivery_probe && !inputs.windows_outbox_relay && github.ref == 'refs/heads/feature/codex-pipeline'
+    if: ${{ !inputs.topic_review_probe && (inputs.windows_delivery_probe && !inputs.windows_outbox_relay && github.ref == 'refs/heads/feature/codex-pipeline') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:
@@ -163,7 +182,7 @@ jobs:
           PROBE_ACTION: ${{ inputs.windows_delivery_probe_action }}
         run: python roman-reels/scripts/windows_delivery_probe.py "$PROBE_ACTION"
   four-part-drive-self-test:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.four_part_drive_self_test && inputs.check_drive_intake_access && !inputs.run_drive_intake && github.ref == 'refs/heads/feature/codex-four-part-intake') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.four_part_drive_self_test && inputs.check_drive_intake_access && !inputs.run_drive_intake && github.ref == 'refs/heads/feature/codex-four-part-intake')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -199,7 +218,7 @@ jobs:
           retention-days: 3
           if-no-files-found: error
   drive-intake:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.run_drive_intake && !inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.run_drive_intake && !inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     concurrency:
@@ -231,7 +250,7 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
   drive-intake-access:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.check_drive_intake_access && github.ref == 'refs/heads/feature/codex-pipeline')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -251,7 +270,7 @@ jobs:
           path: ${{ runner.temp }}/drive-intake-access.json
           retention-days: 7
   inspect-saved-apify:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.inspect_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.inspect_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
@@ -267,7 +286,7 @@ jobs:
       - name: Inspect downloaded files without service credentials
         run: python roman-reels/scripts/inspect-apify-media.py
   read-saved-apify:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.read_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.read_saved_apify && github.ref == 'refs/heads/feature/codex-pipeline')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
@@ -286,7 +305,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/read-saved-apify.mjs
   reference-research:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.apify_reference_research && github.ref == 'refs/heads/feature/codex-pipeline') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.apify_reference_research && github.ref == 'refs/heads/feature/codex-pipeline')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -319,7 +338,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
   production-queue-tests:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -332,14 +351,14 @@ jobs:
           node roman-reels/scripts/production-queue.test.mjs
           node roman-reels/scripts/manual-intake.test.mjs
   claude-task:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.run_claude_task && !inputs.test_production_queue && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.run_claude_task && !inputs.test_production_queue && !inputs.check_google_queue && !inputs.send_pilot_drafts && !inputs.check_apify_access && !inputs.collect_one_apify_reel && github.ref == 'refs/heads/automation/roman-reels-v1')) }}
     uses: ./.github/workflows/roman-claude-task.yml
     with:
       enabled: ${{ vars.ROMAN_CLAUDE_ENABLED == 'true' }}
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
   google-queue:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && ((inputs.check_google_queue || inputs.send_pilot_drafts) && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.run_drive_intake && !inputs.check_drive_intake_access && !inputs.apify_reference_research && !inputs.read_saved_apify && !inputs.inspect_saved_apify && (github.ref == 'refs/heads/automation/roman-reels-v1' || (inputs.check_google_queue && !inputs.send_pilot_drafts && (github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/feature/codex-approved-four-part-jobs')))) }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && ((inputs.check_google_queue || inputs.send_pilot_drafts) && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.run_drive_intake && !inputs.check_drive_intake_access && !inputs.apify_reference_research && !inputs.read_saved_apify && !inputs.inspect_saved_apify && (github.ref == 'refs/heads/automation/roman-reels-v1' || (inputs.check_google_queue && !inputs.send_pilot_drafts && (github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/feature/codex-approved-four-part-jobs'))))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -379,7 +398,7 @@ jobs:
           ROMAN_REELS_WEBHOOK_TOKEN: ${{ secrets.ROMAN_REELS_WEBHOOK_TOKEN }}
         run: node roman-reels/scripts/send-drafts-to-sheet.mjs roman-reels/research/roman-pilot-drafts.json
   one-reel:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.collect_one_apify_reel && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.collect_one_apify_reel && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
@@ -406,7 +425,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
   apify:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.check_apify_access && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1') }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (inputs.check_apify_access && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts && github.ref == 'refs/heads/automation/roman-reels-v1')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -421,7 +440,7 @@ jobs:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node roman-reels/scripts/check-apify-access.mjs
   check:
-    if: ${{ !inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (!inputs.run_drive_intake && !inputs.check_drive_intake_access && !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts) }}
+    if: ${{ !inputs.topic_review_probe && (!inputs.windows_delivery_probe && !inputs.windows_outbox_relay && (!inputs.run_drive_intake && !inputs.check_drive_intake_access && !inputs.inspect_saved_apify && !inputs.read_saved_apify && !inputs.apify_reference_research && !inputs.test_production_queue && !inputs.run_claude_task && !inputs.check_apify_access && !inputs.collect_one_apify_reel && !inputs.check_google_queue && !inputs.send_pilot_drafts)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
