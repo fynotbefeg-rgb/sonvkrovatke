@@ -115,3 +115,17 @@ node roman-reels/scripts/check-editorial-release.mjs \
 Артефакт стоимости: `scope: viewer_workflow`, `requiredPayment: false`, `trialOnly: false`, непустые `testedUsage`, `limitations`, массив `components`. Покрыть все слои `tool`, `model`, `integration`, `execution`, `data`, включая все обязательные зависимости каждого слоя. Для каждого: `layer`, `name`, `access` (free/free_tier/not_required), `requiredPayment: false`, `requiredCost: 0`, `checkedAt`, `limits`, `sourceUrl` (официальный HTTPS источник), `sourceQuote`. Для not_required дополнительно `notRequiredReason`. Тарифы проверяются не более 30 дней назад. При любом неизвестном/платном/просроченном компоненте отправка запрещена.
 
 Цитаты, полноту списка зависимостей, официальность URL и соответствие теста проверяет редактор: автоматическая структура и хеш не подтверждают их истинность. Учебные example.com данные существуют только в тестах, не являются доказательствами стоимости реальных сервисов. Платная подписка Claude Pro/Max не превращается в бесплатную из-за того, что она уже куплена.
+
+
+## Узкий режим раскрытия расходов SEO
+
+`costReview.policy: seo_disclosed_costs_v1` разрешён только для точных трёх
+хешей принятой SEO-речи (roman-topic-seo-20261013, revision 2). Без policy действует
+прежний бесплатный режим; неизвестный режим запрещён. Тарифный evidence сохраняет
+все прежние поля и добавляет policy, costDisclosure и noFreeBundleClaim=true.
+requiredPayment должен совпадать с наличием платных компонентов. Для access=paid
+нужны requiredPayment=true, requiredCost>0, currency (ISO-код), billingBasis и
+minimumCommitment (явно «нет», если обязательного пополнения нет). Бесплатные
+компоненты сохраняют requiredCost=0 и requiredPayment=false. Все пять слоёв,
+свежесть официальных источников, демонстрация и остальные gates обязательны.
+Новый режим ничего не записывает в Google и не разрешает оплату или генерацию.
