@@ -921,3 +921,51 @@ paid amount/currency/billing basis/minimum commitment and explicit disclosure
 remain mandatory. Other topics remain free-only; demo/reference/semantic gates
 unchanged. See SEO_RELEASE_STATUS.md. No Google writes, payments, generation,
 HeyGen or production. PR57 receipt probe verified the topic; speech stays pending.
+
+
+## 2026-10-15 — GSC bounded read adapter, not a live MCP connection
+Audited upstream mcp-gsc at d49eea9. Prepared separate Node adapter with three
+read-only operations, fixed page/date/10-row query, returned-property binding,
+no redirects/retries, per-session reservation and bounded response. Seven offline
+tests include denied write-tools and broad/expired provider metadata. Auth scope
+metadata is a provider contract, not independent OAuth proof. No credentials,
+login, MCP transport or live data yet. See GSC_READONLY_CONNECTION.md for precise
+remaining OAuth/Windows storage/MCP steps. No installation or live changes.
+
+
+## 2026-10-16 — подготовка последовательного слияния PR57–59
+
+Проверены прежние точные head и зелёный CI; независимое ревью Luna не нашло
+блокирующих замечаний. В изолированной ветке сохранены обе стороны конфликтов
+handoff и все новые тесты Linux/Windows. PR58 включает изменения PR57; PR59
+включает PR57/58. CI нужно подтвердить на обновлённых head. Base не изменена.
+
+**Следующий шаг после разрешённого слияния — диагностика ноутбука и оставшиеся
+фактические проверки, не автоматическая регистрация Google-пакета.** Тема
+выбрана; точные основы/хуки pending. Демонстрация GSC/OpenSEO, текущий reference
+и semantic release остаются незавершёнными; новый режим стоимости их не отменяет.
+Материалы GEO/карточки подготовлены в облаке, на ноутбук не передавались.
+Ни Google, ни бот, ни секреты, ни HeyGen/генерация/монтаж не затронуты.
+
+
+## 2026-10-16 — разрешённое владельцем обновление кода
+
+Владелец отдельно разрешил Codex последовательное слияние PR57 → PR58 → PR59.
+PR57 слит: 0db814735b6722e79af076817bfbac613875cff1.
+PR58 слит: 04f16b9eea0e102c288155aa77386424b1ca9fb5.
+Перед слиянием CI был зелёным на точных head, prospective merge tree PR58
+совпал с проверенным деревом. Эта завершающая запись включена в PR59; его
+фактический статус и merge SHA — https://github.com/fynotbefeg-rgb/sonvkrovatke/pull/59 .
+Последняя правка относится только к передаче состояния, код проверок не менялся.
+
+**Claude на ноутбуке:** проверить чистоту рабочего дерева; обновить основную
+ветку только fetch + merge --ff-only. Локальные данные и .playwright-mcp не трогать.
+Затем только диагностика текущего супервизора/бота и MCP без перезапуска процессов
+и без второго бота. Следующий шаг первого пилота — закрыть недостающие факты и
+доступы, не автоматическая отправка pending-пакета в Google.
+
+Тема SEO уже выбрана: Codex подтвердил точную ревизию 2 защищённым чтением.
+Принятую основу/хуки не переписывать. Пакет пока не зарегистрирован для отдельных
+серверных квитанций; GSC/OpenSEO demo и редакторский допуск не завершены.
+Никакого разрешения на HeyGen, платные вызовы, монтаж или производство слияния
+не дают. Google, токены, конфиги, база, процессы и автозапуск не менялись.
