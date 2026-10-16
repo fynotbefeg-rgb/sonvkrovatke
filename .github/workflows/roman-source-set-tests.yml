@@ -77,6 +77,7 @@ jobs:
           node --test roman-reels/scripts/researched-gemini-drafts.test.mjs
           node --test roman-reels/scripts/gemini-bounded-client.test.mjs
           node --test roman-reels/scripts/gemini-editorial-cli.test.mjs
+          node --test roman-reels/scripts/editorial-release.test.mjs
           node roman-reels/scripts/windows-gemini-config.test.mjs
           node --test roman-reels/scripts/source-uploader.test.mjs
           node --test roman-reels/scripts/four-part-receipt-upload.test.mjs
@@ -131,6 +132,8 @@ jobs:
           node --test roman-reels/scripts/gemini-bounded-client.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node --test roman-reels/scripts/gemini-editorial-cli.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test roman-reels/scripts/editorial-release.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node roman-reels/scripts/topic-self-approval.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

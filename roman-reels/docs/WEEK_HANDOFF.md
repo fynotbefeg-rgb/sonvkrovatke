@@ -211,3 +211,12 @@ Prepared owner-only masked WinForms API-key entry, DPAPI CurrentUser storage out
 ## 2026-10-15 — exact topic read-only cloud probe and pending speech packet
 
 Prepared isolated topic_review_probe in existing registered check workflow; allowed only base and the explicit probe branch, all other jobs suppressed. Uses existing credentials inside Actions, exports only topic ID/revision/status and false approvalWrites/production flags, no identities or tokens. Four offline tests. Prepared exact three-hook/current plugin body pending manifest and shared packet (revision2), no invented approvals/endings. Existing editorial release remains required: incomplete GSC/OpenSEO demo, unverified reference metrics and original free-workflow gate still block publication; owner-approved overview angle is recorded, not silently substituted for proof. No Google registration or production performed.
+
+
+## 2026-10-15 — scoped disclosed SEO pricing policy
+Prepared version 1.3.0: only exact accepted topic/revision/three speech hashes
+may use seo_disclosed_costs_v1. All five cost layers, official fresh pricing,
+paid amount/currency/billing basis/minimum commitment and explicit disclosure
+remain mandatory. Other topics remain free-only; demo/reference/semantic gates
+unchanged. See SEO_RELEASE_STATUS.md. No Google writes, payments, generation,
+HeyGen or production. PR57 receipt probe verified the topic; speech stays pending.

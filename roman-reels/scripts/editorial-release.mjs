@@ -5,6 +5,17 @@ import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {validateManifest,scriptHash} from './approval-manifest.mjs';
 import {editorialRulesVersion,editorialRulesSha256} from './editorial-rules.mjs';
+const seoDisclosedHashes=new Map([
+ [1,'7df1fb116e05fe5c96026bad10fa48fcfd8bd2b20864f226c1908d5bbaa7de74'],
+ [2,'43a7a60221f59fe54cf53b109edcae85cef78a74774b2e4f68e55ea4d8e9084a'],
+ [3,'202ac6f7833a85815869a351c71b6c6dd85f583d61fa592d730f8da60a45b549'],
+]);
+// Owner-relayed topic decision: narrowly scoped cost disclosure, never an approval receipt.
+function permitsDisclosedCosts(items) {
+ return items.length===3 && items.every(i=>i.topic_id==='roman-topic-seo-20261013' &&
+  i.script_revision===2 && i.version_id===`R-roman-topic-seo-20261013-h${i.hook_id}` &&
+  seoDisclosedHashes.get(i.hook_id)===scriptHash(i));
+}
 const projectRoot=fileURLToPath(new URL('../../',import.meta.url));
 const criteria=['task','reference','setup','demo','claims','costs_limits','body_hooks','approval'];
 const nonempty=x=>typeof x==='string'&&Boolean(x.trim());
@@ -66,13 +77,24 @@ export function assessEditorialRelease(manifest,review,{root=projectRoot,now=Dat
  try {
   const cost=review?.costReview;
   if(cost?.status!=='verified'||cost.scope!=='viewer_workflow'||cost.workflowMatchesScript!==true)throw Error('Verified end-to-end viewer workflow pricing required');
+  const disclosed=cost.policy==='seo_disclosed_costs_v1';
+  if(cost.policy!==undefined&&cost.policy!=='free_viewer_workflow'&&!disclosed)throw Error('Unknown audience cost policy');
+  if(disclosed&&!permitsDisclosedCosts(items))throw Error('Disclosed pricing exception does not cover this exact topic, revision and speech');
   const record=JSON.parse(proof(cost.evidence,root));
-  if(record.scope!=='viewer_workflow'||record.requiredPayment!==false||record.trialOnly!==false||!nonempty(record.testedUsage)||!nonempty(record.limitations))throw Error('Free workflow, tested usage and explicit limits required; a trial is insufficient');
+  if(disclosed) {
+   if(record.policy!=='seo_disclosed_costs_v1'||typeof record.requiredPayment!=='boolean'||
+     !nonempty(record.costDisclosure)||record.noFreeBundleClaim!==true)throw Error('Explicit audience cost disclosure required');
+  }
+  if(record.scope!=='viewer_workflow'||(!disclosed&&record.requiredPayment!==false)||record.trialOnly!==false||!nonempty(record.testedUsage)||!nonempty(record.limitations))throw Error('Free workflow, tested usage and explicit limits required; a trial is insufficient');
   const layers=['tool','model','integration','execution','data'];
   if(!Array.isArray(record.components)||layers.some(layer=>!record.components.some(c=>c.layer===layer)))throw Error('Review all cost layers, including model, integrations and execution');
+  if(disclosed&&record.requiredPayment!==record.components.some(c=>c.requiredPayment===true))throw Error('Inconsistent payment summary');
   for(const c of record.components) {
    const checked=Date.parse(c.checkedAt);
-   if(!layers.includes(c.layer)||!nonempty(c.name)||!['free','free_tier','not_required'].includes(c.access)||c.requiredPayment!==false||c.requiredCost!==0||
+   if(!layers.includes(c.layer)||!nonempty(c.name)||!(disclosed?['free','free_tier','not_required','paid']:['free','free_tier','not_required']).includes(c.access)||
+     (c.access==='paid' ? (c.requiredPayment!==true||!Number.isFinite(c.requiredCost)||c.requiredCost<=0||
+       !/^[A-Z]{3}$/.test(c.currency||'')||!nonempty(c.billingBasis)||!nonempty(c.minimumCommitment)) :
+       (c.requiredPayment!==false||c.requiredCost!==0))||
      !nonempty(c.limits)||!nonempty(c.sourceQuote)||!Number.isFinite(checked)||checked>now||now-checked>30*86400000)throw Error('Unknown, paid or stale component pricing blocks release');
    const url=new URL(c.sourceUrl);if(url.protocol!=='https:'||url.username||url.password)throw Error('Official pricing/documentation HTTPS source required');
    if(c.access==='not_required'&&!nonempty(c.notRequiredReason))throw Error('Explain why a cost layer is not required');

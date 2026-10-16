@@ -133,3 +133,53 @@ test('free tier requires stated limits; unused layer requires an explanation',t=
  record.components[0].limits='TEST ONLY';record.components[0].access='not_required';review.costReview.evidence=save('cost.json',record);assert.equal(assessEditorialRelease(manifest,review,options).eligibleForRomanReview,false);
  record.components[0].notRequiredReason='TEST ONLY no dependency';review.costReview.evidence=save('cost.json',record);assert.equal(assessEditorialRelease(manifest,review,options).eligibleForRomanReview,true);
 });
+
+// Fictional tariffs and evidence below exercise policy; they are not a live SEO review.
+function disclosedSetup(t) {
+ const s=setup(t);
+ s.manifest=JSON.parse(readFileSync(new URL('../research/seo-accepted-packet-20261015/pending-manifest.json',import.meta.url)));
+ s.review.scriptHashes=s.manifest.items.map(i=>({versionId:i.version_id,scriptHash:scriptHash(i)}));
+ s.review.costReview.policy='seo_disclosed_costs_v1';
+ s.cost=JSON.parse(readFileSync(join(s.root,s.review.costReview.evidence.path)));
+ Object.assign(s.cost,{policy:'seo_disclosed_costs_v1',requiredPayment:true,noFreeBundleClaim:true,costDisclosure:'TEST ONLY paid data; no free bundle claim'});
+ Object.assign(s.cost.components[4],{access:'paid',requiredPayment:true,requiredCost:0.25,currency:'USD',billingBasis:'TEST ONLY per task',minimumCommitment:'TEST ONLY none'});
+ s.refresh=()=>{s.review.costReview.evidence=s.save('cost.json',s.cost);};s.refresh();return s;
+}
+test('exact SEO speech permits disclosed fictional paid pricing but never approval or production',t=>{
+ const s=disclosedSetup(t),r=requireEditorialRelease(s.manifest,s.review,s.options);
+ assert.equal(r.eligibleForRomanReview,true);assert.equal(r.romanApprovalGranted,false);assert.equal(r.productionReady,false);
+});
+test('SEO pricing exception cannot migrate to another topic, changed speech, revision or ID',t=>{
+ const s=disclosedSetup(t);
+ for(const change of [d=>d.items.forEach(i=>i.topic_id='another'),d=>d.items[0].hook_text+='!',
+  d=>d.items[0].script_text+='!',d=>d.items.forEach(i=>i.script_revision++),d=>d.items[0].version_id+='-new']) {
+  const d=structuredClone(s.manifest);change(d);const r=structuredClone(s.review);
+  r.scriptHashes=d.items.map(i=>({versionId:i.version_id,scriptHash:scriptHash(i)}));
+  assert.ok(assessEditorialRelease(d,r,s.options).blockers.some(b=>b.id==='costs'));
+ }
+ const other=setup(t);other.review.costReview=s.review.costReview;
+ other.review.costReview.evidence=other.save('cost.json',s.cost);
+ assert.ok(assessEditorialRelease(other.manifest,other.review,other.options).blockers.some(b=>b.id==='costs'));
+});
+test('disclosed pricing still rejects incomplete, contradictory, stale and trial-only evidence',t=>{
+ const s=disclosedSetup(t),original=structuredClone(s.cost);
+ for(const change of [c=>c.requiredPayment=false,c=>c.noFreeBundleClaim=false,c=>c.costDisclosure='',
+  c=>c.trialOnly=true,c=>c.components.pop(),c=>c.components[4].access='unknown',
+  c=>c.components[4].currency='',c=>c.components[4].billingBasis='',c=>c.components[4].minimumCommitment='',
+  c=>c.components[4].requiredCost=0,c=>c.components[4].requiredPayment=false,c=>c.components[4].checkedAt='2020-01-01',
+  c=>c.components[4].sourceQuote='',c=>c.components[4].sourceUrl='http://example.com/pricing']) {
+  s.cost=structuredClone(original);change(s.cost);s.refresh();
+  assert.ok(assessEditorialRelease(s.manifest,s.review,s.options).blockers.some(b=>b.id==='costs'));
+ }
+});
+test('cost exception preserves factual, demonstration, reference, version and approval gates',t=>{
+ const s=disclosedSetup(t);
+ for(const [id,change] of [['demo',r=>r.demonstration.status='prepared'],['reference',r=>r.reference=null],
+  ['rules',r=>r.rulesVersion='1.2.0'],['semantic',r=>r.semanticReviewCompleted=false],['approval',r=>r.romanApprovalGranted=true]]) {
+  const r=structuredClone(s.review);change(r);assert.ok(assessEditorialRelease(s.manifest,r,s.options).blockers.some(b=>b.id===id));
+ }
+ delete s.review.costReview.policy;
+ assert.ok(assessEditorialRelease(s.manifest,s.review,s.options).blockers.some(b=>b.id==='costs'));
+ s.review.costReview.policy='anything';
+ assert.ok(assessEditorialRelease(s.manifest,s.review,s.options).blockers.some(b=>b.id==='costs'));
+});
