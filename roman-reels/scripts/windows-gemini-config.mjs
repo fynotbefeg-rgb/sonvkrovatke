@@ -9,7 +9,7 @@ const fail = () => { throw new Error('Private Gemini configuration unavailable o
 const exact = (x, keys) => x && !Array.isArray(x) && Object.keys(x).sort().join(',') === [...keys].sort().join(',');
 export function validateGeminiConfig(x) {
   if (!exact(x, ['configVersion','apiKey','projectName','quotaTierReported']) || x.configVersion !== '1.0.0' ||
-      typeof x.apiKey !== 'string' || !/^[A-Za-z0-9_-]{20,256}$/.test(x.apiKey) ||
+      typeof x.apiKey !== 'string' || !/^[A-Za-z0-9_.-]{20,256}$/.test(x.apiKey) ||
       typeof x.projectName !== 'string' || !x.projectName.trim() || x.projectName.length > 200 ||
       /[\r\n\x00]/.test(x.projectName) || x.quotaTierReported !== 'Free') fail();
   return x;
