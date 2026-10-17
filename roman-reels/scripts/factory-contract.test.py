@@ -75,8 +75,15 @@ class ContractTests(unittest.TestCase):
 import hashlib, importlib.util, json, locale, subprocess, sys
 locale.getencoding = lambda: "cp1252"
 locale.getpreferredencoding = lambda do_setlocale=True: "cp1252"
-control = subprocess.run(["node", "-e", "process.stdout.write(Buffer.from('d081', 'hex'))"],
-                         capture_output=True, text=True)  # default decoding, as the old legacy_hash did
+# Control: default decoding, as the old legacy_hash did. The old defect shows up in one of two ways, by OS:
+# Windows loses stdout (None) after the reader thread fails; Linux raises UnicodeDecodeError at once.
+# Only UnicodeDecodeError is caught here, every other error must surface.
+try:
+    control = subprocess.run(["node", "-e", "process.stdout.write(Buffer.from('d081', 'hex'))"],
+                             capture_output=True, text=True)
+    control_broken = control.stdout is None
+except UnicodeDecodeError:
+    control_broken = True
 spec = importlib.util.spec_from_file_location("v", sys.argv[1])
 v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
 job = {"reelId": "R-юникод-h1", "scriptVersion": 1, "hookText": "Ёлка 😀  ", "scriptText": "Привет, мир! Ё\ud800"}
@@ -84,7 +91,7 @@ values = [job["reelId"], job["scriptVersion"], job["hookText"], job["scriptText"
 # Reference: the same Node serialization read as raw bytes, so no text decoding is involved at all.
 raw = subprocess.run(["node", "-e", "let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>process.stdout.write(JSON.stringify(JSON.parse(s))))"],
                      input=json.dumps(values, ensure_ascii=True).encode("ascii"), capture_output=True, check=True).stdout
-print(json.dumps({"encoding": locale.getencoding(), "controlBroken": control.stdout is None,
+print(json.dumps({"encoding": locale.getencoding(), "controlBroken": control_broken,
                   "hash": v.legacy_hash(job), "expected": hashlib.sha256(raw).hexdigest(),
                   "nonAscii": any(b > 127 for b in raw)}))
 '''
