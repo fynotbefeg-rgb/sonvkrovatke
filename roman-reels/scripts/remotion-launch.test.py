@@ -114,6 +114,37 @@ class RemotionLaunchTests(unittest.TestCase):
         self.assertIn("npm ci", str(caught.exception))
         self.assertFalse((Path(self.temp.name) / "out").exists())
 
+    def test_render_concurrency_one_and_two_reach_the_remotion_command_and_only_that_flag_changes(self):
+        pv = fake_pv(self.temp.name)
+        commands = {}
+        with patch.object(runner.shutil, "which", return_value="/fake/node"):
+            for value in (None, 1, 2):
+                options = {} if value is None else {"concurrency": value}
+                runner.render_with_remotion("o.mp4", "p.json", [], pv=pv,
+                                            run=lambda command, **kwargs: commands.setdefault(value, command), **options)
+        for value, expected in ((None, "2"), (1, "1"), (2, "2")):
+            command = commands[value]
+            self.assertEqual(command[command.index("--concurrency") + 1], expected)
+        self.assertEqual(runner.DEFAULT_RENDER_CONCURRENCY, 2)
+        one, two = list(commands[1]), list(commands[2])
+        one[one.index("--concurrency") + 1] = "2"
+        self.assertEqual(one, two)  # quality, codec, composition and paths are untouched
+
+    def test_invalid_render_concurrency_is_rejected_before_anything_starts(self):
+        pv = fake_pv(self.temp.name)
+        for bad in (0, 3, -1, True, False, 1.0, "2", None):
+            with self.subTest(value=bad):
+                with self.assertRaises(ValueError):
+                    runner.remotion_render_command("node", "entry.js", "o.mp4", "p.json", [], bad)
+                with patch.object(subprocess, "run", side_effect=AssertionError("nothing must be started")):
+                    with self.assertRaises(ValueError):
+                        runner.render_with_remotion("o.mp4", "p.json", [], pv=pv, concurrency=bad)
+                out = Path(self.temp.name) / "out-invalid"
+                with patch.object(runner, "check_input", side_effect=AssertionError("must fail before reading the job")):
+                    with self.assertRaises(ValueError):
+                        runner.run({"sourceVideo": {"fps": 25}}, out, render_concurrency=bad)
+                self.assertFalse(out.exists())
+
     def test_runner_source_no_longer_starts_npx(self):
         source = Path(runner.__file__).read_text(encoding="utf-8") if hasattr(runner, "__file__") else \
             Path(__file__).with_name("run-development-montage.py").read_text(encoding="utf-8")

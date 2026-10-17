@@ -29,7 +29,9 @@ def write_json(file, data):
         stream.write(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
 
 
-def run(plan, body, hooks, public_directory, output_directory, browser=None, render_hooks=(1, 2, 3), renderer=None):
+def run(plan, body, hooks, public_directory, output_directory, browser=None, render_hooks=(1, 2, 3), renderer=None,
+        render_concurrency=montage.DEFAULT_RENDER_CONCURRENCY):
+    montage.check_render_concurrency(render_concurrency)  # before any file, folder or process is created
     selected = tuple(render_hooks)
     if not selected or len(set(selected)) != len(selected) or any(type(n) is not int or n not in {1, 2, 3} for n in selected):
         raise ValueError('Select distinct hook numbers 1/2/3')
@@ -58,7 +60,8 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     report = {'mode': 'development', 'productionReady': False, 'approvalStatus': 'pending_approval',
               'freshRecognition': False, 'needsSpeechReview': True,
               'timingMethod': 'verified_cached_part_timings_with_assembly_offset',
-              'requestedHooks': list(selected), 'complete': False, 'renders': []}
+              'requestedHooks': list(selected), 'renderConcurrency': render_concurrency,
+              'complete': False, 'renders': []}
     report_file = output / 'pipeline-report.json'
     write_json(report_file, report)
     manifest = assembler.assemble(plan, source_dir)
@@ -77,7 +80,8 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     for job, _ in jobs:
         if job['hookNumber'] not in selected:
             continue
-        qc = renderer(job, output / f"h{job['hookNumber']}", browser, montage_plan=plans[job['hookNumber']])
+        qc = renderer(job, output / f"h{job['hookNumber']}", browser, montage_plan=plans[job['hookNumber']],
+                      render_concurrency=render_concurrency)
         if qc.get('technicalPassed') is not True:
             raise ValueError('Montage technical QC did not pass')
         report['renders'].append({'hookNumber': job['hookNumber'], 'reelId': job['reelId'],
@@ -101,8 +105,12 @@ if __name__ == '__main__':
     parser.add_argument('--out', required=True)
     parser.add_argument('--browser-executable')
     parser.add_argument('--render-hooks', nargs='+', type=int, default=[1, 2, 3])
+    parser.add_argument('--render-concurrency', type=int, choices=montage.ALLOWED_RENDER_CONCURRENCY,
+                        default=montage.DEFAULT_RENDER_CONCURRENCY,
+                        help='Remotion workers per render: 1 (less memory) or 2 (default)')
     args = parser.parse_args()
     read = lambda file: json.loads(Path(file).read_text(encoding='utf-8'))
     run(read(args.source_set), read(args.body_speech), {n: read(file) for n, file in enumerate(args.hook_speech, 1)},
-        args.public_directory, args.out, args.browser_executable, args.render_hooks)
+        args.public_directory, args.out, args.browser_executable, args.render_hooks,
+        render_concurrency=args.render_concurrency)
     print('Development pipeline passed. Cached speech still needs review; no publication allowed.')

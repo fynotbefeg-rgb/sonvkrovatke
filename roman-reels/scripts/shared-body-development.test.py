@@ -35,10 +35,10 @@ class PipelineTests(unittest.TestCase):
                      'hooks': [{'hookNumber': n, 'localPath': f'h{n}.mp4', 'sha256': self.speech[f'h{n}']['sourceSha256']} for n in [1, 2, 3]]}
         self.out = Path(self.temp.name) / 'output'
     def tearDown(self): self.temp.cleanup()
-    def run_pipeline(self, renderer, hooks=(1, 2, 3)):
+    def run_pipeline(self, renderer, hooks=(1, 2, 3), **options):
         with patch.object(media, 'PUBLIC', self.root):
             return pipeline.run(self.plan, self.speech['body'], {n: self.speech[f'h{n}'] for n in [1, 2, 3]},
-                                'rr/incoming/new-run', self.out, render_hooks=hooks, renderer=renderer)
+                                'rr/incoming/new-run', self.out, render_hooks=hooks, renderer=renderer, **options)
 
     def test_three_distinct_jobs_and_no_approval_or_fresh_asr_claim(self):
         jobs = []
@@ -85,7 +85,7 @@ class PipelineTests(unittest.TestCase):
 
     def test_body_planned_once_and_shifted_into_each_variant(self):
         received = {}
-        def renderer(job, *_, montage_plan=None):
+        def renderer(job, *_, montage_plan=None, **__):
             received[job['hookNumber']] = (job, montage_plan)
             return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
         report = self.run_pipeline(renderer)
@@ -100,6 +100,39 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual((e['type'], e['wordStart'] - hw, e['wordEnd'] - hw), (r['type'], r['wordStart'], r['wordEnd']))
                 self.assertAlmostEqual(e['start'] - start, r['start'], delta=2e-6)
             self.assertEqual(plan, json.loads((self.out / f"{job['reelId']}-plan.json").read_text(encoding='utf-8')))
+
+    def test_render_concurrency_reaches_every_renderer_and_defaults_to_two(self):
+        seen = []
+        def renderer(job, *_, montage_plan=None, render_concurrency=None):
+            seen.append((job['hookNumber'], render_concurrency))
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer, render_concurrency=1)
+        self.assertEqual(seen, [(1, 1), (2, 1), (3, 1)])
+        self.assertEqual(report['renderConcurrency'], 1)
+        self.assertTrue(report['complete'])  # processing order of the three variants is unchanged
+        self.temp.cleanup(); self.setUp(); seen.clear()
+        self.assertEqual(self.run_pipeline(renderer)['renderConcurrency'], 2)
+        self.assertEqual(seen, [(1, 2), (2, 2), (3, 2)])
+
+    def test_invalid_render_concurrency_is_rejected_before_any_output_or_render(self):
+        def renderer(*_, **__): raise AssertionError('no render must start')
+        for bad in [0, 3, -1, True, False, 1.0, '2', None]:
+            with self.subTest(value=bad):
+                with self.assertRaises(ValueError): self.run_pipeline(renderer, render_concurrency=bad)
+                self.assertFalse(self.out.exists())
+                self.assertFalse((self.root / 'rr/incoming/new-run').exists())
+
+    def test_command_line_accepts_only_one_or_two(self):
+        import subprocess, sys
+        script = Path(__file__).with_name('run-shared-body-development.py')
+        base = [sys.executable, str(script), 'x.json', '--body-speech', 'b.json', '--hook-speech', 'h1.json', 'h2.json', 'h3.json',
+                '--public-directory', 'rr/incoming/never', '--out', str(self.out)]
+        help_text = subprocess.run([sys.executable, str(script), '--help'], capture_output=True, text=True, encoding='utf-8', timeout=60).stdout
+        self.assertIn('--render-concurrency', help_text)
+        for bad in ['0', '3', 'two']:
+            run = subprocess.run(base + ['--render-concurrency', bad], capture_output=True, timeout=60)
+            self.assertEqual(run.returncode, 2, bad)  # argparse rejects it before anything is read or created
+            self.assertFalse(self.out.exists())
 
 
 if __name__ == '__main__': unittest.main()
