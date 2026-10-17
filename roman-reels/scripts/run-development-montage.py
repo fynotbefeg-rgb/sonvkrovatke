@@ -60,7 +60,7 @@ let s='';for await(const chunk of process.stdin)s+=chunk;
 const plan=await buildMontagePlan(JSON.parse(s));process.stdout.write(JSON.stringify(plan));"""
     if montage_plan is None:
         response = subprocess.run(["node", "--experimental-strip-types", "--input-type=module", "-e",
-                                   bridge, str(DIRECTOR)], input=json.dumps(job), text=True,
+                                   bridge, str(DIRECTOR)], input=json.dumps(job), text=True, encoding="utf-8",
                                   capture_output=True, timeout=60, check=True)
         plan = json.loads(response.stdout)
     else:

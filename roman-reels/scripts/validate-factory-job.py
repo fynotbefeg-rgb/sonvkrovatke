@@ -16,7 +16,8 @@ def legacy_hash(job):
     values = [job["reelId"], job["scriptVersion"], job["hookText"], job["scriptText"]]
     result = subprocess.run(
         ["node", "-e", "let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>process.stdout.write(JSON.stringify(JSON.parse(s))))"],
-        input=json.dumps(values, ensure_ascii=True), text=True, capture_output=True, check=True,
+        # Node writes UTF-8; never decode it with the system code page (cp1252/cp1251 on Windows).
+        input=json.dumps(values, ensure_ascii=True), text=True, encoding="utf-8", capture_output=True, check=True,
     )
     return hashlib.sha256(result.stdout.encode("utf-8")).hexdigest()
 
