@@ -35,7 +35,7 @@ $save.Add_Click({
     $plain = $null
     try {
         $project = $projectBox.Text.Trim()
-        if ($keyBox.Text -cnotmatch '^[A-Za-z0-9_-]{20,256}$' -or
+        if ($keyBox.Text -cnotmatch '^[A-Za-z0-9_.-]{20,256}$' -or
             [string]::IsNullOrWhiteSpace($project) -or $project.Length -gt 200 -or
             $project -match "[\r\n\x00]" -or -not $free.Checked) {
             $status.Text = 'Check the key, project and Free tier confirmation. Nothing saved.'

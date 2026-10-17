@@ -11,6 +11,7 @@ const config=()=>({configVersion:'1.0.0',apiKey:KEY,projectName:'Test project',q
 async function setup(t){const root=await mkdtemp(path.join(tmpdir(),'rr-win-gemini-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
 test('config schema rejects unknown/blank/malformed fields and never includes the input in errors',()=>{
   assert.equal(validateGeminiConfig(config()).apiKey,KEY);
+  assert.equal(validateGeminiConfig({...config(),apiKey:'AQ.FAKE-dotted_key_never_real_12345'}).apiKey,'AQ.FAKE-dotted_key_never_real_12345'); // dotted key format, fictional
   for(const value of [{...config(),apiKey:'bad\nkey'},{...config(),surprise:true},{...config(),quotaTierReported:'Paid'},{...config(),projectName:''},null]){
     assert.throws(()=>validateGeminiConfig(value),e=>!e.message.includes(KEY));
   }
