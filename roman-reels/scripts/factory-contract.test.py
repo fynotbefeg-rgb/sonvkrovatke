@@ -65,6 +65,45 @@ class ContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.validate(job)
 
+    def test_hash_does_not_depend_on_the_system_text_encoding(self):
+        # A child process whose locale encoding is forced to cp1252 on any OS. Node writes UTF-8: 0xD0 0x81 ("Ё")
+        # contains 0x81, which cp1252 cannot decode, so decoding with the system code page breaks the subprocess reader.
+        import json
+        import subprocess
+        import sys
+        child = r'''
+import hashlib, importlib.util, json, locale, subprocess, sys
+locale.getencoding = lambda: "cp1252"
+locale.getpreferredencoding = lambda do_setlocale=True: "cp1252"
+# Control: default decoding, as the old legacy_hash did. The old defect shows up in one of two ways, by OS:
+# Windows loses stdout (None) after the reader thread fails; Linux raises UnicodeDecodeError at once.
+# Only UnicodeDecodeError is caught here, every other error must surface.
+try:
+    control = subprocess.run(["node", "-e", "process.stdout.write(Buffer.from('d081', 'hex'))"],
+                             capture_output=True, text=True)
+    control_broken = control.stdout is None
+except UnicodeDecodeError:
+    control_broken = True
+spec = importlib.util.spec_from_file_location("v", sys.argv[1])
+v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+job = {"reelId": "R-юникод-h1", "scriptVersion": 1, "hookText": "Ёлка 😀  ", "scriptText": "Привет, мир! Ё\ud800"}
+values = [job["reelId"], job["scriptVersion"], job["hookText"], job["scriptText"]]
+# Reference: the same Node serialization read as raw bytes, so no text decoding is involved at all.
+raw = subprocess.run(["node", "-e", "let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>process.stdout.write(JSON.stringify(JSON.parse(s))))"],
+                     input=json.dumps(values, ensure_ascii=True).encode("ascii"), capture_output=True, check=True).stdout
+print(json.dumps({"encoding": locale.getencoding(), "controlBroken": control_broken,
+                  "hash": v.legacy_hash(job), "expected": hashlib.sha256(raw).hexdigest(),
+                  "nonAscii": any(b > 127 for b in raw)}))
+'''
+        run = subprocess.run([sys.executable, "-c", child, str(Path(__file__).with_name("validate-factory-job.py"))],
+                             capture_output=True, timeout=60)  # bytes: the control's traceback is in the console code page
+        self.assertEqual(run.returncode, 0, run.stderr.decode("utf-8", "replace")[-800:])
+        result = json.loads(run.stdout.decode("ascii"))
+        self.assertEqual(result["encoding"], "cp1252")
+        self.assertTrue(result["controlBroken"], "the forced encoding must reproduce the original decoding failure")
+        self.assertTrue(result["nonAscii"], "the reference serialization must contain non-ASCII UTF-8 bytes")
+        self.assertEqual(result["hash"], result["expected"])
+
     def test_rejects_stale_approval_bad_identity_and_future_version(self):
         for mutation in [lambda j: j.update(reelId="R-other-h1"),
                          lambda j: j.update(schemaVersion="2.0.0"),

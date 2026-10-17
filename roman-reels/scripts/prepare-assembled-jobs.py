@@ -5,7 +5,7 @@ import hashlib
 import importlib.util
 import json
 import math
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from factory_media import public_source, probe, decode, sha256, validate_intervals
 
@@ -17,6 +17,15 @@ spec.loader.exec_module(development)
 def require(ok, message):
     if not ok:
         raise ValueError(message)
+
+
+def repository_relative(public_directory, file_name):
+    """Repository-relative source path in POSIX form on every platform.
+
+    public_source() rejects backslashes, and str(Path(...)) renders them on Windows. PurePosixPath never
+    converts separators, so a directory containing a backslash is still refused downstream as before.
+    """
+    return str(PurePosixPath(public_directory) / file_name)
 
 
 def shifted(intervals, offset):
@@ -80,7 +89,7 @@ def prepare(manifest, body, hooks, public_directory, endings=None):
         if platform_mode:
             require(math.isclose(variant["endingStart"], parts[2]["timelineStart"], abs_tol=1e-8),
                     "Invalid ending offset")
-        relative = str(Path(public_directory) / variant["outputFile"])
+        relative = repository_relative(public_directory, variant["outputFile"])
         source = public_source(relative)
         require(sha256(source) == variant["sha256"], "Assembled source checksum mismatch")
         metadata = probe(source)

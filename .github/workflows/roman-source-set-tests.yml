@@ -154,3 +154,37 @@ jobs:
           $parseErrors = $null
           [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path roman-reels/scripts/setup-windows-gemini.ps1), [ref]$tokens, [ref]$parseErrors) | Out-Null
           if ($parseErrors.Count -gt 0) { throw 'Gemini setup script parse failed' }
+
+  windows-assembly:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install FFmpeg and validation dependencies
+        shell: pwsh
+        run: |
+          choco install ffmpeg -y --no-progress
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install -r roman-reels/schemas/requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ffmpeg -version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ffprobe -version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Shared-body assembly and plans on Windows (real Windows paths, synthetic MP4s)
+        shell: pwsh
+        run: |
+          python roman-reels/scripts/assembled-jobs.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/shared-body-development.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/shared-body-plans.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/factory-contract.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

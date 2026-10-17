@@ -1,7 +1,7 @@
 """Real concatenated media plus synthetic test timings; no models/network/approval."""
 import copy
 import importlib.util
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import subprocess
 import tempfile
 import unittest
@@ -72,6 +72,23 @@ class AssembledJobTests(unittest.TestCase):
             self.assertFalse(evidence["productionReady"])
         self.assertEqual(self.speech, original)
         self.assertEqual(len({job["scriptHash"] for job, _ in jobs}), 3)
+
+    def test_repository_relative_path_stays_posix_under_windows_path_semantics(self):
+        # PureWindowsPath renders str() with backslashes on any OS: that is what the old str(Path(...)) gave on
+        # Windows, and factory_media.public_source() rejects it. This reproduces the failure here on Ubuntu too.
+        legacy = str(PureWindowsPath("incoming") / "R-test-h1.mp4")
+        self.assertEqual(legacy, "incoming\\R-test-h1.mp4")
+        with patch.object(media, "PUBLIC", self.root), self.assertRaises(ValueError):
+            media.public_source(legacy)
+        self.assertEqual(combined.repository_relative("incoming", "R-test-h1.mp4"), "incoming/R-test-h1.mp4")
+        # The whole preparation with the module's Path behaving like WindowsPath.
+        with patch.object(combined, "Path", PureWindowsPath):
+            jobs = self.prepare()
+        for job, _ in jobs:
+            self.assertEqual(job["sourceVideo"]["localPath"], f"incoming/{job['reelId']}.mp4")
+        # Allowed paths are unchanged: a backslash in the directory is still refused on every platform.
+        with patch.object(media, "PUBLIC", self.root), self.assertRaises(ValueError):
+            combined.prepare(self.manifest, self.speech["body"], {n: self.speech[f"h{n}"] for n in [1, 2, 3]}, "incoming\\x")
 
     def test_incomplete_production_wrong_identity_and_timeline_are_rejected(self):
         for change in [lambda m: m.update(complete=False), lambda m: m.update(mode="production"),
