@@ -6,6 +6,7 @@ on:
     branches: [automation/roman-reels-v1, feature/codex-pipeline]
     paths:
       - 'roman-reels/scripts/**'
+      - 'roman-reels/pv/src/factory/**'
       - 'roman-reels/docs/**'
       - 'CLAUDE.md'
       - 'roman-reels/schemas/**'
@@ -71,6 +72,8 @@ jobs:
           python roman-reels/scripts/source-set.test.py
           python roman-reels/scripts/assembled-jobs.test.py
           python roman-reels/scripts/shared-body-development.test.py
+          python roman-reels/scripts/shared-body-plans.test.py
+          node --experimental-strip-types --test roman-reels/pv/src/factory/director.test.ts roman-reels/pv/src/factory/interface.test.ts roman-reels/pv/src/factory/shared-body.test.ts
           python roman-reels/scripts/factory-contract.test.py
           python roman-reels/scripts/factory-media.test.py
           node --test roman-reels/scripts/platform-ending-drafts.test.mjs

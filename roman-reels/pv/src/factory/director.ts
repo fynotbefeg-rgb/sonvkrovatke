@@ -348,7 +348,10 @@ function windowOf(words: Word[], candidate: Candidate, duration: number) {
 
 // ---------- plan ----------
 
-export function buildMontagePlan(job: FactoryJob): MontagePlan {
+/** Segment switches for the shared-body mode; both default to true, so a normal single reel is planned exactly as before. */
+export type PlanOptions = { zoom?: boolean; cta?: boolean };
+
+export function buildMontagePlan(job: FactoryJob, options: PlanOptions = {}): MontagePlan {
   assertJob(job);
   const words = job.wordTimings;
   const duration = job.sourceVideo.duration;
@@ -369,7 +372,7 @@ export function buildMontagePlan(job: FactoryJob): MontagePlan {
 
   // Accents: priority first, then time; greedy acceptance without overlaps in the top band.
   const candidates = [
-    ...numberCandidates(words), ...listCandidates(words), ...ctaCandidates(words, duration), ...toolCandidates(words, job.visualAssets ?? []),
+    ...numberCandidates(words), ...listCandidates(words), ...(options.cta === false ? [] : ctaCandidates(words, duration)), ...toolCandidates(words, job.visualAssets ?? []),
   ].sort((a, b) => a.priority - b.priority || a.wordStart - b.wordStart);
   const budget = Math.max(1, Math.floor(duration / RULES.accentSecondsPerItem));
   const accepted: Array<Candidate & { start: number; end: number }> = [];
@@ -406,7 +409,8 @@ export function buildMontagePlan(job: FactoryJob): MontagePlan {
   }
 
   // One gentle zoom, only on a spoken number after the opening seconds.
-  const zoomOn = accepted.find((a) => a.type === "number" && words[a.wordStart].start >= RULES.zoomMinStart);
+  const zoomOn = options.zoom === false ? undefined
+    : accepted.find((a) => a.type === "number" && words[a.wordStart].start >= RULES.zoomMinStart);
   if (zoomOn) {
     events.push({
       id: "zoom-01", type: "zoom", start: zoomOn.start, end: zoomOn.end,
@@ -419,6 +423,70 @@ export function buildMontagePlan(job: FactoryJob): MontagePlan {
   const plan = { events };
   validateMontagePlan(job, plan);
   return plan;
+}
+
+// ---------- shared body + three hooks ----------
+
+export type SharedBodyInput = {
+  /** The shared body part on its own timeline: cached word timings from 0 (leading silence included) and its length. */
+  body: { wordTimings: Word[]; duration: number };
+  /** Assembled variants: full job plus the assembly boundary taken from the manifest/evidence, never guessed. */
+  variants: Array<{ job: FactoryJob; hookWordCount: number; bodyStart: number }>;
+};
+
+const SHIFT_TOLERANCE = 1e-6; // assembled timings are the part timings + offset, rounded to 6 decimals
+
+const segmentJob = (base: FactoryJob, wordTimings: Word[], duration: number): FactoryJob => ({
+  ...base, montagePlan: undefined, sourceVideo: { ...base.sourceVideo, duration }, wordTimings,
+});
+
+/**
+ * Shared-body mode: the body plan is built ONCE from the body part's own timings and duration (its own accent budget,
+ * closing call to action and single zoom), then shifted into every variant. Each hook is planned separately, without
+ * zoom or call to action. Every resulting plan passes the standard validateMontagePlan against its full job.
+ * A normal single reel keeps using buildMontagePlan(job) unchanged.
+ */
+export function buildSharedBodyPlans(input: SharedBodyInput): { body: MontagePlan; variants: MontagePlan[] } {
+  const { body, variants } = input ?? ({} as SharedBodyInput);
+  if (!body || !Array.isArray(body.wordTimings) || !isFiniteNumber(body.duration) || body.duration <= 0) fail("Shared body timings required");
+  if (!Array.isArray(variants) || variants.length === 0) fail("At least one assembled variant required");
+  variants.forEach((v) => assertJob(v.job));
+  // One body plan for all variants; it must fit inside the shortest assembled file.
+  const room = Math.min(...variants.map((v) => v.job.sourceVideo.duration - v.bodyStart));
+  const bodyDuration = Math.min(body.duration, room);
+  const bodyPlan = buildMontagePlan(segmentJob(variants[0].job, body.wordTimings, bodyDuration));
+  const plans = variants.map(({ job, hookWordCount, bodyStart }) => {
+    const words = job.wordTimings;
+    if (!Number.isInteger(hookWordCount) || hookWordCount < 1 || hookWordCount + body.wordTimings.length !== words.length) {
+      fail(`${job.reelId}: hookWordCount does not split the job into hook + shared body`);
+    }
+    if (!isFiniteNumber(bodyStart) || words[hookWordCount - 1].end > bodyStart + EPS) fail(`${job.reelId}: hook overlaps the body`);
+    body.wordTimings.forEach((w, i) => {
+      const own = words[hookWordCount + i];
+      if (own.text !== w.text || Math.abs(own.start - (w.start + bodyStart)) > SHIFT_TOLERANCE ||
+          Math.abs(own.end - (w.end + bodyStart)) > SHIFT_TOLERANCE) {
+        fail(`${job.reelId}: body word ${i} is not the shared body shifted by bodyStart`);
+      }
+    });
+    const hook = buildMontagePlan(segmentJob(job, words.slice(0, hookWordCount), bodyStart), { zoom: false, cta: false });
+    const duration = job.sourceVideo.duration;
+    const shifted = bodyPlan.events.map((e) => {
+      const wordStart = e.wordStart + hookWordCount;
+      const wordEnd = e.wordEnd + hookWordCount;
+      // Snap to this job's rounded word times (≤ 1e-6) so exact contract checks see full coverage.
+      return {
+        ...e, id: `body-${e.id}`, wordStart, wordEnd,
+        start: Math.min(e.start + bodyStart, words[wordStart].start),
+        end: Math.min(duration, Math.max(e.end + bodyStart, words[wordEnd].end)),
+      };
+    });
+    const events = [...hook.events.map((e) => ({ ...e, id: `hook-${e.id}` })), ...shifted];
+    events.sort((a, b) => a.start - b.start || a.layer - b.layer || (a.id < b.id ? -1 : 1));
+    const plan = { events };
+    validateMontagePlan(job, plan);
+    return plan;
+  });
+  return { body: bodyPlan, variants: plans };
 }
 
 const EVENT_TYPES = new Set<string>(["caption", "card", "keyword", "number", "zoom", "b_roll", "split_screen", "diagram", "interface"]);

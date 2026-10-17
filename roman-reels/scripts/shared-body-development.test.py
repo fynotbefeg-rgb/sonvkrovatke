@@ -42,7 +42,7 @@ class PipelineTests(unittest.TestCase):
 
     def test_three_distinct_jobs_and_no_approval_or_fresh_asr_claim(self):
         jobs = []
-        def renderer(job, *_):
+        def renderer(job, *_, **__):
             jobs.append(job)
             return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
         report = self.run_pipeline(renderer)
@@ -56,7 +56,7 @@ class PipelineTests(unittest.TestCase):
 
     def test_renderer_failure_leaves_complete_false_and_preserves_originals(self):
         calls = []
-        def renderer(job, *_):
+        def renderer(job, *_, **__):
             calls.append(job['hookNumber'])
             if len(calls) == 2: raise ValueError('Render failure')
             return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
@@ -82,6 +82,24 @@ class PipelineTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.run_pipeline(lambda *_: None)
         self.assertFalse(self.out.exists())
         self.assertFalse((self.root / 'rr/incoming/new-run').exists())
+
+    def test_body_planned_once_and_shifted_into_each_variant(self):
+        received = {}
+        def renderer(job, *_, montage_plan=None):
+            received[job['hookNumber']] = (job, montage_plan)
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer)
+        self.assertTrue(report['sharedBodyPlan']); self.assertEqual(sorted(received), [1, 2, 3])
+        body_plan = json.loads((self.out / 'shared-body-plan.json').read_text(encoding='utf-8'))
+        for n, (job, plan) in received.items():
+            evidence = json.loads((self.out / f"{job['reelId']}-speech.json").read_text(encoding='utf-8'))
+            hw, start = evidence['hookWordCount'], evidence['bodyStart']
+            body = [e for e in plan['events'] if e['wordStart'] >= hw]
+            self.assertEqual([e['id'] for e in body], ['body-' + e['id'] for e in body_plan['events']])
+            for e, r in zip(body, body_plan['events']):
+                self.assertEqual((e['type'], e['wordStart'] - hw, e['wordEnd'] - hw), (r['type'], r['wordStart'], r['wordEnd']))
+                self.assertAlmostEqual(e['start'] - start, r['start'], delta=2e-6)
+            self.assertEqual(plan, json.loads((self.out / f"{job['reelId']}-plan.json").read_text(encoding='utf-8')))
 
 
 if __name__ == '__main__': unittest.main()

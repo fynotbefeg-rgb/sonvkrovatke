@@ -7,6 +7,7 @@ import subprocess
 
 from factory_media import public_source, probe, sha256, technical_qc
 from preserve_source_audio import preserve
+import shared_body_plans as shared_plans
 
 ROOT = Path(__file__).resolve().parents[1]
 PV = ROOT / "pv"
@@ -44,7 +45,8 @@ def check_input(job):
     check_visual_assets(job.get("visualAssets", []))
 
 
-def run(job, output_directory, browser_executable=None):
+def run(job, output_directory, browser_executable=None, montage_plan=None):
+    """montage_plan: optional precomputed plan (shared-body mode); it must pass Director validation and the contract."""
     check_input(job)
     if not (PV / "node_modules/@remotion/cli/package.json").is_file():
         raise ValueError("Install locked Remotion dependencies with npm ci first")
@@ -56,10 +58,15 @@ def run(job, output_directory, browser_executable=None):
 const {buildMontagePlan}=await import(pathToFileURL(process.argv[1]).href);
 let s='';for await(const chunk of process.stdin)s+=chunk;
 const plan=await buildMontagePlan(JSON.parse(s));process.stdout.write(JSON.stringify(plan));"""
-    response = subprocess.run(["node", "--experimental-strip-types", "--input-type=module", "-e",
-                               bridge, str(DIRECTOR)], input=json.dumps(job), text=True,
-                              capture_output=True, timeout=60, check=True)
-    job.update(montagePlan=json.loads(response.stdout), productionStatus="montage_ready")
+    if montage_plan is None:
+        response = subprocess.run(["node", "--experimental-strip-types", "--input-type=module", "-e",
+                                   bridge, str(DIRECTOR)], input=json.dumps(job), text=True,
+                                  capture_output=True, timeout=60, check=True)
+        plan = json.loads(response.stdout)
+    else:
+        plan = montage_plan
+        shared_plans.validate(job, plan)
+    job.update(montagePlan=plan, productionStatus="montage_ready")
     contract.validate(job)
     output = Path(output_directory).resolve()
     output.mkdir(parents=True, exist_ok=False)

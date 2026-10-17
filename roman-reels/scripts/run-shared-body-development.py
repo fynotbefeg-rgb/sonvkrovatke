@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 import factory_media as media
+import shared_body_plans
 
 
 def load(name, file):
@@ -65,11 +66,18 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     for job, evidence in jobs:
         write_json(output / f"{job['reelId']}-job.json", job)
         write_json(output / f"{job['reelId']}-speech.json", evidence)
+    # The body is planned once; each variant gets that plan shifted by its own manifest boundary plus its hook plan.
+    body_plan, plans = shared_body_plans.build(manifest, jobs, body, hooks)
+    write_json(output / 'shared-body-plan.json', body_plan)
+    for job, _ in jobs:
+        write_json(output / f"{job['reelId']}-plan.json", plans[job['hookNumber']])
+    report['sharedBodyPlan'] = True
+    report_file.write_text(json.dumps(report, indent=2) + '\n')
     renderer = renderer or montage.run
     for job, _ in jobs:
         if job['hookNumber'] not in selected:
             continue
-        qc = renderer(job, output / f"h{job['hookNumber']}", browser)
+        qc = renderer(job, output / f"h{job['hookNumber']}", browser, montage_plan=plans[job['hookNumber']])
         if qc.get('technicalPassed') is not True:
             raise ValueError('Montage technical QC did not pass')
         report['renders'].append({'hookNumber': job['hookNumber'], 'reelId': job['reelId'],
