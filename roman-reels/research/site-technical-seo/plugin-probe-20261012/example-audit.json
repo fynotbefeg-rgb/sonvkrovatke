@@ -1,0 +1,722 @@
+{
+  "url": "https://example.com",
+  "timestamp": "2026-10-12T08:50:39.567049+00:00",
+  "score": 22,
+  "band": "critical",
+  "error": null,
+  "score_version": 2,
+  "score_max": {
+    "google_ai": 20,
+    "robots": 14,
+    "schema": 14,
+    "content": 14,
+    "brand_entity": 12,
+    "meta": 11,
+    "llms": 6,
+    "signals": 6,
+    "ai_discovery": 3
+  },
+  "google_ai": {
+    "checked": true,
+    "points": 13,
+    "max_points": 20,
+    "final_url": "https://example.com/",
+    "checks": [
+      {
+        "id": "G-INDEX",
+        "status": "pass",
+        "points": 5,
+        "max_points": 5,
+        "evidence": "HTTP 200, indexable, Googlebot allowed",
+        "source_url": "https://developers.google.com/search/docs/essentials/technical",
+        "evidence_level": "google-official"
+      },
+      {
+        "id": "G-SNIPPET",
+        "status": "pass",
+        "points": 5,
+        "max_points": 5,
+        "evidence": "No snippet restrictions",
+        "source_url": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag",
+        "evidence_level": "google-official"
+      },
+      {
+        "id": "G-CANONICAL",
+        "status": "fail",
+        "points": 0,
+        "max_points": 3,
+        "evidence": "No rel=canonical: Google picks the canonical on its own",
+        "source_url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+        "evidence_level": "google-official"
+      },
+      {
+        "id": "G-DATES",
+        "status": "warn",
+        "points": 1,
+        "max_points": 2,
+        "evidence": "No valid publication or update date found",
+        "source_url": "https://developers.google.com/search/docs/appearance/publication-dates",
+        "evidence_level": "heuristic"
+      },
+      {
+        "id": "G-BYLINE",
+        "status": "warn",
+        "points": 1,
+        "max_points": 2,
+        "evidence": "No author found: Google asks 'who created the content'",
+        "source_url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+        "evidence_level": "heuristic"
+      },
+      {
+        "id": "G-LINKS",
+        "status": "fail",
+        "points": 0,
+        "max_points": 1,
+        "evidence": "Links are not crawlable <a href> elements (JS routes or none)",
+        "source_url": "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+        "evidence_level": "google-official"
+      },
+      {
+        "id": "G-VIEWPORT",
+        "status": "pass",
+        "points": 1,
+        "max_points": 1,
+        "evidence": "meta viewport present",
+        "source_url": "https://developers.google.com/search/docs/appearance/page-experience",
+        "evidence_level": "google-official"
+      },
+      {
+        "id": "G-SITEMAP",
+        "status": "fail",
+        "points": 0,
+        "max_points": 1,
+        "evidence": "No robots.txt, no declared sitemap",
+        "source_url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+        "evidence_level": "google-official"
+      },
+      {
+        "id": "G-GENAI-CONTROL",
+        "status": "manual",
+        "points": 0,
+        "max_points": 0,
+        "evidence": "Check Search Console > Settings > Search generative AI control",
+        "source_url": "https://developers.google.com/search/docs/fundamentals/ai-optimization-guide",
+        "evidence_level": "google-official"
+      }
+    ]
+  },
+  "checks": {
+    "robots_txt": {
+      "score": 0,
+      "max": 14,
+      "passed": false,
+      "details": {
+        "found": false,
+        "bots_allowed": [],
+        "bots_missing": [],
+        "bots_blocked": [],
+        "bots_partial": [],
+        "citation_bots_ok": false,
+        "crawl_delay": null,
+        "citation_bots_explicit": false,
+        "sitemaps": []
+      }
+    },
+    "llms_txt": {
+      "score": 0,
+      "max": 6,
+      "passed": false,
+      "details": {
+        "found": false,
+        "has_h1": false,
+        "has_description": false,
+        "has_sections": false,
+        "has_links": false,
+        "word_count": 0,
+        "has_full": false,
+        "sections_count": 0,
+        "links_count": 0,
+        "has_blockquote": false,
+        "has_optional_section": false,
+        "companion_files_hint": false,
+        "validation_warnings": [],
+        "blocked_by_cdn": false
+      }
+    },
+    "schema_jsonld": {
+      "score": 0,
+      "max": 14,
+      "passed": false,
+      "details": {
+        "has_website": false,
+        "has_webapp": false,
+        "has_faq": false,
+        "found_types": []
+      }
+    },
+    "meta_tags": {
+      "score": 5,
+      "max": 11,
+      "passed": false,
+      "details": {
+        "has_title": true,
+        "has_description": false,
+        "has_canonical": false,
+        "has_og_title": false,
+        "has_og_description": false,
+        "has_og_image": false,
+        "title_text": "Example Domain",
+        "description_text": "",
+        "description_length": 0,
+        "title_length": 14,
+        "canonical_url": "",
+        "x_robots_noindex": false,
+        "x_robots_tag": "",
+        "has_noai": false,
+        "noai_value": ""
+      }
+    },
+    "content": {
+      "score": 2,
+      "max": 14,
+      "passed": false,
+      "details": {
+        "has_h1": false,
+        "heading_count": 0,
+        "has_numbers": false,
+        "has_links": false,
+        "word_count": 27,
+        "h1_text": "",
+        "numbers_count": 0,
+        "external_links_count": 0,
+        "has_heading_hierarchy": false,
+        "has_lists_or_tables": false,
+        "has_front_loading": false,
+        "images_alt_ok": true
+      }
+    },
+    "signals": {
+      "score": 3,
+      "max": 6,
+      "passed": true,
+      "details": {
+        "has_lang": true,
+        "lang_value": "en",
+        "has_rss": false,
+        "rss_url": "",
+        "has_freshness": false,
+        "freshness_date": "",
+        "freshness_valid": false
+      }
+    },
+    "ai_discovery": {
+      "score": 0,
+      "max": 3,
+      "passed": false,
+      "details": {
+        "has_well_known_ai": false,
+        "has_summary": false,
+        "has_faq": false,
+        "has_service": false,
+        "summary_valid": false,
+        "faq_count": 0,
+        "endpoints_found": 0,
+        "has_webmcp_declaration": false,
+        "webmcp_declared_tool_count": 0,
+        "has_markdown": false
+      }
+    },
+    "brand_entity": {
+      "score": 0,
+      "max": 12,
+      "passed": false,
+      "details": {
+        "brand_name_consistent": false,
+        "names_found": [
+          "Example Domain"
+        ],
+        "primary_name": "Example Domain",
+        "schema_desc_matches_meta": false,
+        "kg_pillar_count": 0,
+        "kg_pillar_urls": [],
+        "has_wikipedia": false,
+        "has_wikidata": false,
+        "has_linkedin": false,
+        "has_crunchbase": false,
+        "has_about_link": false,
+        "has_contact_info": false,
+        "has_geo_schema": false,
+        "has_hreflang": false,
+        "hreflang_count": 0,
+        "faq_depth": 0,
+        "has_recent_articles": false
+      }
+    },
+    "google_ai": {
+      "score": 13,
+      "max": 20,
+      "passed": false,
+      "details": {
+        "checked": true,
+        "points": 13,
+        "max_points": 20,
+        "final_url": "https://example.com/",
+        "checks": [
+          {
+            "id": "G-INDEX",
+            "status": "pass",
+            "points": 5,
+            "max_points": 5,
+            "evidence": "HTTP 200, indexable, Googlebot allowed",
+            "source_url": "https://developers.google.com/search/docs/essentials/technical",
+            "evidence_level": "google-official"
+          },
+          {
+            "id": "G-SNIPPET",
+            "status": "pass",
+            "points": 5,
+            "max_points": 5,
+            "evidence": "No snippet restrictions",
+            "source_url": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag",
+            "evidence_level": "google-official"
+          },
+          {
+            "id": "G-CANONICAL",
+            "status": "fail",
+            "points": 0,
+            "max_points": 3,
+            "evidence": "No rel=canonical: Google picks the canonical on its own",
+            "source_url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+            "evidence_level": "google-official"
+          },
+          {
+            "id": "G-DATES",
+            "status": "warn",
+            "points": 1,
+            "max_points": 2,
+            "evidence": "No valid publication or update date found",
+            "source_url": "https://developers.google.com/search/docs/appearance/publication-dates",
+            "evidence_level": "heuristic"
+          },
+          {
+            "id": "G-BYLINE",
+            "status": "warn",
+            "points": 1,
+            "max_points": 2,
+            "evidence": "No author found: Google asks 'who created the content'",
+            "source_url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+            "evidence_level": "heuristic"
+          },
+          {
+            "id": "G-LINKS",
+            "status": "fail",
+            "points": 0,
+            "max_points": 1,
+            "evidence": "Links are not crawlable <a href> elements (JS routes or none)",
+            "source_url": "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+            "evidence_level": "google-official"
+          },
+          {
+            "id": "G-VIEWPORT",
+            "status": "pass",
+            "points": 1,
+            "max_points": 1,
+            "evidence": "meta viewport present",
+            "source_url": "https://developers.google.com/search/docs/appearance/page-experience",
+            "evidence_level": "google-official"
+          },
+          {
+            "id": "G-SITEMAP",
+            "status": "fail",
+            "points": 0,
+            "max_points": 1,
+            "evidence": "No robots.txt, no declared sitemap",
+            "source_url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+            "evidence_level": "google-official"
+          },
+          {
+            "id": "G-GENAI-CONTROL",
+            "status": "manual",
+            "points": 0,
+            "max_points": 0,
+            "evidence": "Check Search Console > Settings > Search generative AI control",
+            "source_url": "https://developers.google.com/search/docs/fundamentals/ai-optimization-guide",
+            "evidence_level": "google-official"
+          }
+        ]
+      }
+    }
+  },
+  "score_breakdown": {
+    "robots": 0,
+    "llms": 0,
+    "schema": 0,
+    "meta": 5,
+    "content": 2,
+    "signals": 3,
+    "ai_discovery": 0,
+    "brand_entity": 0,
+    "negative_penalty": -1,
+    "google_ai": 13
+  },
+  "recommendations": [
+    "Create robots.txt with Allow rules for AI bots (GPTBot, ClaudeBot, PerplexityBot)",
+    "[G-CANONICAL] No rel=canonical: Google picks the canonical on its own \u2014 https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+    "[G-DATES] No valid publication or update date found \u2014 https://developers.google.com/search/docs/appearance/publication-dates",
+    "[G-BYLINE] No author found: Google asks 'who created the content' \u2014 https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+    "[G-LINKS] Links are not crawlable <a href> elements (JS routes or none) \u2014 https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+    "[G-SITEMAP] No robots.txt, no declared sitemap \u2014 https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+    "Create /llms.txt for AI indexing: geo llms --base-url https://example.com. Note: llms.txt is an organizational signal, not a proven ranking factor. It helps structure content for AI systems.",
+    "Add WebSite JSON-LD schema to homepage",
+    "Add Organization JSON-LD schema with name, url, and logo",
+    "Add FAQPage schema with site FAQs",
+    "Add sameAs links in Organization schema to Wikipedia, Wikidata, LinkedIn, or Crunchbase for Knowledge Graph disambiguation",
+    "Add a visible /about or /chi-siamo link to build trust signals for AI",
+    "Add address, telephone or contactPoint to Organization schema for entity validation",
+    "Add a single H1 heading that clearly states the page topic",
+    "Expand content to 300+ words \u2014 AI engines need substance to cite",
+    "Add H2/H3 subheadings to structure content for AI extraction",
+    "Front-load key information in the first 30% of content for AI snippet selection",
+    "Add <link rel=\"canonical\"> to prevent duplicate content issues in AI indexing",
+    "Add Open Graph tags (og:title, og:description, og:image) for AI and social previews",
+    "Add optimized meta description (150-160 characters)",
+    "Add numerical data and concrete statistics (+40% AI visibility)",
+    "Cite authoritative sources with external links (increase AI credibility)",
+    "Add RSS/Atom feed and link it in <head> with <link rel=\"alternate\" type=\"application/rss+xml\"> for AI discovery",
+    "Create /.well-known/ai.txt to define AI crawler permissions",
+    "Create /ai/summary.json with site name and description for AI engines",
+    "Create /ai/faq.json with structured FAQ for AI search visibility",
+    "Create /ai/service.json to describe service capabilities for AI",
+    "Add potentialAction (SearchAction) to WebSite schema for AI agent discoverability",
+    "Add descriptive labels to forms (label, aria-label) to make them usable by AI agents",
+    "Consider adding WebMCP toolname/tooldescription attributes to interactive elements for Chrome AI agent support",
+    "\u26a0\ufe0f Content requires JavaScript to render (25 words in raw HTML). AI crawlers don't execute JS. Implement SSR, SSG, or pre-rendering."
+  ],
+  "webmcp": {
+    "readiness_level": "none",
+    "agent_ready": false,
+    "has_register_tool": false,
+    "has_tool_attributes": false,
+    "tool_count": 0,
+    "has_potential_action": false,
+    "potential_actions": [],
+    "has_labeled_forms": false,
+    "labeled_forms_count": 0,
+    "has_openapi": false,
+    "has_webmcp_declaration": false,
+    "declared_tool_count": 0
+  },
+  "negative_signals": {
+    "severity": "low",
+    "signals_found": 1,
+    "cta_density_high": false,
+    "cta_count": 0,
+    "has_popup_signals": false,
+    "is_thin_content": false,
+    "broken_links_count": 0,
+    "has_keyword_stuffing": false,
+    "has_author_signal": false,
+    "boilerplate_ratio": 0.0,
+    "has_mixed_signals": false
+  },
+  "cdn_check": {
+    "checked": true,
+    "browser_status": 200,
+    "browser_content_length": 577,
+    "bot_results": [
+      {
+        "bot": "GPTBot",
+        "status": 200,
+        "content_length": 577,
+        "blocked": false,
+        "challenge_detected": false
+      },
+      {
+        "bot": "OAI-SearchBot",
+        "status": 200,
+        "content_length": 577,
+        "blocked": false,
+        "challenge_detected": false
+      },
+      {
+        "bot": "PerplexityBot",
+        "status": 200,
+        "content_length": 577,
+        "blocked": false,
+        "challenge_detected": false
+      },
+      {
+        "bot": "Claude-SearchBot",
+        "status": 200,
+        "content_length": 577,
+        "blocked": false,
+        "challenge_detected": false
+      },
+      {
+        "bot": "Googlebot",
+        "status": 200,
+        "content_length": 577,
+        "blocked": false,
+        "challenge_detected": false
+      },
+      {
+        "bot": "Applebot",
+        "status": 200,
+        "content_length": 577,
+        "blocked": false,
+        "challenge_detected": false
+      }
+    ],
+    "any_blocked": false,
+    "cdn_detected": "cloudflare",
+    "cdn_headers": {
+      "cf-ray": "a494dbb3ca51ae26-MSP",
+      "cf-cache-status": "HIT",
+      "server": "envoy"
+    },
+    "error": ""
+  },
+  "js_rendering": {
+    "checked": true,
+    "raw_word_count": 25,
+    "raw_heading_count": 0,
+    "has_empty_root": false,
+    "has_noscript_content": false,
+    "framework_detected": "",
+    "js_dependent": true,
+    "details": "Only 25 words and 0 headings in raw HTML. Content likely requires JavaScript to render. AI crawlers won't see it. Consider SSR/SSG or pre-rendering."
+  },
+  "multimodal": {
+    "checked": true,
+    "total_images": 0,
+    "images_with_alt": 0,
+    "alt_coverage": 0.0,
+    "caption_count": 0,
+    "has_video": false,
+    "video_count": 0,
+    "has_video_schema": false,
+    "has_video_captions": false,
+    "has_audio": false,
+    "has_audio_schema": false,
+    "has_transcript": false,
+    "readiness_level": "none"
+  },
+  "trust_stack": {
+    "checked": true,
+    "technical": {
+      "name": "technical",
+      "label": "Technical Trust",
+      "score": 2,
+      "max_score": 5,
+      "signals_found": [
+        "HTTPS"
+      ],
+      "signals_missing": [
+        "Strict-Transport-Security header missing",
+        "Content-Security-Policy header missing",
+        "X-Frame-Options header missing"
+      ],
+      "details": {}
+    },
+    "identity": {
+      "name": "identity",
+      "label": "Identity Trust",
+      "score": 0,
+      "max_score": 5,
+      "signals_found": [],
+      "signals_missing": [
+        "Inconsistent brand name across title/H1/schema",
+        "No about page link found",
+        "No contact information in schema",
+        "No Organization JSON-LD schema",
+        "No author attribution found"
+      ],
+      "details": {}
+    },
+    "social": {
+      "name": "social",
+      "label": "Social Trust",
+      "score": 0,
+      "max_score": 5,
+      "signals_found": [],
+      "signals_missing": [
+        "No sameAs links in schema",
+        "No Knowledge Graph pillar links",
+        "No reviews or testimonials found",
+        "No social media profile links"
+      ],
+      "details": {}
+    },
+    "academic": {
+      "name": "academic",
+      "label": "Academic Trust",
+      "score": 0,
+      "max_score": 5,
+      "signals_found": [],
+      "signals_missing": [
+        "Few or no statistics/numbers in content",
+        "Few external source links",
+        "No links to authoritative sources (DOI, PubMed, Scholar)",
+        "No References/Sources section",
+        "No original research data patterns"
+      ],
+      "details": {
+        "authoritative_domains": [],
+        "statistics_count": 0,
+        "numbers_count": 0
+      }
+    },
+    "consistency": {
+      "name": "consistency",
+      "label": "Consistency Trust",
+      "score": 1,
+      "max_score": 5,
+      "signals_found": [
+        "No mixed signals"
+      ],
+      "signals_missing": [
+        "Inconsistent brand naming",
+        "Schema description differs from meta description",
+        "No dateModified in schema"
+      ],
+      "details": {}
+    },
+    "composite_score": 3,
+    "grade": "F",
+    "trust_level": "low"
+  },
+  "prompt_injection": {
+    "checked": true,
+    "hidden_text_found": false,
+    "hidden_text_count": 0,
+    "hidden_text_samples": [],
+    "invisible_unicode_found": false,
+    "invisible_unicode_count": 0,
+    "llm_instruction_found": false,
+    "llm_instruction_count": 0,
+    "llm_instruction_samples": [],
+    "html_comment_injection_found": false,
+    "html_comment_injection_count": 0,
+    "html_comment_samples": [],
+    "monochrome_text_found": false,
+    "monochrome_text_count": 0,
+    "microfont_found": false,
+    "microfont_count": 0,
+    "data_attr_injection_found": false,
+    "data_attr_injection_count": 0,
+    "data_attr_samples": [],
+    "aria_hidden_injection_found": false,
+    "aria_hidden_injection_count": 0,
+    "aria_hidden_samples": [],
+    "ugc_surface_found": false,
+    "ugc_surface_samples": [],
+    "ugc_injection_risk": false,
+    "patterns_found": 0,
+    "severity": "clean",
+    "risk_level": "none"
+  },
+  "rag_chunk": {
+    "checked": true,
+    "total_sections": 1,
+    "sections_in_range": 0,
+    "avg_section_words": 25.0,
+    "has_definition_opening": true,
+    "heading_as_boundary_ratio": 0.0,
+    "anchor_sentences": 1,
+    "chunk_readiness_score": 15
+  },
+  "embedding_proximity": {
+    "checked": true,
+    "skipped_reason": "sentence-transformers not installed (pip install geo-optimizer-skill[embedding])",
+    "model_name": "",
+    "query_scores": [],
+    "avg_similarity": 0.0,
+    "top_similarity": 0.0,
+    "retrievable_chunks": 0,
+    "total_chunks": 0
+  },
+  "content_decay": {
+    "checked": true,
+    "signals": [],
+    "earliest_decay_days": null,
+    "decay_risk": "low",
+    "evergreen_score": 100
+  },
+  "platform_citation": {
+    "checked": true,
+    "platforms": [
+      {
+        "platform": "chatgpt",
+        "score": 0,
+        "strengths": [],
+        "recommendations": [
+          "Allow GPTBot in robots.txt",
+          "Add /llms.txt for LLM-friendly site summary",
+          "Add FAQPage schema for Q&A-style answers",
+          "Add Organization schema for entity clarity"
+        ]
+      },
+      {
+        "platform": "perplexity",
+        "score": 0,
+        "strengths": [],
+        "recommendations": [
+          "Allow PerplexityBot in robots.txt",
+          "Add /llms.txt with links to key resources",
+          "Add dateModified schema or freshness indicators",
+          "Add external links to authoritative sources"
+        ]
+      },
+      {
+        "platform": "google_ai",
+        "score": 10,
+        "strengths": [
+          "Googlebot allowed (feeds Search and AI Overviews)"
+        ],
+        "recommendations": [
+          "Add JSON-LD schema markup",
+          "Complete title, description, and canonical meta tags",
+          "Add dateModified / lastmod freshness signals",
+          "Serve content server-side; Google AI may not execute your JS",
+          "Add descriptive alt text to images",
+          "Add sameAs links to social profiles and Wikipedia"
+        ]
+      }
+    ]
+  },
+  "context_window": {
+    "checked": true,
+    "total_words": 25,
+    "total_tokens_estimate": 32,
+    "front_loaded_ratio": 0.5,
+    "key_info_tokens": 32,
+    "filler_ratio": 0.0,
+    "optimal_for": [
+      "rag_chunk",
+      "perplexity",
+      "chatgpt",
+      "claude"
+    ],
+    "truncation_risk": "none",
+    "context_efficiency_score": 100
+  },
+  "instruction_readiness": {
+    "checked": true,
+    "labeled_buttons": 0,
+    "unlabeled_buttons": 0,
+    "action_clarity_score": 100,
+    "total_inputs": 0,
+    "labeled_inputs": 0,
+    "typed_inputs": 0,
+    "form_readability_score": 100,
+    "nav_links": 0,
+    "stateful_urls": false,
+    "has_aria_live": false,
+    "has_error_roles": false,
+    "readiness_score": 60,
+    "readiness_level": "ready"
+  },
+  "http_status": 200,
+  "page_size": 577,
+  "audit_duration_ms": 1597
+}

@@ -1,0 +1,1385 @@
+{
+  "checkedAt": "2026-10-11T15:40:01.046374+00:00",
+  "shortcode": "DVUmmr8gZhU",
+  "owner": "cooper.simson",
+  "url": "https://www.instagram.com/reel/DVUmmr8gZhU/",
+  "publishedDate": "2026-02-28",
+  "dateSource": "Instagram original page meta description",
+  "primaryEmbed": {
+    "url": "https://www.instagram.com/reel/DVUmmr8gZhU/embed/captioned/",
+    "mediaId": "3842866166347438164",
+    "videoViewCount": 430253,
+    "likes": 13643,
+    "comments": 32524,
+    "reach": null
+  },
+  "aggregator": {
+    "url": "https://pictame.com/en/discover/hashtag/claude-ai-integration-for-teams",
+    "playCount": 919554,
+    "directReelCodeFoundInPublicPage": true
+  },
+  "qualifiesAsFreshReference": false,
+  "reason": "Older than 60 days; never label as recent",
+  "paidRequestsCreated": 0,
+  "media": {
+    "sha256": "f74849e32b0af126569e08377909156bcd2154e04c41c9e9c0fb40ca305c40ed",
+    "bytes": 9358397,
+    "durationSeconds": 54.029977,
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "audioPresent": true
+  },
+  "inspection": {
+    "frameCount": 18,
+    "intervalSeconds": 3,
+    "continuousPlaybackVerified": false,
+    "wordAccuracyReviewed": false
+  },
+  "speech": {
+    "method": "faster-whisper-small CPU int8, English, word timestamps; not human verified",
+    "elapsedSeconds": 18.791152698999213,
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 3.78,
+        "text": " Is it possible to replace an entire SEO agency and rank higher with AI?",
+        "words": [
+          {
+            "text": " Is",
+            "start": 0.0,
+            "end": 0.24,
+            "probability": 0.8253467082977295
+          },
+          {
+            "text": " it",
+            "start": 0.24,
+            "end": 0.34,
+            "probability": 0.9950061440467834
+          },
+          {
+            "text": " possible",
+            "start": 0.34,
+            "end": 0.64,
+            "probability": 0.9986826777458191
+          },
+          {
+            "text": " to",
+            "start": 0.64,
+            "end": 0.86,
+            "probability": 0.9970206618309021
+          },
+          {
+            "text": " replace",
+            "start": 0.86,
+            "end": 1.18,
+            "probability": 0.9944130778312683
+          },
+          {
+            "text": " an",
+            "start": 1.18,
+            "end": 1.3,
+            "probability": 0.9646760821342468
+          },
+          {
+            "text": " entire",
+            "start": 1.3,
+            "end": 1.64,
+            "probability": 0.9994975328445435
+          },
+          {
+            "text": " SEO",
+            "start": 1.64,
+            "end": 2.02,
+            "probability": 0.9813288450241089
+          },
+          {
+            "text": " agency",
+            "start": 2.02,
+            "end": 2.48,
+            "probability": 0.9146106839179993
+          },
+          {
+            "text": " and",
+            "start": 2.48,
+            "end": 2.96,
+            "probability": 0.9740923643112183
+          },
+          {
+            "text": " rank",
+            "start": 2.96,
+            "end": 3.16,
+            "probability": 0.9954891800880432
+          },
+          {
+            "text": " higher",
+            "start": 3.16,
+            "end": 3.42,
+            "probability": 0.9873491525650024
+          },
+          {
+            "text": " with",
+            "start": 3.42,
+            "end": 3.64,
+            "probability": 0.9961426854133606
+          },
+          {
+            "text": " AI?",
+            "start": 3.64,
+            "end": 3.78,
+            "probability": 0.9676246643066406
+          }
+        ]
+      },
+      {
+        "start": 4.28,
+        "end": 9.58,
+        "text": " I tried it and it worked. Here's how. Welcome back to day nine of the 100-day actual AI series.",
+        "words": [
+          {
+            "text": " I",
+            "start": 4.28,
+            "end": 4.44,
+            "probability": 0.992909848690033
+          },
+          {
+            "text": " tried",
+            "start": 4.44,
+            "end": 4.64,
+            "probability": 0.9973260164260864
+          },
+          {
+            "text": " it",
+            "start": 4.64,
+            "end": 4.86,
+            "probability": 0.9829626083374023
+          },
+          {
+            "text": " and",
+            "start": 4.86,
+            "end": 5.06,
+            "probability": 0.8068532347679138
+          },
+          {
+            "text": " it",
+            "start": 5.06,
+            "end": 5.16,
+            "probability": 0.9969524145126343
+          },
+          {
+            "text": " worked.",
+            "start": 5.16,
+            "end": 5.34,
+            "probability": 0.9982662796974182
+          },
+          {
+            "text": " Here's",
+            "start": 5.64,
+            "end": 5.9,
+            "probability": 0.9848479926586151
+          },
+          {
+            "text": " how.",
+            "start": 5.9,
+            "end": 6.06,
+            "probability": 0.996945321559906
+          },
+          {
+            "text": " Welcome",
+            "start": 6.62,
+            "end": 6.7,
+            "probability": 0.9835520386695862
+          },
+          {
+            "text": " back",
+            "start": 6.7,
+            "end": 7.0,
+            "probability": 0.9950704574584961
+          },
+          {
+            "text": " to",
+            "start": 7.0,
+            "end": 7.22,
+            "probability": 0.991025984287262
+          },
+          {
+            "text": " day",
+            "start": 7.22,
+            "end": 7.44,
+            "probability": 0.8705669641494751
+          },
+          {
+            "text": " nine",
+            "start": 7.44,
+            "end": 7.8,
+            "probability": 0.7103579640388489
+          },
+          {
+            "text": " of",
+            "start": 7.8,
+            "end": 8.0,
+            "probability": 0.9977300763130188
+          },
+          {
+            "text": " the",
+            "start": 8.0,
+            "end": 8.1,
+            "probability": 0.9358340501785278
+          },
+          {
+            "text": " 100",
+            "start": 8.1,
+            "end": 8.3,
+            "probability": 0.7460453510284424
+          },
+          {
+            "text": "-day",
+            "start": 8.3,
+            "end": 8.5,
+            "probability": 0.7047605216503143
+          },
+          {
+            "text": " actual",
+            "start": 8.5,
+            "end": 8.82,
+            "probability": 0.10336259007453918
+          },
+          {
+            "text": " AI",
+            "start": 8.82,
+            "end": 9.16,
+            "probability": 0.9521343111991882
+          },
+          {
+            "text": " series.",
+            "start": 9.16,
+            "end": 9.58,
+            "probability": 0.969455361366272
+          }
+        ]
+      },
+      {
+        "start": 10.1,
+        "end": 15.52,
+        "text": " To set this up, first go to GitHub and download this cloud skill. Once you install it, type SEO",
+        "words": [
+          {
+            "text": " To",
+            "start": 10.1,
+            "end": 10.12,
+            "probability": 0.906732439994812
+          },
+          {
+            "text": " set",
+            "start": 10.12,
+            "end": 10.3,
+            "probability": 0.9960415363311768
+          },
+          {
+            "text": " this",
+            "start": 10.3,
+            "end": 10.5,
+            "probability": 0.9971790313720703
+          },
+          {
+            "text": " up,",
+            "start": 10.5,
+            "end": 10.76,
+            "probability": 0.9976751208305359
+          },
+          {
+            "text": " first",
+            "start": 10.9,
+            "end": 11.08,
+            "probability": 0.9732859134674072
+          },
+          {
+            "text": " go",
+            "start": 11.08,
+            "end": 11.32,
+            "probability": 0.8603134155273438
+          },
+          {
+            "text": " to",
+            "start": 11.32,
+            "end": 11.44,
+            "probability": 0.9982690811157227
+          },
+          {
+            "text": " GitHub",
+            "start": 11.44,
+            "end": 11.7,
+            "probability": 0.9771907329559326
+          },
+          {
+            "text": " and",
+            "start": 11.7,
+            "end": 11.96,
+            "probability": 0.977997899055481
+          },
+          {
+            "text": " download",
+            "start": 11.96,
+            "end": 12.26,
+            "probability": 0.9956875443458557
+          },
+          {
+            "text": " this",
+            "start": 12.26,
+            "end": 12.74,
+            "probability": 0.9947373270988464
+          },
+          {
+            "text": " cloud",
+            "start": 12.74,
+            "end": 13.06,
+            "probability": 0.20537462830543518
+          },
+          {
+            "text": " skill.",
+            "start": 13.06,
+            "end": 13.42,
+            "probability": 0.8877679109573364
+          },
+          {
+            "text": " Once",
+            "start": 14.1,
+            "end": 14.14,
+            "probability": 0.994937539100647
+          },
+          {
+            "text": " you",
+            "start": 14.14,
+            "end": 14.3,
+            "probability": 0.9984709620475769
+          },
+          {
+            "text": " install",
+            "start": 14.3,
+            "end": 14.58,
+            "probability": 0.9962959885597229
+          },
+          {
+            "text": " it,",
+            "start": 14.58,
+            "end": 14.76,
+            "probability": 0.9939250349998474
+          },
+          {
+            "text": " type",
+            "start": 14.88,
+            "end": 15.02,
+            "probability": 0.9962466359138489
+          },
+          {
+            "text": " SEO",
+            "start": 15.02,
+            "end": 15.52,
+            "probability": 0.9369694590568542
+          }
+        ]
+      },
+      {
+        "start": 15.52,
+        "end": 19.82,
+        "text": " into cloud code, give it your website URL, and it's going to run this entire report for you.",
+        "words": [
+          {
+            "text": " into",
+            "start": 15.52,
+            "end": 15.78,
+            "probability": 0.981145441532135
+          },
+          {
+            "text": " cloud",
+            "start": 15.78,
+            "end": 16.04,
+            "probability": 0.5727103352546692
+          },
+          {
+            "text": " code,",
+            "start": 16.04,
+            "end": 16.44,
+            "probability": 0.9898970127105713
+          },
+          {
+            "text": " give",
+            "start": 16.6,
+            "end": 16.68,
+            "probability": 0.9912161827087402
+          },
+          {
+            "text": " it",
+            "start": 16.68,
+            "end": 16.78,
+            "probability": 0.9944027066230774
+          },
+          {
+            "text": " your",
+            "start": 16.78,
+            "end": 16.9,
+            "probability": 0.9845731854438782
+          },
+          {
+            "text": " website",
+            "start": 16.9,
+            "end": 17.12,
+            "probability": 0.9761856198310852
+          },
+          {
+            "text": " URL,",
+            "start": 17.12,
+            "end": 17.44,
+            "probability": 0.9759441614151001
+          },
+          {
+            "text": " and",
+            "start": 17.86,
+            "end": 18.04,
+            "probability": 0.996485710144043
+          },
+          {
+            "text": " it's",
+            "start": 18.04,
+            "end": 18.2,
+            "probability": 0.9925904273986816
+          },
+          {
+            "text": " going",
+            "start": 18.2,
+            "end": 18.3,
+            "probability": 0.8404319286346436
+          },
+          {
+            "text": " to",
+            "start": 18.3,
+            "end": 18.34,
+            "probability": 0.9985182881355286
+          },
+          {
+            "text": " run",
+            "start": 18.34,
+            "end": 18.5,
+            "probability": 0.9953237175941467
+          },
+          {
+            "text": " this",
+            "start": 18.5,
+            "end": 18.68,
+            "probability": 0.9941285848617554
+          },
+          {
+            "text": " entire",
+            "start": 18.68,
+            "end": 19.0,
+            "probability": 0.9992882609367371
+          },
+          {
+            "text": " report",
+            "start": 19.0,
+            "end": 19.36,
+            "probability": 0.9953829646110535
+          },
+          {
+            "text": " for",
+            "start": 19.36,
+            "end": 19.62,
+            "probability": 0.9970314502716064
+          },
+          {
+            "text": " you.",
+            "start": 19.62,
+            "end": 19.82,
+            "probability": 0.9992103576660156
+          }
+        ]
+      },
+      {
+        "start": 20.16,
+        "end": 23.82,
+        "text": " Once it starts, cloud is going to spin up five agents that are going to crawl your website,",
+        "words": [
+          {
+            "text": " Once",
+            "start": 20.16,
+            "end": 20.38,
+            "probability": 0.9960632920265198
+          },
+          {
+            "text": " it",
+            "start": 20.38,
+            "end": 20.56,
+            "probability": 0.9989056587219238
+          },
+          {
+            "text": " starts,",
+            "start": 20.56,
+            "end": 20.8,
+            "probability": 0.998907208442688
+          },
+          {
+            "text": " cloud",
+            "start": 21.06,
+            "end": 21.12,
+            "probability": 0.5474796891212463
+          },
+          {
+            "text": " is",
+            "start": 21.12,
+            "end": 21.26,
+            "probability": 0.8330380320549011
+          },
+          {
+            "text": " going",
+            "start": 21.26,
+            "end": 21.34,
+            "probability": 0.9588291049003601
+          },
+          {
+            "text": " to",
+            "start": 21.34,
+            "end": 21.38,
+            "probability": 0.9984891414642334
+          },
+          {
+            "text": " spin",
+            "start": 21.38,
+            "end": 21.6,
+            "probability": 0.9841699600219727
+          },
+          {
+            "text": " up",
+            "start": 21.6,
+            "end": 21.78,
+            "probability": 0.9975547194480896
+          },
+          {
+            "text": " five",
+            "start": 21.78,
+            "end": 22.2,
+            "probability": 0.9686155915260315
+          },
+          {
+            "text": " agents",
+            "start": 22.2,
+            "end": 22.7,
+            "probability": 0.9935454726219177
+          },
+          {
+            "text": " that",
+            "start": 22.7,
+            "end": 22.9,
+            "probability": 0.9978764057159424
+          },
+          {
+            "text": " are",
+            "start": 22.9,
+            "end": 23.0,
+            "probability": 0.9983249306678772
+          },
+          {
+            "text": " going",
+            "start": 23.0,
+            "end": 23.06,
+            "probability": 0.9911660552024841
+          },
+          {
+            "text": " to",
+            "start": 23.06,
+            "end": 23.12,
+            "probability": 0.999622106552124
+          },
+          {
+            "text": " crawl",
+            "start": 23.12,
+            "end": 23.34,
+            "probability": 0.9894604682922363
+          },
+          {
+            "text": " your",
+            "start": 23.34,
+            "end": 23.48,
+            "probability": 0.9970009922981262
+          },
+          {
+            "text": " website,",
+            "start": 23.48,
+            "end": 23.82,
+            "probability": 0.9900332093238831
+          }
+        ]
+      },
+      {
+        "start": 24.18,
+        "end": 28.06,
+        "text": " analyze all your pages, and research for winning keywords and strategies.",
+        "words": [
+          {
+            "text": " analyze",
+            "start": 24.18,
+            "end": 24.68,
+            "probability": 0.9929913282394409
+          },
+          {
+            "text": " all",
+            "start": 24.68,
+            "end": 24.88,
+            "probability": 0.9977433681488037
+          },
+          {
+            "text": " your",
+            "start": 24.88,
+            "end": 24.98,
+            "probability": 0.9895791411399841
+          },
+          {
+            "text": " pages,",
+            "start": 24.98,
+            "end": 25.4,
+            "probability": 0.9970157146453857
+          },
+          {
+            "text": " and",
+            "start": 25.76,
+            "end": 26.2,
+            "probability": 0.9987693428993225
+          },
+          {
+            "text": " research",
+            "start": 26.2,
+            "end": 26.56,
+            "probability": 0.9977523684501648
+          },
+          {
+            "text": " for",
+            "start": 26.56,
+            "end": 26.82,
+            "probability": 0.9981762170791626
+          },
+          {
+            "text": " winning",
+            "start": 26.82,
+            "end": 27.0,
+            "probability": 0.9930765628814697
+          },
+          {
+            "text": " keywords",
+            "start": 27.0,
+            "end": 27.38,
+            "probability": 0.9191483855247498
+          },
+          {
+            "text": " and",
+            "start": 27.38,
+            "end": 27.6,
+            "probability": 0.9961414933204651
+          },
+          {
+            "text": " strategies.",
+            "start": 27.6,
+            "end": 28.06,
+            "probability": 0.9992651343345642
+          }
+        ]
+      },
+      {
+        "start": 28.92,
+        "end": 32.32,
+        "text": " After about three minutes, it's going to give you a full SEO breakdown with health scores,",
+        "words": [
+          {
+            "text": " After",
+            "start": 28.92,
+            "end": 29.28,
+            "probability": 0.3730980157852173
+          },
+          {
+            "text": " about",
+            "start": 29.28,
+            "end": 29.5,
+            "probability": 0.9874885082244873
+          },
+          {
+            "text": " three",
+            "start": 29.5,
+            "end": 29.82,
+            "probability": 0.8082675337791443
+          },
+          {
+            "text": " minutes,",
+            "start": 29.82,
+            "end": 30.06,
+            "probability": 0.993390679359436
+          },
+          {
+            "text": " it's",
+            "start": 30.2,
+            "end": 30.24,
+            "probability": 0.87452033162117
+          },
+          {
+            "text": " going",
+            "start": 30.24,
+            "end": 30.36,
+            "probability": 0.7128356099128723
+          },
+          {
+            "text": " to",
+            "start": 30.36,
+            "end": 30.4,
+            "probability": 0.9961557984352112
+          },
+          {
+            "text": " give",
+            "start": 30.4,
+            "end": 30.52,
+            "probability": 0.9075577259063721
+          },
+          {
+            "text": " you",
+            "start": 30.52,
+            "end": 30.58,
+            "probability": 0.9935534000396729
+          },
+          {
+            "text": " a",
+            "start": 30.58,
+            "end": 30.7,
+            "probability": 0.9905656576156616
+          },
+          {
+            "text": " full",
+            "start": 30.7,
+            "end": 30.88,
+            "probability": 0.9974129796028137
+          },
+          {
+            "text": " SEO",
+            "start": 30.88,
+            "end": 31.2,
+            "probability": 0.9637998938560486
+          },
+          {
+            "text": " breakdown",
+            "start": 31.2,
+            "end": 31.6,
+            "probability": 0.961299479007721
+          },
+          {
+            "text": " with",
+            "start": 31.6,
+            "end": 31.88,
+            "probability": 0.8275588154792786
+          },
+          {
+            "text": " health",
+            "start": 31.88,
+            "end": 32.04,
+            "probability": 0.7827470898628235
+          },
+          {
+            "text": " scores,",
+            "start": 32.04,
+            "end": 32.32,
+            "probability": 0.8837831616401672
+          }
+        ]
+      },
+      {
+        "start": 32.4,
+        "end": 36.26,
+        "text": " content breakdown, keyword analysis, and an AI surge readiness plan to get your content",
+        "words": [
+          {
+            "text": " content",
+            "start": 32.4,
+            "end": 32.72,
+            "probability": 0.9963054656982422
+          },
+          {
+            "text": " breakdown,",
+            "start": 32.72,
+            "end": 33.12,
+            "probability": 0.9120861887931824
+          },
+          {
+            "text": " keyword",
+            "start": 33.32,
+            "end": 33.52,
+            "probability": 0.9605177640914917
+          },
+          {
+            "text": " analysis,",
+            "start": 33.52,
+            "end": 33.84,
+            "probability": 0.9947203397750854
+          },
+          {
+            "text": " and",
+            "start": 33.96,
+            "end": 34.3,
+            "probability": 0.9958380460739136
+          },
+          {
+            "text": " an",
+            "start": 34.3,
+            "end": 34.42,
+            "probability": 0.9284603595733643
+          },
+          {
+            "text": " AI",
+            "start": 34.42,
+            "end": 34.62,
+            "probability": 0.9635483026504517
+          },
+          {
+            "text": " surge",
+            "start": 34.62,
+            "end": 34.88,
+            "probability": 0.6771860122680664
+          },
+          {
+            "text": " readiness",
+            "start": 34.88,
+            "end": 35.2,
+            "probability": 0.9861494302749634
+          },
+          {
+            "text": " plan",
+            "start": 35.2,
+            "end": 35.56,
+            "probability": 0.997611403465271
+          },
+          {
+            "text": " to",
+            "start": 35.56,
+            "end": 35.7,
+            "probability": 0.9695507287979126
+          },
+          {
+            "text": " get",
+            "start": 35.7,
+            "end": 35.8,
+            "probability": 0.99861741065979
+          },
+          {
+            "text": " your",
+            "start": 35.8,
+            "end": 35.9,
+            "probability": 0.9977266192436218
+          },
+          {
+            "text": " content",
+            "start": 35.9,
+            "end": 36.26,
+            "probability": 0.9965851306915283
+          }
+        ]
+      },
+      {
+        "start": 36.26,
+        "end": 40.84,
+        "text": " showing up in chat, GPT, and other AI searches. What's even crazier is you can then give this plan",
+        "words": [
+          {
+            "text": " showing",
+            "start": 36.26,
+            "end": 36.54,
+            "probability": 0.9808180332183838
+          },
+          {
+            "text": " up",
+            "start": 36.54,
+            "end": 36.72,
+            "probability": 0.9984654188156128
+          },
+          {
+            "text": " in",
+            "start": 36.72,
+            "end": 36.8,
+            "probability": 0.7795095443725586
+          },
+          {
+            "text": " chat,",
+            "start": 36.8,
+            "end": 36.96,
+            "probability": 0.9607059955596924
+          },
+          {
+            "text": " GPT,",
+            "start": 37.1,
+            "end": 37.4,
+            "probability": 0.6529709249734879
+          },
+          {
+            "text": " and",
+            "start": 37.48,
+            "end": 37.54,
+            "probability": 0.997097373008728
+          },
+          {
+            "text": " other",
+            "start": 37.54,
+            "end": 37.72,
+            "probability": 0.9979416728019714
+          },
+          {
+            "text": " AI",
+            "start": 37.72,
+            "end": 37.98,
+            "probability": 0.9789832830429077
+          },
+          {
+            "text": " searches.",
+            "start": 37.98,
+            "end": 38.34,
+            "probability": 0.9695788621902466
+          },
+          {
+            "text": " What's",
+            "start": 38.86,
+            "end": 39.12,
+            "probability": 0.9962796866893768
+          },
+          {
+            "text": " even",
+            "start": 39.12,
+            "end": 39.24,
+            "probability": 0.9990987777709961
+          },
+          {
+            "text": " crazier",
+            "start": 39.24,
+            "end": 39.62,
+            "probability": 0.9949507117271423
+          },
+          {
+            "text": " is",
+            "start": 39.62,
+            "end": 39.78,
+            "probability": 0.9648492932319641
+          },
+          {
+            "text": " you",
+            "start": 39.78,
+            "end": 39.88,
+            "probability": 0.9431924223899841
+          },
+          {
+            "text": " can",
+            "start": 39.88,
+            "end": 40.0,
+            "probability": 0.9986967444419861
+          },
+          {
+            "text": " then",
+            "start": 40.0,
+            "end": 40.12,
+            "probability": 0.9767946600914001
+          },
+          {
+            "text": " give",
+            "start": 40.12,
+            "end": 40.38,
+            "probability": 0.9974243640899658
+          },
+          {
+            "text": " this",
+            "start": 40.38,
+            "end": 40.6,
+            "probability": 0.9989399313926697
+          },
+          {
+            "text": " plan",
+            "start": 40.6,
+            "end": 40.84,
+            "probability": 0.9831162095069885
+          }
+        ]
+      },
+      {
+        "start": 40.84,
+        "end": 44.68,
+        "text": " to Claude and build an agent that's going to set all this up for you so you don't have to do",
+        "words": [
+          {
+            "text": " to",
+            "start": 40.84,
+            "end": 41.14,
+            "probability": 0.9851499795913696
+          },
+          {
+            "text": " Claude",
+            "start": 41.14,
+            "end": 41.62,
+            "probability": 0.9020331799983978
+          },
+          {
+            "text": " and",
+            "start": 41.62,
+            "end": 41.78,
+            "probability": 0.9573374390602112
+          },
+          {
+            "text": " build",
+            "start": 41.78,
+            "end": 41.92,
+            "probability": 0.9923071265220642
+          },
+          {
+            "text": " an",
+            "start": 41.92,
+            "end": 42.08,
+            "probability": 0.9985496401786804
+          },
+          {
+            "text": " agent",
+            "start": 42.08,
+            "end": 42.3,
+            "probability": 0.9975929856300354
+          },
+          {
+            "text": " that's",
+            "start": 42.3,
+            "end": 42.58,
+            "probability": 0.9623628258705139
+          },
+          {
+            "text": " going",
+            "start": 42.58,
+            "end": 42.68,
+            "probability": 0.9312100410461426
+          },
+          {
+            "text": " to",
+            "start": 42.68,
+            "end": 42.74,
+            "probability": 0.9991982579231262
+          },
+          {
+            "text": " set",
+            "start": 42.74,
+            "end": 42.9,
+            "probability": 0.9965946078300476
+          },
+          {
+            "text": " all",
+            "start": 42.9,
+            "end": 43.26,
+            "probability": 0.989977240562439
+          },
+          {
+            "text": " this",
+            "start": 43.26,
+            "end": 43.42,
+            "probability": 0.9414380788803101
+          },
+          {
+            "text": " up",
+            "start": 43.42,
+            "end": 43.56,
+            "probability": 0.9991312623023987
+          },
+          {
+            "text": " for",
+            "start": 43.56,
+            "end": 43.78,
+            "probability": 0.9995982050895691
+          },
+          {
+            "text": " you",
+            "start": 43.78,
+            "end": 43.96,
+            "probability": 0.9993102550506592
+          },
+          {
+            "text": " so",
+            "start": 43.96,
+            "end": 44.12,
+            "probability": 0.7415993809700012
+          },
+          {
+            "text": " you",
+            "start": 44.12,
+            "end": 44.24,
+            "probability": 0.9953045845031738
+          },
+          {
+            "text": " don't",
+            "start": 44.24,
+            "end": 44.34,
+            "probability": 0.9958927631378174
+          },
+          {
+            "text": " have",
+            "start": 44.34,
+            "end": 44.46,
+            "probability": 0.9984197616577148
+          },
+          {
+            "text": " to",
+            "start": 44.46,
+            "end": 44.54,
+            "probability": 0.9996650218963623
+          },
+          {
+            "text": " do",
+            "start": 44.54,
+            "end": 44.68,
+            "probability": 0.9992051720619202
+          }
+        ]
+      },
+      {
+        "start": 44.68,
+        "end": 48.44,
+        "text": " anything. Save this video for later, and if you want to get access to this Claude skill",
+        "words": [
+          {
+            "text": " anything.",
+            "start": 44.68,
+            "end": 44.94,
+            "probability": 0.9993176460266113
+          },
+          {
+            "text": " Save",
+            "start": 45.44,
+            "end": 45.7,
+            "probability": 0.9922279715538025
+          },
+          {
+            "text": " this",
+            "start": 45.7,
+            "end": 45.9,
+            "probability": 0.9991452693939209
+          },
+          {
+            "text": " video",
+            "start": 45.9,
+            "end": 46.12,
+            "probability": 0.9988040924072266
+          },
+          {
+            "text": " for",
+            "start": 46.12,
+            "end": 46.24,
+            "probability": 0.9987003803253174
+          },
+          {
+            "text": " later,",
+            "start": 46.24,
+            "end": 46.5,
+            "probability": 0.9994025230407715
+          },
+          {
+            "text": " and",
+            "start": 46.72,
+            "end": 46.8,
+            "probability": 0.993018388748169
+          },
+          {
+            "text": " if",
+            "start": 46.8,
+            "end": 46.88,
+            "probability": 0.9956052899360657
+          },
+          {
+            "text": " you",
+            "start": 46.88,
+            "end": 46.96,
+            "probability": 0.9993124008178711
+          },
+          {
+            "text": " want",
+            "start": 46.96,
+            "end": 47.1,
+            "probability": 0.985554575920105
+          },
+          {
+            "text": " to",
+            "start": 47.1,
+            "end": 47.18,
+            "probability": 0.9794651865959167
+          },
+          {
+            "text": " get",
+            "start": 47.18,
+            "end": 47.24,
+            "probability": 0.9903903007507324
+          },
+          {
+            "text": " access",
+            "start": 47.24,
+            "end": 47.5,
+            "probability": 0.9978787899017334
+          },
+          {
+            "text": " to",
+            "start": 47.5,
+            "end": 47.72,
+            "probability": 0.9982903599739075
+          },
+          {
+            "text": " this",
+            "start": 47.72,
+            "end": 47.88,
+            "probability": 0.9949140548706055
+          },
+          {
+            "text": " Claude",
+            "start": 47.88,
+            "end": 48.18,
+            "probability": 0.9536317884922028
+          },
+          {
+            "text": " skill",
+            "start": 48.18,
+            "end": 48.44,
+            "probability": 0.9463761448860168
+          }
+        ]
+      },
+      {
+        "start": 48.44,
+        "end": 52.96,
+        "text": " plus a guide on how to set everything up, just comment SEO down below and I'll send everything",
+        "words": [
+          {
+            "text": " plus",
+            "start": 48.44,
+            "end": 48.76,
+            "probability": 0.8120162487030029
+          },
+          {
+            "text": " a",
+            "start": 48.76,
+            "end": 48.9,
+            "probability": 0.9897801876068115
+          },
+          {
+            "text": " guide",
+            "start": 48.9,
+            "end": 49.2,
+            "probability": 0.9986250400543213
+          },
+          {
+            "text": " on",
+            "start": 49.2,
+            "end": 49.42,
+            "probability": 0.9976747632026672
+          },
+          {
+            "text": " how",
+            "start": 49.42,
+            "end": 49.52,
+            "probability": 0.9989979863166809
+          },
+          {
+            "text": " to",
+            "start": 49.52,
+            "end": 49.62,
+            "probability": 0.9987335801124573
+          },
+          {
+            "text": " set",
+            "start": 49.62,
+            "end": 49.78,
+            "probability": 0.9988700747489929
+          },
+          {
+            "text": " everything",
+            "start": 49.78,
+            "end": 50.06,
+            "probability": 0.9986479878425598
+          },
+          {
+            "text": " up,",
+            "start": 50.06,
+            "end": 50.34,
+            "probability": 0.9984009861946106
+          },
+          {
+            "text": " just",
+            "start": 50.78,
+            "end": 50.94,
+            "probability": 0.9950194358825684
+          },
+          {
+            "text": " comment",
+            "start": 50.94,
+            "end": 51.22,
+            "probability": 0.9947840571403503
+          },
+          {
+            "text": " SEO",
+            "start": 51.22,
+            "end": 51.68,
+            "probability": 0.8176345229148865
+          },
+          {
+            "text": " down",
+            "start": 51.68,
+            "end": 51.96,
+            "probability": 0.9945597052574158
+          },
+          {
+            "text": " below",
+            "start": 51.96,
+            "end": 52.22,
+            "probability": 0.9995326995849609
+          },
+          {
+            "text": " and",
+            "start": 52.22,
+            "end": 52.42,
+            "probability": 0.7302826642990112
+          },
+          {
+            "text": " I'll",
+            "start": 52.42,
+            "end": 52.52,
+            "probability": 0.9948482513427734
+          },
+          {
+            "text": " send",
+            "start": 52.52,
+            "end": 52.66,
+            "probability": 0.9982185959815979
+          },
+          {
+            "text": " everything",
+            "start": 52.66,
+            "end": 52.96,
+            "probability": 0.9986878037452698
+          }
+        ]
+      },
+      {
+        "start": 52.96,
+        "end": 53.48,
+        "text": " over to you.",
+        "words": [
+          {
+            "text": " over",
+            "start": 52.96,
+            "end": 53.14,
+            "probability": 0.9978334307670593
+          },
+          {
+            "text": " to",
+            "start": 53.14,
+            "end": 53.32,
+            "probability": 0.9980127811431885
+          },
+          {
+            "text": " you.",
+            "start": 53.32,
+            "end": 53.48,
+            "probability": 0.9993382096290588
+          }
+        ]
+      }
+    ]
+  },
+  "productionReady": false
+}

@@ -1,0 +1,147 @@
+{
+  "items": [
+    {
+      "topic_id": "ai-seo-audit",
+      "hook_id": 1,
+      "version_id": "R-ai-seo-audit-h1",
+      "script_revision": 6,
+      "hook_text": "Сайт, собранный нейросетью, может быть невидим для поиска из-за одной скрытой строки кода.",
+      "script_text": "Сайт, собранный нейросетью, может быть невидим для поиска из-за одной скрытой строки кода.\n\nПосле сборки сайта нейросетью важно проверить его по чек-листу: от доступности страниц до директив robots и noindex. В учебном тесте наш скрипт обнаружил на главной странице тег noindex и некорректные канонические ссылки — такие ошибки скрывают контент от Google. Для полноценной проверки можно выгрузить отчет «Эффективность» из Search Console в CSV и передать его Claude вместе с набором правил. Мы подготовили промпт, чтобы ИИ для каждого URL сопоставлял данные, находил ошибки и писал инструкции по исправлению. Важно помнить: robots.txt управляет обходом, но не гарантирует исключение из индекса. Наш текущий тест ограничен четырьмя страницами и не заменяет полный аудит Googlebot. План работы с Claude — это пока подготовленный сценарий, а не завершенная автоматизация.",
+      "status": "pending_approval",
+      "script_hash": "b200878e447f578a95cc1797f282a3971e13576fe2fbe9eeddb773f44418539c"
+    },
+    {
+      "topic_id": "ai-seo-audit",
+      "hook_id": 2,
+      "version_id": "R-ai-seo-audit-h2",
+      "script_revision": 6,
+      "hook_text": "Вместо того чтобы просить ИИ «сделай SEO», дайте ему конкретный чек-лист и данные из Search Console.",
+      "script_text": "Вместо того чтобы просить ИИ «сделай SEO», дайте ему конкретный чек-лист и данные из Search Console.\n\nПосле сборки сайта нейросетью важно проверить его по чек-листу: от доступности страниц до директив robots и noindex. В учебном тесте наш скрипт обнаружил на главной странице тег noindex и некорректные канонические ссылки — такие ошибки скрывают контент от Google. Для полноценной проверки можно выгрузить отчет «Эффективность» из Search Console в CSV и передать его Claude вместе с набором правил. Мы подготовили промпт, чтобы ИИ для каждого URL сопоставлял данные, находил ошибки и писал инструкции по исправлению. Важно помнить: robots.txt управляет обходом, но не гарантирует исключение из индекса. Наш текущий тест ограничен четырьмя страницами и не заменяет полный аудит Googlebot. План работы с Claude — это пока подготовленный сценарий, а не завершенная автоматизация.",
+      "status": "pending_approval",
+      "script_hash": "1af514a6c5e3702e6a027605fcf887a4b12819a0e80b07706f9da8a3770fbd60"
+    },
+    {
+      "topic_id": "ai-seo-audit",
+      "hook_id": 3,
+      "version_id": "R-ai-seo-audit-h3",
+      "script_revision": 6,
+      "hook_text": "Как превратить выгрузку из Google Search Console в список задач для исправления сайта с помощью Claude.",
+      "script_text": "Как превратить выгрузку из Google Search Console в список задач для исправления сайта с помощью Claude.\n\nПосле сборки сайта нейросетью важно проверить его по чек-листу: от доступности страниц до директив robots и noindex. В учебном тесте наш скрипт обнаружил на главной странице тег noindex и некорректные канонические ссылки — такие ошибки скрывают контент от Google. Для полноценной проверки можно выгрузить отчет «Эффективность» из Search Console в CSV и передать его Claude вместе с набором правил. Мы подготовили промпт, чтобы ИИ для каждого URL сопоставлял данные, находил ошибки и писал инструкции по исправлению. Важно помнить: robots.txt управляет обходом, но не гарантирует исключение из индекса. Наш текущий тест ограничен четырьмя страницами и не заменяет полный аудит Googlebot. План работы с Claude — это пока подготовленный сценарий, а не завершенная автоматизация.",
+      "status": "pending_approval",
+      "script_hash": "ab0d3bb192258ddcd1adecdddc65da3e6e3aa3d19256cbe9cd7351c0e9b0c3f4"
+    }
+  ],
+  "source_sets": [
+    {
+      "topic_id": "ai-seo-audit",
+      "body_revision": 6,
+      "body_text": "После сборки сайта нейросетью важно проверить его по чек-листу: от доступности страниц до директив robots и noindex. В учебном тесте наш скрипт обнаружил на главной странице тег noindex и некорректные канонические ссылки — такие ошибки скрывают контент от Google. Для полноценной проверки можно выгрузить отчет «Эффективность» из Search Console в CSV и передать его Claude вместе с набором правил. Мы подготовили промпт, чтобы ИИ для каждого URL сопоставлял данные, находил ошибки и писал инструкции по исправлению. Важно помнить: robots.txt управляет обходом, но не гарантирует исключение из индекса. Наш текущий тест ограничен четырьмя страницами и не заменяет полный аудит Googlebot. План работы с Claude — это пока подготовленный сценарий, а не завершенная автоматизация.",
+      "body_text_hash": "39b48f3e216b4386e128918643bae70a16fc74d1f4b2bbfc64981f77fa97b1bf",
+      "separator": "\n\n",
+      "versions": [
+        "R-ai-seo-audit-h1",
+        "R-ai-seo-audit-h2",
+        "R-ai-seo-audit-h3"
+      ],
+      "status": "pending_approval"
+    }
+  ],
+  "productionReady": false,
+  "editorialReviewRequired": true,
+  "editorialReview": {
+    "rulesVersion": "1.0.0",
+    "rulesSha256": "93963f9b26b9b2073e269e4ec6b2fbef8ce46b790f5b62c3d4c21cc138a9a7e0",
+    "status": "pending_review",
+    "reviewer": null,
+    "decision": null,
+    "criteria": [
+      {
+        "id": "task",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "reference",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "setup",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "demo",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "claims",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "costs_limits",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "body_hooks",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      },
+      {
+        "id": "approval",
+        "status": "pending",
+        "evidence": [],
+        "note": null
+      }
+    ],
+    "semanticFactCheckAutomated": false,
+    "topicSelectionLiveVerified": false,
+    "romanScriptApprovalGranted": false
+  },
+  "provenance": {
+    "author": "Gemini",
+    "model": "gemini-3-flash-preview",
+    "generatedAt": "2026-10-11T12:41:33.868Z",
+    "usageMetadata": {
+      "promptTokenCount": 3703,
+      "candidatesTokenCount": 502,
+      "totalTokenCount": 5439,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 3703
+        }
+      ],
+      "thoughtsTokenCount": 1234,
+      "serviceTier": "standard"
+    },
+    "actualCostUsd": null,
+    "briefSha256": "d52120abc630acaa86e5f0c56ce923e9092cb538c9003f5ddbc4c4bbf551da3c",
+    "evidenceIds": [
+      "google-noindex",
+      "google-robots",
+      "google-canonical",
+      "google-export",
+      "seo-demo",
+      "roman-checklist"
+    ],
+    "limitations": [
+      "Проверено только 4 учебных URL, а не весь сайт",
+      "Промпт для Claude подготовлен, но еще не испытан в работе",
+      "robots.txt не гарантирует исключение страниц из индекса",
+      "Отсутствуют замеры Core Web Vitals и реального роста позиций"
+    ],
+    "syntheticDemo": true,
+    "clientCaseTested": false
+  }
+}

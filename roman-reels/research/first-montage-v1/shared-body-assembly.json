@@ -1,0 +1,178 @@
+{
+  "assemblyVersion": "1.0.0",
+  "mode": "development",
+  "topicId": "ai-shared-body-fixture",
+  "createdAt": "2026-10-10T04:12:52.717636+00:00",
+  "productionReady": false,
+  "complete": true,
+  "variants": [
+    {
+      "reelId": "R-ai-shared-body-fixture-h1",
+      "hookNumber": 1,
+      "outputFile": "R-ai-shared-body-fixture-h1.mp4",
+      "sha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "duration": 40.239999999999995,
+      "bodyStart": 6.52,
+      "technicalQc": {
+        "technicalPassed": true,
+        "technicalChecks": {
+          "decode": true,
+          "resolution": true,
+          "audio": true,
+          "duration": true,
+          "fps": true,
+          "codecs": true
+        },
+        "outputSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+        "metadata": {
+          "duration": 40.24,
+          "width": 1080,
+          "height": 1920,
+          "fps": 25.0,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "audioChannels": 2
+        },
+        "productionReady": false,
+        "remainingChecks": [
+          "trusted_current_approval",
+          "transcript_match",
+          "montage_plan",
+          "visual_assets",
+          "subtitle_layout",
+          "visual_review"
+        ]
+      },
+      "parts": [
+        {
+          "role": "hook",
+          "localPath": "ai/h1.mp4",
+          "sha256": "8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd",
+          "originalDuration": 6.485,
+          "timelineStart": 0,
+          "timelineEnd": 6.52
+        },
+        {
+          "role": "body",
+          "localPath": "ai/body1.mp4",
+          "sha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+          "originalDuration": 33.72,
+          "timelineStart": 6.52,
+          "timelineEnd": 40.239999999999995
+        }
+      ]
+    },
+    {
+      "reelId": "R-ai-shared-body-fixture-h2",
+      "hookNumber": 2,
+      "outputFile": "R-ai-shared-body-fixture-h2.mp4",
+      "sha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "duration": 41.519999999999996,
+      "bodyStart": 7.8,
+      "technicalQc": {
+        "technicalPassed": true,
+        "technicalChecks": {
+          "decode": true,
+          "resolution": true,
+          "audio": true,
+          "duration": true,
+          "fps": true,
+          "codecs": true
+        },
+        "outputSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+        "metadata": {
+          "duration": 41.52,
+          "width": 1080,
+          "height": 1920,
+          "fps": 25.0,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "audioChannels": 2
+        },
+        "productionReady": false,
+        "remainingChecks": [
+          "trusted_current_approval",
+          "transcript_match",
+          "montage_plan",
+          "visual_assets",
+          "subtitle_layout",
+          "visual_review"
+        ]
+      },
+      "parts": [
+        {
+          "role": "hook",
+          "localPath": "ai/h2.mp4",
+          "sha256": "5ab06283c1f28c3d01da9ee2ac2720a66d4fcc4697f2ef28da36cacf4a43ca2e",
+          "originalDuration": 7.765,
+          "timelineStart": 0,
+          "timelineEnd": 7.8
+        },
+        {
+          "role": "body",
+          "localPath": "ai/body1.mp4",
+          "sha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+          "originalDuration": 33.72,
+          "timelineStart": 7.8,
+          "timelineEnd": 41.519999999999996
+        }
+      ]
+    },
+    {
+      "reelId": "R-ai-shared-body-fixture-h3",
+      "hookNumber": 3,
+      "outputFile": "R-ai-shared-body-fixture-h3.mp4",
+      "sha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "duration": 38.48,
+      "bodyStart": 4.76,
+      "technicalQc": {
+        "technicalPassed": true,
+        "technicalChecks": {
+          "decode": true,
+          "resolution": true,
+          "audio": true,
+          "duration": true,
+          "fps": true,
+          "codecs": true
+        },
+        "outputSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+        "metadata": {
+          "duration": 38.48,
+          "width": 1080,
+          "height": 1920,
+          "fps": 25.0,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "audioChannels": 2
+        },
+        "productionReady": false,
+        "remainingChecks": [
+          "trusted_current_approval",
+          "transcript_match",
+          "montage_plan",
+          "visual_assets",
+          "subtitle_layout",
+          "visual_review"
+        ]
+      },
+      "parts": [
+        {
+          "role": "hook",
+          "localPath": "ai/h3.mp4",
+          "sha256": "e378029223e4f50e96bc3a82384023b8cc1880b3090518960557d83727a3dce6",
+          "originalDuration": 4.76,
+          "timelineStart": 0,
+          "timelineEnd": 4.76
+        },
+        {
+          "role": "body",
+          "localPath": "ai/body1.mp4",
+          "sha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+          "originalDuration": 33.72,
+          "timelineStart": 4.76,
+          "timelineEnd": 38.48
+        }
+      ]
+    }
+  ]
+}

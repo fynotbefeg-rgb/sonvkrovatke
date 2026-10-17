@@ -1,0 +1,92 @@
+{
+  "reportVersion": "1.0.0",
+  "mode": "development",
+  "productionReady": false,
+  "fixture": "existing repository ai/h1+h2+h3+body1",
+  "pipeline": {
+    "mode": "development",
+    "productionReady": false,
+    "approvalStatus": "pending_approval",
+    "freshRecognition": false,
+    "needsSpeechReview": true,
+    "timingMethod": "verified_cached_part_timings_with_assembly_offset",
+    "requestedHooks": [
+      1
+    ],
+    "complete": true,
+    "renders": [
+      {
+        "hookNumber": 1,
+        "reelId": "R-ai-shared-body-fixture-h1",
+        "technicalPassed": true,
+        "outputSha256": "1d476fdb042c22eb1194596ba7d3f5b9979cfacb579d0b9e6cd505439484de96"
+      }
+    ],
+    "allThreeRendered": false
+  },
+  "technicalQc": {
+    "technicalPassed": true,
+    "technicalChecks": {
+      "decode": true,
+      "resolution": true,
+      "audio": true,
+      "duration": true,
+      "fps": true,
+      "codecs": true
+    },
+    "outputSha256": "1d476fdb042c22eb1194596ba7d3f5b9979cfacb579d0b9e6cd505439484de96",
+    "metadata": {
+      "duration": 40.24,
+      "width": 1080,
+      "height": 1920,
+      "fps": 25.0,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "audioChannels": 2
+    },
+    "productionReady": false,
+    "remainingChecks": [
+      "trusted_current_approval",
+      "transcript_match",
+      "montage_plan",
+      "visual_assets",
+      "subtitle_layout",
+      "visual_review"
+    ]
+  },
+  "audioPreservation": {
+    "strategy": "copy_original_aac_full_timeline",
+    "decodedAudioHash": "SHA256=9ecf4a26b8fc7d95deed515d48424fa3797e5f21e8a02981d19eff4885337bf9",
+    "sourceSha256": "e154facc8689a49f97e69511cd4b925ec7c340b825e6f2260acde16d591a59f1",
+    "audioClock": {
+      "start": 0.0,
+      "duration": 40.24,
+      "sampleRate": 48000
+    },
+    "productionReady": false
+  },
+  "videoBytes": 33726109,
+  "visualReview": {
+    "sampleSeconds": [
+      9
+    ],
+    "faceAndMicrophoneUncoveredInSample": true,
+    "fullVideoReviewed": false
+  },
+  "driveUpload": {
+    "completed": true,
+    "ownerExplicitlyAuthorized": true,
+    "destination": "owner ChatGPT folder, private preview",
+    "metadataVerified": true,
+    "sizeVerified": 33726109,
+    "remoteChecksumIndependentlyVerified": false,
+    "publicSharingEnabled": false,
+    "productionDelivery": false
+  },
+  "limits": [
+    "Cached part timings; no fresh ASR",
+    "h1 rendered only; h2/h3 source/jobs prepared",
+    "No current Roman approval or publication",
+    "No live Drive-to-professional-montage worker enabled"
+  ]
+}

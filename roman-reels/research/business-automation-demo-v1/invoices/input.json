@@ -1,0 +1,54 @@
+{
+  "fixtureVersion": "1.0.0",
+  "synthetic": true,
+  "invoices": [
+    {
+      "fixtureId": "invoice-001",
+      "invoiceNumber": "DEMO-2026-001",
+      "issuedOn": "2026-10-10",
+      "dueOn": "2026-10-20",
+      "supplier": "ДЕМО-мастерская «Пример»",
+      "buyer": "ДЕМО-студия «Тест»",
+      "currency": "RUB",
+      "items": [
+        {
+          "description": "Учебная настройка обработки заявок",
+          "quantity": 1,
+          "unitPrice": "18500.50"
+        },
+        {
+          "description": "Учебное сопровождение, час",
+          "quantity": 2,
+          "unitPrice": "2745.00"
+        }
+      ],
+      "total": "23990.50",
+      "taxAmount": null,
+      "paymentDetails": null
+    },
+    {
+      "fixtureId": "invoice-002",
+      "invoiceNumber": "DEMO-2026-002",
+      "issuedOn": "2026-10-10",
+      "dueOn": "2026-10-24",
+      "supplier": "DEMO Automation Workshop",
+      "buyer": "ДЕМО-студия «Тест»",
+      "currency": "EUR",
+      "items": [
+        {
+          "description": "Учебная настройка шаблона предложения",
+          "quantity": 1,
+          "unitPrice": "1250.00"
+        },
+        {
+          "description": "Учебная проверка двух шаблонов",
+          "quantity": 2,
+          "unitPrice": "125.00"
+        }
+      ],
+      "total": "1500.00",
+      "taxAmount": null,
+      "paymentDetails": null
+    }
+  ]
+}

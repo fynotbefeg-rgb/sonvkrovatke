@@ -1,0 +1,16 @@
+{
+  "fixtureType": "owned_static_counterexample",
+  "html": "<!doctype html><html><head><title>Static test</title></head><body><p>This small static page already contains every word of its message in the original HTML and uses no JavaScript to show any of its content.</p></body></html>",
+  "scriptTagCount": 0,
+  "expectedJsDependent": false,
+  "observed": {
+    "checked": true,
+    "raw_word_count": 25,
+    "raw_heading_count": 0,
+    "has_empty_root": false,
+    "has_noscript_content": false,
+    "framework_detected": "",
+    "js_dependent": true,
+    "details": "Only 25 words and 0 headings in raw HTML. Content likely requires JavaScript to render. AI crawlers won't see it. Consider SSR/SSG or pre-rendering."
+  }
+}

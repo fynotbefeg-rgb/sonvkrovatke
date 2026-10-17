@@ -1,0 +1,291 @@
+{
+  "artifactVersion": "1.0.0",
+  "mode": "development",
+  "sourceRelativePath": "ai/h2.mp4",
+  "sourceSha256": "5ab06283c1f28c3d01da9ee2ac2720a66d4fcc4697f2ef28da36cacf4a43ca2e",
+  "sourceMetadata": {
+    "duration": 7.765,
+    "width": 1080,
+    "height": 1920,
+    "fps": 25.0,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "audioChannels": 2
+  },
+  "createdAt": "2026-10-10T05:48:03.122201+00:00",
+  "transcriber": {
+    "model": "Systran/faster-whisper-small",
+    "revision": "536b0662742c02347bc0e980a01041f333bce120",
+    "modelChecksums": {
+      "config.json": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+      "model.bin": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+      "tokenizer.json": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+      "vocabulary.txt": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+    },
+    "packages": {
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "onnxruntime": "1.31.0",
+      "av": "16.1.0",
+      "tokenizers": "0.22.2"
+    },
+    "device": "cpu",
+    "computeType": "int8",
+    "threads": 2,
+    "beamSize": 5,
+    "vadFilter": false,
+    "vocabularyHints": "Claude, Telegram, WhatsApp.",
+    "language": "ru",
+    "elapsedSeconds": 4.323
+  },
+  "transcriptText": "Если ты до сих пор сам отвечаешь клиентам в почте, мессенджерах и комментариях, ты теряешь часы каждую неделю.",
+  "wordTimings": [
+    {
+      "text": "Если",
+      "start": 0.0,
+      "end": 0.5
+    },
+    {
+      "text": "ты",
+      "start": 0.5,
+      "end": 0.7
+    },
+    {
+      "text": "до",
+      "start": 0.7,
+      "end": 0.84
+    },
+    {
+      "text": "сих",
+      "start": 0.84,
+      "end": 1.04
+    },
+    {
+      "text": "пор",
+      "start": 1.04,
+      "end": 1.28
+    },
+    {
+      "text": "сам",
+      "start": 1.28,
+      "end": 1.48
+    },
+    {
+      "text": "отвечаешь",
+      "start": 1.48,
+      "end": 2.06
+    },
+    {
+      "text": "клиентам",
+      "start": 2.06,
+      "end": 2.58
+    },
+    {
+      "text": "в",
+      "start": 2.58,
+      "end": 2.68
+    },
+    {
+      "text": "почте,",
+      "start": 2.68,
+      "end": 3.12
+    },
+    {
+      "text": "мессенджерах",
+      "start": 3.48,
+      "end": 4.2
+    },
+    {
+      "text": "и",
+      "start": 4.2,
+      "end": 4.28
+    },
+    {
+      "text": "комментариях,",
+      "start": 4.28,
+      "end": 5.0
+    },
+    {
+      "text": "ты",
+      "start": 5.5,
+      "end": 5.56
+    },
+    {
+      "text": "теряешь",
+      "start": 5.56,
+      "end": 6.02
+    },
+    {
+      "text": "часы",
+      "start": 6.02,
+      "end": 6.52
+    },
+    {
+      "text": "каждую",
+      "start": 6.52,
+      "end": 7.04
+    },
+    {
+      "text": "неделю.",
+      "start": 7.04,
+      "end": 7.48
+    }
+  ],
+  "speechSegments": [
+    {
+      "text": "Если ты до сих пор сам отвечаешь клиентам в почте,",
+      "start": 0.0,
+      "end": 3.12
+    },
+    {
+      "text": "мессенджерах и комментариях, ты теряешь часы каждую",
+      "start": 3.48,
+      "end": 7.04
+    },
+    {
+      "text": "неделю.",
+      "start": 7.04,
+      "end": 7.48
+    }
+  ],
+  "rawSegments": [
+    {
+      "text": "Если ты до сих пор сам отвечаешь клиентам в почте,",
+      "start": 0.0,
+      "end": 3.12,
+      "words": [
+        {
+          "text": "Если",
+          "start": 0.0,
+          "end": 0.5,
+          "probability": 0.8310988545417786
+        },
+        {
+          "text": "ты",
+          "start": 0.5,
+          "end": 0.7,
+          "probability": 0.9909747242927551
+        },
+        {
+          "text": "до",
+          "start": 0.7,
+          "end": 0.84,
+          "probability": 0.9882519841194153
+        },
+        {
+          "text": "сих",
+          "start": 0.84,
+          "end": 1.04,
+          "probability": 0.9978146255016327
+        },
+        {
+          "text": "пор",
+          "start": 1.04,
+          "end": 1.28,
+          "probability": 0.9980650544166565
+        },
+        {
+          "text": "сам",
+          "start": 1.28,
+          "end": 1.48,
+          "probability": 0.975158154964447
+        },
+        {
+          "text": "отвечаешь",
+          "start": 1.48,
+          "end": 2.06,
+          "probability": 0.9985027015209198
+        },
+        {
+          "text": "клиентам",
+          "start": 2.06,
+          "end": 2.58,
+          "probability": 0.9773374597231547
+        },
+        {
+          "text": "в",
+          "start": 2.58,
+          "end": 2.68,
+          "probability": 0.9887495040893555
+        },
+        {
+          "text": "почте,",
+          "start": 2.68,
+          "end": 3.12,
+          "probability": 0.9870972335338593
+        }
+      ],
+      "avgLogprob": -0.1334787830710411,
+      "noSpeechProbability": 0.0038282989989966154
+    },
+    {
+      "text": "мессенджерах и комментариях, ты теряешь часы каждую",
+      "start": 3.48,
+      "end": 7.04,
+      "words": [
+        {
+          "text": "мессенджерах",
+          "start": 3.48,
+          "end": 4.2,
+          "probability": 0.944565494855245
+        },
+        {
+          "text": "и",
+          "start": 4.2,
+          "end": 4.28,
+          "probability": 0.9492394924163818
+        },
+        {
+          "text": "комментариях,",
+          "start": 4.28,
+          "end": 5.0,
+          "probability": 0.9742010235786438
+        },
+        {
+          "text": "ты",
+          "start": 5.5,
+          "end": 5.56,
+          "probability": 0.9753088355064392
+        },
+        {
+          "text": "теряешь",
+          "start": 5.56,
+          "end": 6.02,
+          "probability": 0.9976231654485067
+        },
+        {
+          "text": "часы",
+          "start": 6.02,
+          "end": 6.52,
+          "probability": 0.9980644583702087
+        },
+        {
+          "text": "каждую",
+          "start": 6.52,
+          "end": 7.04,
+          "probability": 0.9918342530727386
+        }
+      ],
+      "avgLogprob": -0.1334787830710411,
+      "noSpeechProbability": 0.0038282989989966154
+    },
+    {
+      "text": "неделю.",
+      "start": 7.04,
+      "end": 7.48,
+      "words": [
+        {
+          "text": "неделю.",
+          "start": 7.04,
+          "end": 7.48,
+          "probability": 0.9983109831809998
+        }
+      ],
+      "avgLogprob": -0.1334787830710411,
+      "noSpeechProbability": 0.0038282989989966154
+    }
+  ],
+  "alignmentMethod": "whisper_word_timestamps_not_forced_alignment",
+  "needsSpeechReview": true,
+  "productionReady": false
+}

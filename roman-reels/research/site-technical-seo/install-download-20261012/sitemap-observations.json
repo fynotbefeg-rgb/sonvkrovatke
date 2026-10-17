@@ -1,0 +1,21 @@
+{
+  "sitemapIndexUrl": "https://install.download/sitemaps/index_sitemap.xml",
+  "xmlParsed": true,
+  "sitemapCount": 464,
+  "childSitemap": "https://install.download/sitemaps/sitemap-windows-categories-en_sitemap.xml",
+  "childStatus": 200,
+  "childXmlParsed": true,
+  "childUrlCount": 121,
+  "categoryUrlsPresent": {
+    "https://install.download/windows/business": true,
+    "https://install.download/windows/browsers": true
+  },
+  "childUrlSample": [
+    "https://install.download/windows/browsers",
+    "https://install.download/windows/security-privacy",
+    "https://install.download/windows/business",
+    "https://install.download/windows/hobbies",
+    "https://install.download/windows/internet"
+  ],
+  "fullSitemapCrawlPerformed": false
+}

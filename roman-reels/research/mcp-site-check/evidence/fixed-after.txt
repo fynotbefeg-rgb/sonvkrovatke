@@ -1,0 +1,12 @@
+### Ran Playwright code
+```js
+await page.getByRole('link', { name: 'Оставить заявку' }).click();
+```
+### Page
+- Page URL: http://127.0.0.1:34421/contact
+- Page Title: Контакты — учебный сайт
+### Snapshot
+- [Snapshot](research/mcp-site-check/evidence/page-2026-10-10T15-23-43-116Z.yml)
+- generic [active] [ref=f3e1]:
+  - heading "Форма заявки доступна" [level=1] [ref=f3e2]
+  - paragraph [ref=f3e3]: Учебная страница; данные не отправляются.

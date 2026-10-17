@@ -1,0 +1,12 @@
+]
+```json
+{
+  "id": "unknown-indexing",
+  "verdict": "unknown",
+  "evidence": "No search console data, traffic data, or index check results were provided.",
+  "explanation": "The site's indexing and organic traffic status cannot be determined based on the provided information.",
+  "suggestedFix": "No action is suggested as the site's indexing and traffic status are unknown."
+}
+``` [end of text]
+
+

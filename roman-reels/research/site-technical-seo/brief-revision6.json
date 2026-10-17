@@ -1,0 +1,229 @@
+{
+  "briefVersion": "1.0.0",
+  "topicId": "ai-seo-audit",
+  "topic": "SEO-чек-лист после создания сайта с ИИ: что проверить и как получить задачи для исправления",
+  "scriptRevision": 6,
+  "businessProblem": "Предприниматель создал сайт с ИИ и хочет проверить его по конкретному списку. Нужен чек-лист с доказательствами, а не общие SEO-советы.",
+  "romanFeedback": "Главное — чек-лист, что проверить для SEO-оптимизации. В Search Console достаточно показать кнопку выгрузки или отдельно объяснить доступ Claude. Данные клиентского сайта сейчас не обязательны.",
+  "topicSelection": "Роман уточнил направление. Это не утверждение точной версии 6.",
+  "sources": [
+    {
+      "id": "google-noindex",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/block-indexing",
+      "checkedAt": "2026-10-11",
+      "supports": "Доступная Googlebot страница с noindex исключается из индекса после обработки правила. Нельзя заключать текущий статус Google из одного HTML; нужна Search Console."
+    },
+    {
+      "id": "google-robots",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots/intro",
+      "checkedAt": "2026-10-11",
+      "supports": "robots.txt управляет обходом, не гарантирует исключения URL из индекса. Не смешивать с noindex."
+    },
+    {
+      "id": "google-canonical",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+      "checkedAt": "2026-10-11",
+      "supports": "canonical — сигнал предпочтительной страницы, не обязательная директива и не доказательство выбора Google."
+    },
+    {
+      "id": "google-sitemap",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview",
+      "checkedAt": "2026-10-11",
+      "supports": "Sitemap помогает находить страницы, не гарантирует обход или индексацию."
+    },
+    {
+      "id": "google-cwv",
+      "url": "https://developers.google.com/search/docs/appearance/core-web-vitals",
+      "checkedAt": "2026-10-11",
+      "supports": "LCP, INP и CLS требуют измерения. Скорость/полевые CWV и рост позиций в нашей демонстрации не измерены."
+    },
+    {
+      "id": "seo-demo",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/blob/feature/codex-pipeline/roman-reels/research/site-technical-seo/evidence/audit-report.json",
+      "checkedAt": "2026-10-11",
+      "supports": "Собственный учебный сайт, 4 URL, 10 заранее написанных проверок: до 1PASS/9FAIL; после 10PASS. Порог title/description/H1 по учебному чек-листу, не универсальные причины санкций."
+    },
+    {
+      "id": "functional-demo",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/blob/956ee69/roman-reels/research/mcp-site-audit-current/evidence/audit-report.json",
+      "checkedAt": "2026-10-11",
+      "supports": "Ранее отдельно проверены 4 учебные страницы и 9 функциональных сценариев: до 1PASS/8FAIL, после 9PASS. Ложное сообщение о получении заявки, мобильное меню и переполнение. Не складывать это как один аудит одного клиентского сайта."
+    },
+    {
+      "id": "google-export",
+      "url": "https://support.google.com/webmasters/answer/7576553?hl=en",
+      "checkedAt": "2026-10-11",
+      "supports": "Performance содержит клики, показы, CTR и среднюю позицию; есть экспорт. Интерфейс и выгрузка на реальном аккаунте в текущем этапе не проверены."
+    },
+    {
+      "id": "roman-checklist",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/blob/deab6cc/roman-reels/docs/SEO_CHECKLIST_FOR_ROMAN.md",
+      "checkedAt": "2026-10-11",
+      "supports": "Подготовлены 13 проверок, промпт с доказательствами и план экспорта. Это подготовленный материал, не испытанный в Claude аудит."
+    }
+  ],
+  "alternatives": [
+    {
+      "method": "Браузерные сценарии Playwright",
+      "use": "Страницы, мобильное меню, форма, запись в приёмнике",
+      "limit": "Согласованные сценарии и тестовый приёмник; не SEO-позиции",
+      "cost": "Собственные вычисления; не измерено"
+    },
+    {
+      "method": "Технический HTTP/DOM чек-лист",
+      "use": "robots, noindex, sitemap, canonical, переходы, метаданные",
+      "limit": "Реализован ограниченный учебный исполнитель. Не общий crawler и не Googlebot",
+      "cost": "Собственные вычисления; тарифы неизвестны"
+    },
+    {
+      "method": "Search Console и PageSpeed/Lighthouse",
+      "use": "Фактическое индексирование, выбранный canonical, полевые и лабораторные метрики",
+      "limit": "Подключение реального сайта и измерения отдельным этапом, не выполнялись",
+      "cost": "Не оценено"
+    },
+    {
+      "method": "ИИ на основе собранных отчётов",
+      "use": "Помогает объяснять данные и готовить задачи, не заменяет измерение",
+      "limit": "Gemini получает этот бриф для речи; отдельный автоматический анализ сайта моделью не тестирован",
+      "cost": "Gemini ранее разрешён; стоимость вызова неизвестна"
+    }
+  ],
+  "demo": {
+    "synthetic": true,
+    "checkedAt": "2026-10-11T08:34:32.795Z",
+    "inputSha256": "806d02ee86b645e725a97ee21a3c237a1303bc3e16683251ee3d93b8762abb39",
+    "method": "10 fixed manually authored Playwright/HTTP checks on seeded owned fixture; separate prior functional demonstration",
+    "candidates": [
+      {
+        "id": "index-directives",
+        "status": "FAIL",
+        "expected": "На главной отсутствует запрет индексации",
+        "observed": {
+          "path": "/",
+          "robots": "noindex"
+        }
+      }
+    ],
+    "findings": [
+      {
+        "id": "index-directives",
+        "priority": "P1",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": [
+          {
+            "path": "/",
+            "robots": "noindex"
+          },
+          {
+            "path": "/services",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/pricing",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/contact",
+            "robots": "index,follow"
+          }
+        ],
+        "observedAfter": [
+          {
+            "path": "/",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/services",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/pricing",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/contact",
+            "robots": "index,follow"
+          }
+        ]
+      },
+      {
+        "id": "canonicals",
+        "priority": "P1",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": [
+          {
+            "path": "/",
+            "canonicalPath": "/"
+          },
+          {
+            "path": "/services",
+            "canonicalPath": "/"
+          },
+          {
+            "path": "/pricing",
+            "canonicalPath": "/pricing"
+          },
+          {
+            "path": "/contact",
+            "canonicalPath": "/contact"
+          }
+        ],
+        "observedAfter": [
+          {
+            "path": "/",
+            "canonicalPath": "/"
+          },
+          {
+            "path": "/services",
+            "canonicalPath": "/services"
+          },
+          {
+            "path": "/pricing",
+            "canonicalPath": "/pricing"
+          },
+          {
+            "path": "/contact",
+            "canonicalPath": "/contact"
+          }
+        ]
+      },
+      {
+        "id": "legacy-redirect",
+        "priority": "P2",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "status": 302,
+          "location": "/"
+        },
+        "observedAfter": {
+          "status": 301,
+          "location": "/services"
+        }
+      }
+    ],
+    "claudeSessionTested": false,
+    "onePromptAuditTested": false,
+    "clientCaseTested": false,
+    "googleIndexVerified": false,
+    "limits": [
+      "4 заданных учебных URL; не полный crawler/Googlebot",
+      "Нет Search Console, Core Web Vitals или измеренного роста трафика",
+      "Статические требования title/description/H1 по учебному чек-листу, не гарантия санкций",
+      "Не автономный запуск ИИ одним промптом; обе демонстрации отдельные"
+    ]
+  },
+  "requirements": [
+    "Одна основа и три хука. Хук+основа 100–145 слов; окончания не писать.",
+    "Главное — прикладной чек-лист после создания сайта с ИИ. Дать несколько конкретных групп проверок: доступность и ссылки; robots/noindex/sitemap/canonical; содержание и заголовки; скорость и телефон. Полный список выдаётся отдельно.",
+    "Включить один короткий подтверждённый пример: на собственном учебном сайте нашли noindex. Проверку выполнял наш скрипт, не Claude. Не сводить всю речь к описанию тестового сайта; цифры тестов не зачитывать.",
+    "Search Console — короткий вспомогательный шаг: Эффективность, период, Экспорт, передача файла Claude. Не утверждать что этот шаг уже исполнен на реальном аккаунте.",
+    "Сформулировать задачу Claude: для каждого пункта статус, URL, доказательство, правка и повторная проверка. Промпт только подготовлен, ещё не испытан: не говорить получил, сделал, нашёл с Claude.",
+    "MCP не обязателен для CSV. Не обещать что Claude или весь процесс бесплатный. Не обещать рост трафика, позиции или полноту аудита.",
+    "Скорость измеряется отдельно; индексация проверяется по данным Google. robots не равен noindex. Несколько H1 и отсутствие description не автоматический штраф.",
+    "Три хука с различными углами: проверки перед запуском сайта с ИИ; конкретный список вместо общего промпта; задачи с доказательствами. Без выдуманных потерь или запугивания.",
+    "Естественная речь для предпринимателей. Минимум технической перегрузки; разделять выполненный учебный пример и предложенный рабочий путь. Версия 6 pending."
+  ]
+}

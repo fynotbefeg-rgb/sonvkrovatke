@@ -1,0 +1,27 @@
+{
+  "reportVersion": "1.0.0",
+  "codeCommit": "b3316ed98968ea5715c923e75bd55a4c8f98ddd8",
+  "offlineTests": {"newPlanner": 8, "passed": true},
+  "ciRun": {"id": 38337924866, "conclusion": "success"},
+  "readOnlyLiveRun": {
+    "id": 38337924933,
+    "jobId": 115102152502,
+    "conclusion": "success",
+    "authenticatedRead": true,
+    "approvedItems": 0,
+    "generationAllowed": false,
+    "renderAllowed": false,
+    "googleWrites": false
+  },
+  "planningExecuted": false,
+  "jobsCreated": 0,
+  "nonemptySharedApprovalFlowVerifiedLive": false,
+  "featureOrApprovalChanged": false,
+  "windowsChanged": false,
+  "limits": [
+    "Queue empty at read time; reason cannot be inferred from count",
+    "No packet delivery to Windows or worker autostart",
+    "Saved diagnostic JSON is not approval authority",
+    "No HeyGen, new ASR, upload, render or production activation"
+  ]
+}

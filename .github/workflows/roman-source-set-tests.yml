@@ -1,0 +1,193 @@
+name: Roman Reels — six-part source tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [automation/roman-reels-v1, feature/codex-pipeline]
+    paths:
+      - 'roman-reels/scripts/**'
+      - 'roman-reels/pv/src/factory/**'
+      - 'roman-reels/docs/**'
+      - 'CLAUDE.md'
+      - 'roman-reels/schemas/**'
+      - 'roman-reels/research/platform-ending-drafts-v2.json'
+      - 'roman-reels/research/gemini-revision-seo/**'
+      - '.github/workflows/roman-source-set-tests.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: roman-source-set-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/feature/codex-pipeline' || github.ref == 'refs/heads/automation/roman-reels-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install media and validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r roman-reels/schemas/requirements.txt
+      - name: Offline checks with synthetic MP4s, no service credentials
+        run: |
+          python roman-reels/scripts/platform-source-set.test.py
+          python roman-reels/scripts/gsc-export.test.py
+          python roman-reels/scripts/drive-intake.test.py
+          python roman-reels/scripts/four-part-drive-intake.test.py
+          python roman-reels/scripts/four-part-drive-fixture.test.py
+          node roman-reels/scripts/four-part-receipt.test.mjs
+          node roman-reels/scripts/approved-four-part-jobs.test.mjs
+          node roman-reels/scripts/queue-delivery-bridge.test.mjs
+          node roman-reels/scripts/production-queue.test.mjs
+          node roman-reels/scripts/telegram-panel.test.mjs
+          node roman-reels/scripts/telegram-candidates.test.mjs
+          node roman-reels/scripts/telegram-poll-recovery.test.mjs
+          node roman-reels/scripts/review-status.test.mjs
+          node roman-reels/scripts/shared-review.test.mjs
+          node roman-reels/scripts/topic-only-review.test.mjs
+          node roman-reels/scripts/topic-self-approval.test.mjs
+          node roman-reels/scripts/check-selected-topic.test.mjs
+          node roman-reels/scripts/gsc-readonly-client.test.mjs
+          node roman-reels/scripts/windows-telegram-config.test.mjs
+          node roman-reels/scripts/windows-plan-delivery.test.mjs
+          node roman-reels/scripts/windows-plan-ack.test.mjs
+          node roman-reels/scripts/windows-outbox-channel.test.mjs
+          node roman-reels/scripts/relay-windows-outbox.test.mjs
+          node roman-reels/scripts/windows-runtime-supervisor.test.mjs
+          node roman-reels/scripts/recovery-drills.test.mjs
+          python roman-reels/scripts/windows-plan-publisher.test.py
+          python roman-reels/scripts/windows-delivery-probe.test.py
+          python roman-reels/scripts/windows-outbox-relay.test.py
+          python roman-reels/scripts/source-set.test.py
+          python roman-reels/scripts/assembled-jobs.test.py
+          python roman-reels/scripts/shared-body-development.test.py
+          python roman-reels/scripts/shared-body-plans.test.py
+          python roman-reels/scripts/remotion-launch.test.py
+          node --experimental-strip-types --test roman-reels/pv/src/factory/director.test.ts roman-reels/pv/src/factory/interface.test.ts roman-reels/pv/src/factory/shared-body.test.ts
+          python roman-reels/scripts/factory-contract.test.py
+          python roman-reels/scripts/factory-media.test.py
+          node --test roman-reels/scripts/platform-ending-drafts.test.mjs
+          node --test roman-reels/scripts/shared-body-drafts.test.mjs
+          node --test roman-reels/scripts/researched-gemini-drafts.test.mjs
+          node --test roman-reels/scripts/gemini-bounded-client.test.mjs
+          node --test roman-reels/scripts/gemini-editorial-cli.test.mjs
+          node --test roman-reels/scripts/editorial-release.test.mjs
+          node roman-reels/scripts/windows-gemini-config.test.mjs
+          node --test roman-reels/scripts/source-uploader.test.mjs
+          node --test roman-reels/scripts/four-part-receipt-upload.test.mjs
+
+  windows-telegram:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Publisher and fictional delivery checks on Windows
+        shell: pwsh
+        run: |
+          python roman-reels/scripts/windows-plan-publisher.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/windows-delivery-probe.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/windows-outbox-relay.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: SQLite cleanup and Telegram offline checks on Windows
+        shell: pwsh
+        run: |
+          node roman-reels/scripts/queue-delivery-bridge.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/production-queue.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/telegram-panel.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/telegram-candidates.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/telegram-poll-recovery.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-telegram-config.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-plan-delivery.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-plan-ack.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-outbox-channel.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/relay-windows-outbox.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-runtime-supervisor.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/recovery-drills.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test roman-reels/scripts/gemini-bounded-client.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test roman-reels/scripts/gemini-editorial-cli.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test roman-reels/scripts/editorial-release.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/topic-self-approval.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/gsc-readonly-client.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/windows-gemini-config.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node roman-reels/scripts/check-selected-topic.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $parseErrors = $null
+          $tokens = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path roman-reels/scripts/setup-windows-telegram.ps1), [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -gt 0) { throw 'Setup script parse failed' }
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path roman-reels/scripts/setup-windows-gemini.ps1), [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -gt 0) { throw 'Gemini setup script parse failed' }
+
+  windows-assembly:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install FFmpeg and validation dependencies
+        shell: pwsh
+        run: |
+          choco install ffmpeg -y --no-progress
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install -r roman-reels/schemas/requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ffmpeg -version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ffprobe -version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Shared-body assembly and plans on Windows (real Windows paths, synthetic MP4s)
+        shell: pwsh
+        run: |
+          python roman-reels/scripts/assembled-jobs.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/shared-body-development.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/shared-body-plans.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/factory-contract.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/remotion-launch.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
