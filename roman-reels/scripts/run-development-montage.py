@@ -15,6 +15,15 @@ PV = ROOT / "pv"
 DIRECTOR = PV / "src/factory/director.ts"
 COMPOSITION_ID = "RomanFactoryV1"
 RENDER_TIMEOUT_SECONDS = 900
+ALLOWED_RENDER_CONCURRENCY = (1, 2)
+DEFAULT_RENDER_CONCURRENCY = 2
+
+
+def check_render_concurrency(value):
+    """Only 1 or 2 parallel Remotion workers; checked before anything is created or started."""
+    if type(value) is not int or value not in ALLOWED_RENDER_CONCURRENCY:
+        raise ValueError("render_concurrency must be 1 or 2")
+    return value
 
 
 def find_node():
@@ -46,14 +55,17 @@ def remotion_cli_entry(pv=PV):
     return path
 
 
-def remotion_render_command(node, entry, raw_video, props, browser_args=()):
+def remotion_render_command(node, entry, raw_video, props, browser_args=(), concurrency=DEFAULT_RENDER_CONCURRENCY):
     """Argument list for the render; every path is one list item, so spaces and non-ASCII need no quoting."""
     return [str(node), str(entry), "render", COMPOSITION_ID, str(raw_video), "--props", str(props),
-            "--codec", "h264", "--audio-codec", "aac", "--crf", "18", "--concurrency", "2", *browser_args]
+            "--codec", "h264", "--audio-codec", "aac", "--crf", "18",
+            "--concurrency", str(check_render_concurrency(concurrency)), *browser_args]
 
 
-def render_with_remotion(raw_video, props, browser_args, pv=PV, run=subprocess.run):
-    command = remotion_render_command(find_node(), remotion_cli_entry(pv), raw_video, props, browser_args)
+def render_with_remotion(raw_video, props, browser_args, pv=PV, run=subprocess.run,
+                         concurrency=DEFAULT_RENDER_CONCURRENCY):
+    check_render_concurrency(concurrency)
+    command = remotion_render_command(find_node(), remotion_cli_entry(pv), raw_video, props, browser_args, concurrency)
     return run(command, cwd=pv, timeout=RENDER_TIMEOUT_SECONDS, check=True)  # list, never shell=True
 
 
@@ -87,8 +99,13 @@ def check_input(job):
     check_visual_assets(job.get("visualAssets", []))
 
 
-def run(job, output_directory, browser_executable=None, montage_plan=None):
-    """montage_plan: optional precomputed plan (shared-body mode); it must pass Director validation and the contract."""
+def run(job, output_directory, browser_executable=None, montage_plan=None,
+        render_concurrency=DEFAULT_RENDER_CONCURRENCY):
+    """montage_plan: optional precomputed plan (shared-body mode); it must pass Director validation and the contract.
+
+    render_concurrency: 1 or 2 Remotion workers (default 2); quality, resolution and codec settings do not change.
+    """
+    check_render_concurrency(render_concurrency)
     check_input(job)
     remotion_cli_entry(PV)  # fail fast, before any output is created
     find_node()
@@ -123,7 +140,7 @@ const plan=await buildMontagePlan(JSON.parse(s));process.stdout.write(JSON.strin
         if not browser.is_file():
             raise ValueError("Browser executable must be a local file")
         browser_args = ["--browser-executable", str(browser)]
-    render_with_remotion(raw_video, props, browser_args)
+    render_with_remotion(raw_video, props, browser_args, concurrency=render_concurrency)
     audio_report = preserve(public_source(source["localPath"]), raw_video, video, source["sha256"])
     (output / "source-audio-preservation.json").write_text(json.dumps(audio_report, indent=2) + "\n")
     job.update(productionStatus="rendered", outputPath=str(video))
