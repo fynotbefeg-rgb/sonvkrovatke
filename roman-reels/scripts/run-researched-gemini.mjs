@@ -11,6 +11,8 @@ import {createGeminiClient} from './gemini-bounded-client.mjs';
 
 export const LEDGER_STORE_MARKER='gemini-ledger-store.json';
 const MODEL='gemini-3-flash-preview';
+// One-off comparison allowlist; the pinned default above never changes. Any other model id is refused before a request.
+export const COMPARISON_MODELS=Object.freeze([MODEL,'gemini-3.8-flash']);
 // Codes raised before any generation request leaves the machine.
 const PRE_NETWORK=new Set(['task_not_allowed','generation_not_authorized','missing_key','model_not_allowed','prompt_invalid','invalid_mime',
  'invalid_limits','invalid_ledger','ledger_invalid','ledger_locked','ledger_lock_stale','run_budget_exhausted','day_budget_exhausted',
@@ -34,13 +36,14 @@ export function assertDurableLedger(file,env=process.env){
  return resolve(file);
 }
 
-export async function runResearched({mode,input,output,env=process.env,now=()=>new Date()}){
+export async function runResearched({mode,input,output,env=process.env,now=()=>new Date(),model=MODEL}){
  if(!['prepare','generate'].includes(mode)||!input||!output)throw Error('Usage: run-researched-gemini.mjs prepare|generate brief.json output.json');
+ if(!COMPARISON_MODELS.includes(model))throw Error('Model is not in the explicit comparison allowlist; no request');
  if(existsSync(output))throw Error('Output already exists; no request or overwrite allowed');
  const brief=JSON.parse(readFileSync(input,'utf8')),prompt=researchPrompt(brief);
  if(prompt.length>16000)throw Error('Prompt exceeds input character cap');
  if(mode==='prepare'){
-  writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model:MODEL,prompt,
+  writeFileSync(output,JSON.stringify({mode:'offline_request_preview',model,prompt,
    maxOutputTokens:4096,maxGenerateCalls:1,timeoutSeconds:90,sendsToSheets:false,productionReady:false,
    editorialReviewRequired:true,editorialRulesVersion,editorialRulesSha256},null,2)+'\n',{flag:'wx'});
   return 'Prepared one request; no API calls.';
@@ -51,15 +54,15 @@ export async function runResearched({mode,input,output,env=process.env,now=()=>n
  const list=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{headers:{'x-goog-api-key':key},signal:AbortSignal.timeout(30000)});
  if(!list.ok)throw Error(`Gemini models HTTP ${list.status}; no generation attempted`);
  const models=await list.json();
- if(!models.models?.some(m=>m.name===`models/${MODEL}`&&m.supportedGenerationMethods?.includes('generateContent')))throw Error('Selected model unavailable; no fallback generation');
- const client=createGeminiClient({apiKey:key,ledgerFile,allowGenerate:true,models:[MODEL],
+ if(!models.models?.some(m=>m.name===`models/${model}`&&m.supportedGenerationMethods?.includes('generateContent')))throw Error('Selected model unavailable; no fallback generation');
+ const client=createGeminiClient({apiKey:key,ledgerFile,allowGenerate:true,models:[model],
   limits:{maxRequestsPerRun:1,maxRetries:0,maxOutputTokens:4096,timeoutMs:90000,maxPromptChars:16000}});
  let answer;
- try{answer=await client.generate({task:'draft_suggestion',model:MODEL,prompt,responseMimeType:'application/json',temperature:0.4});}
+ try{answer=await client.generate({task:'draft_suggestion',model,prompt,responseMimeType:'application/json',temperature:0.4});}
  catch(error){
   // Bounded, redacted diagnostic; the client already strips the key from its messages.
   const report=JSON.stringify({
-   model:MODEL,checkedAt:now().toISOString(),generationCalls:PRE_NETWORK.has(error.code)?0:1,errorCode:error.code||'unexpected',
+   model,checkedAt:now().toISOString(),generationCalls:PRE_NETWORK.has(error.code)?0:1,errorCode:error.code||'unexpected',
    providerMessage:String(error.message||'').split(key).join('[REDACTED]').slice(0,600),newDraftGenerated:false,
    retryAttempted:false,actualCostUsd:null},null,2)+'\n';
   // Never overwrite an earlier report and never let a report collision hide the original error.
@@ -68,7 +71,7 @@ export async function runResearched({mode,input,output,env=process.env,now=()=>n
   }
   throw Error(`Gemini generation not completed (${error.code||'unexpected'}); no automatic retry`);
  }
- const result=researchedDrafts(brief,JSON.parse(answer.text),{model:MODEL,generatedAt:now().toISOString(),usageMetadata:answer.usage||null,actualCostUsd:null});
+ const result=researchedDrafts(brief,JSON.parse(answer.text),{model,generatedAt:now().toISOString(),usageMetadata:answer.usage||null,actualCostUsd:null});
  writeFileSync(output,JSON.stringify(result,null,2)+'\n',{flag:'wx'});
  return `Generated 3 pending revision-${brief.scriptRevision} drafts; editorial review required; nothing sent to Sheets.`;
 }

@@ -8,13 +8,18 @@ import {runResearched} from './run-researched-gemini.mjs';
 
 export async function runWindowsGemini({args,env=process.env,platform=process.platform,
   load=loadGeminiConfig,init=initializeGeminiStore,check=checkGeminiStore,access=checkGeminiAccess,editorial=runResearched}) {
+  // Optional per-run model for the single comparison test (editing modes only, allowlisted in the runner); never persisted.
+  const modelArg=args.find(a=>typeof a==='string'&&a.startsWith('--model=')),model=modelArg?.slice(8);
+  if(modelArg&&!(['prepare','generate'].includes(args[0])&&args.at(-1)===modelArg))throw new Error('--model is only accepted last, for prepare or generate');
+  if(modelArg)args=args.slice(0,-1);
   const [mode,input,output,permission]=args;
   if(!['init-store','check-config','check-access','prepare','generate'].includes(mode))throw new Error('Unknown Gemini mode');
   const editing=['prepare','generate'].includes(mode);
   if((!editing&&args.length!==1)||(mode==='prepare'&&args.length!==3)||(mode==='generate'&&(args.length!==4||permission!=='--allow-one-generation')))
     throw new Error('Expected mode or prepare|generate brief.json output.json; generate requires --allow-one-generation');
   if(platform!=='win32'||env.GITHUB_ACTIONS==='true')throw new Error('This wrapper requires the Windows owner session');
-  if(mode==='prepare') return editorial({mode,input,output,env:{}}); // entirely offline, no key required
+  const extra=modelArg?{model}:{};
+  if(mode==='prepare') return editorial({mode,input,output,env:{},...extra}); // entirely offline, no key required
   const paths=geminiPaths(env.LOCALAPPDATA);
   const config=await load(paths.config);
   if(mode==='init-store')return {status:'initialized',...(await init(paths)),generationCalls:0};
@@ -26,7 +31,7 @@ export async function runWindowsGemini({args,env=process.env,platform=process.pl
     return {...result,accessAvailable:result.catalogueHttpStatus===200&&result.modelListed===true&&result.countTokensHttpStatus===200};
   }
   if(env.ROMAN_GEMINI_ALLOW_GENERATE!=='true')throw new Error('Owner single-generation authorization required');
-  return editorial({mode,input,output,env:{ROMAN_GEMINI_ALLOW_GENERATE:'true',ROMAN_GEMINI_LEDGER:paths.ledger,GEMINI_API_KEY:config.apiKey}});
+  return editorial({mode,input,output,env:{ROMAN_GEMINI_ALLOW_GENERATE:'true',ROMAN_GEMINI_LEDGER:paths.ledger,GEMINI_API_KEY:config.apiKey},...extra});
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
   runWindowsGemini({args:process.argv.slice(2)}).then(x=>{console.log(typeof x==='string'?x:JSON.stringify(x));if(x?.accessAvailable===false)process.exitCode=1;},()=>{
