@@ -1,17 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createGscReadOnlyClient,GSC_READONLY_TOOLS,GSC_READONLY_SCOPE,GSC_PAGE} from './gsc-readonly-client.mjs';
-const time=Date.parse('2026-10-15T10:00:00Z'),property='sc-domain:idco.ru';
+const time=Date.parse('2026-10-15T10:00:00Z'),property='https://idco.ru/';
 function setup({fetch,auth}={}) {
  const calls=[],clock={value:time};let tokens=0;
  const client=createGscReadOnlyClient({now:()=>clock.value,readonlyTokenProvider:async()=>{tokens++;return auth||{scope:GSC_READONLY_SCOPE,accessToken:'FAKE_PRIVATE_TOKEN',expiresAt:time+3600000};},
   fetchImpl:async(url,init)=>{calls.push({url,init});return fetch?fetch(url,init):Response.json(url.endsWith('/sites')?
-   {siteEntry:[{siteUrl:property,permissionLevel:'siteOwner'},{siteUrl:'sc-domain:other.example',permissionLevel:'siteOwner'}]}:
+   {siteEntry:[{siteUrl:'sc-domain:idco.ru',permissionLevel:'siteOwner'},{siteUrl:property,permissionLevel:'siteFullUser'},{siteUrl:'sc-domain:other.example',permissionLevel:'siteOwner'}]}:
    url.endsWith('index:inspect')?{inspectionResult:{indexStatusResult:{verdict:'NEUTRAL'}}}:{rows:[]});}});
  return {client,calls,clock,tokens:()=>tokens};
 }
 test('only three tools; unknown methods and extra arguments refuse before auth or HTTP',async()=>{
- const s=setup();assert.equal(GSC_READONLY_TOOLS.length,3);
+ const s=setup();assert.equal(GSC_READONLY_TOOLS.length,4);
  for(const name of ['submit_sitemap','delete_sitemap','add_site','delete_site','manage_sitemaps','reauthenticate','constructor','sites.add'])
   await assert.rejects(s.client.callTool(name,{property}));
  await assert.rejects(s.client.callTool('list_properties',{url:'https://evil.example'}));
@@ -21,7 +21,7 @@ test('only three tools; unknown methods and extra arguments refuse before auth o
 test('explicit returned property required; no default, foreign or unverified property',async()=>{
  const s=setup();await assert.rejects(s.client.callTool('get_page_queries',{property}));
  const list=await s.client.callTool('list_properties');assert.deepEqual(list.properties,[property]);
- for(const p of ['https://idco.ru/','sc-domain:other.example','https://idco.ru@evil.example/'])
+ for(const p of ['sc-domain:idco.ru','sc-domain:other.example','https://idco.ru@evil.example/'])
   await assert.rejects(s.client.callTool('get_page_queries',{property:p}));
  assert.equal(s.calls.length,1);
 });
@@ -63,4 +63,14 @@ test('stale listing, invalid clocks and oversized/invalid data fail closed',asyn
  for(const fetch of [()=>Response.json({siteEntry:[]},{headers:{'Content-Length':'2097153'}}),()=>Response.json({siteEntry:null}),()=>new Response('{')]) {
   const z=setup({fetch});await assert.rejects(z.client.callTool('list_properties'));await assert.rejects(z.client.callTool('list_properties'));assert.equal(z.calls.length,1);
  }
+});
+test('recent queries: 28 days ending 3 days ago, query dimension, 5 rows, no page filter',async()=>{
+ const s=setup();await s.client.callTool('list_properties');
+ const r=await s.client.callTool('get_recent_queries',{property});
+ const q=JSON.parse(s.calls[1].init.body);
+ assert.equal(q.endDate,'2026-10-12');assert.equal(q.startDate,'2026-09-15');
+ assert.deepEqual(q.dimensions,['query']);assert.equal(q.rowLimit,5);assert.equal(q.dataState,'final');
+ assert.equal(q.dimensionFilterGroups,undefined);assert.equal(r.productionAllowed,false);
+ await assert.rejects(s.client.callTool('get_recent_queries',{property}));assert.equal(s.calls.length,2);
+ await assert.rejects(setup().client.callTool('get_recent_queries',{property:'sc-domain:idco.ru'}));
 });

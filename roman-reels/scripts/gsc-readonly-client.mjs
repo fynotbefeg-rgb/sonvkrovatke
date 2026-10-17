@@ -3,12 +3,12 @@
 export const GSC_READONLY_SCOPE='https://www.googleapis.com/auth/webmasters.readonly';
 export const GSC_PAGE='https://idco.ru/passivnyy-dohod';
 const START='2026-07-10',END='2026-10-09';
-const names=['list_properties','get_page_queries','inspect_page'];
+const names=['list_properties','get_page_queries','inspect_page','get_recent_queries'];
 export const GSC_READONLY_TOOLS=Object.freeze(names.map(name=>Object.freeze({name,
- description:name==='list_properties'?'Read available idco.ru properties':name==='get_page_queries'?'Read at most 10 page-filtered query rows for the fixed export period':'Read indexed inspection for the fixed page; not a live URL test',
+ description:name==='list_properties'?'Read available idco.ru properties':name==='get_recent_queries'?'Read at most 5 site-wide query rows for the 28 days ending 3 days ago':name==='get_page_queries'?'Read at most 10 page-filtered query rows for the fixed export period':'Read indexed inspection for the fixed page; not a live URL test',
  inputSchema: name==='list_properties'?{type:'object',properties:{},additionalProperties:false}:
  {type:'object',properties:{property:{type:'string'}},required:['property'],additionalProperties:false}})));
-const propertyAllowed=p=>p==='sc-domain:idco.ru'||p==='https://idco.ru/';
+const propertyAllowed=p=>p==='https://idco.ru/';
 function exactArgs(args,hasProperty) {
  return args&&typeof args==='object'&&!Array.isArray(args)&&Object.keys(args).length===(hasProperty?1:0)&&
  (!hasProperty||(Object.hasOwn(args,'property')&&propertyAllowed(args.property)));
@@ -56,6 +56,15 @@ export function createGscReadOnlyClient({readonlyTokenProvider,fetchImpl=fetch,n
   }
   if(stopped||!properties||!properties.has(args.property)||!Number.isFinite(now())||now()<capturedAt||now()-capturedAt>300000)
    throw Error('Fresh authorised property listing and explicit exact property required');
+  if(name==='get_recent_queries') {
+   const day=ms=>new Date(ms).toISOString().slice(0,10),end=day(now()-3*864e5),start=day(now()-30*864e5);
+   const result=await request(name,`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(args.property)}/searchAnalytics/query`,{
+    startDate:start,endDate:end,dimensions:['query'],rowLimit:5,startRow:0,type:'web',dataState:'final'});
+   if(!result||typeof result!=='object'||Array.isArray(result)||(result.rows!==undefined&&(!Array.isArray(result.rows)||result.rows.length>5))) {
+    stopped=true;throw Error('Invalid bounded analytics result');
+   }
+   return {period:{startDate:start,endDate:end},data:result,productionAllowed:false};
+  }
   if(name==='get_page_queries') {
    const result=await request(name,`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(args.property)}/searchAnalytics/query`,{
     startDate:START,endDate:END,dimensions:['query'],rowLimit:10,startRow:0,type:'web',dataState:'final',
