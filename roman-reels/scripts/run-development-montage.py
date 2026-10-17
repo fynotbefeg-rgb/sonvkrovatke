@@ -3,6 +3,7 @@ import argparse
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 import subprocess
 
 from factory_media import public_source, probe, sha256, technical_qc
@@ -13,6 +14,47 @@ ROOT = Path(__file__).resolve().parents[1]
 PV = ROOT / "pv"
 DIRECTOR = PV / "src/factory/director.ts"
 COMPOSITION_ID = "RomanFactoryV1"
+RENDER_TIMEOUT_SECONDS = 900
+
+
+def find_node():
+    """Node executable from PATH; nothing is downloaded or installed automatically."""
+    node = shutil.which("node")
+    if node is None:
+        raise ValueError("Node.js was not found on PATH; install Node.js first (nothing is downloaded automatically)")
+    return node
+
+
+def remotion_cli_entry(pv=PV):
+    """Entry point of the installed @remotion/cli, taken from its own package.json (never guessed).
+
+    Launching it through Node avoids npx, which is npx.cmd on Windows and cannot be started without a shell.
+    """
+    package_file = Path(pv) / "node_modules/@remotion/cli/package.json"
+    if not package_file.is_file():
+        raise ValueError("Install locked Remotion dependencies with npm ci first")
+    try:
+        bin_field = json.loads(package_file.read_text(encoding="utf-8")).get("bin")
+    except (OSError, ValueError):
+        raise ValueError("Installed @remotion/cli package.json is unreadable") from None
+    entry = bin_field.get("remotion") if isinstance(bin_field, dict) else None
+    if not isinstance(entry, str) or not entry:
+        raise ValueError("Installed @remotion/cli does not declare a remotion entry point")
+    path = (package_file.parent / entry).resolve()
+    if not path.is_file() or not path.is_relative_to(package_file.parent.resolve()):
+        raise ValueError("Installed @remotion/cli entry point is missing")
+    return path
+
+
+def remotion_render_command(node, entry, raw_video, props, browser_args=()):
+    """Argument list for the render; every path is one list item, so spaces and non-ASCII need no quoting."""
+    return [str(node), str(entry), "render", COMPOSITION_ID, str(raw_video), "--props", str(props),
+            "--codec", "h264", "--audio-codec", "aac", "--crf", "18", "--concurrency", "2", *browser_args]
+
+
+def render_with_remotion(raw_video, props, browser_args, pv=PV, run=subprocess.run):
+    command = remotion_render_command(find_node(), remotion_cli_entry(pv), raw_video, props, browser_args)
+    return run(command, cwd=pv, timeout=RENDER_TIMEOUT_SECONDS, check=True)  # list, never shell=True
 
 
 def check_visual_assets(assets):
@@ -48,8 +90,8 @@ def check_input(job):
 def run(job, output_directory, browser_executable=None, montage_plan=None):
     """montage_plan: optional precomputed plan (shared-body mode); it must pass Director validation and the contract."""
     check_input(job)
-    if not (PV / "node_modules/@remotion/cli/package.json").is_file():
-        raise ValueError("Install locked Remotion dependencies with npm ci first")
+    remotion_cli_entry(PV)  # fail fast, before any output is created
+    find_node()
     source = job["sourceVideo"]
     job = {**job, "visualAssets": job.get("visualAssets", []), "renderSettings": {
         "width": 1080, "height": 1920, "fps": source["fps"], "codec": "h264", "audioCodec": "aac",
@@ -74,16 +116,14 @@ const plan=await buildMontagePlan(JSON.parse(s));process.stdout.write(JSON.strin
     props.write_text(json.dumps(job, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     raw_video = output / "remotion-encoded.mp4"
     video = output / "development.mp4"
-    # --no-install prevents fetching an unexpected CLI; Node deps must be installed first.
+    # Only the locally installed CLI is run (Node deps must be installed first); nothing is fetched.
     browser_args = []
     if browser_executable is not None:
         browser = Path(browser_executable).resolve(strict=True)
         if not browser.is_file():
             raise ValueError("Browser executable must be a local file")
         browser_args = ["--browser-executable", str(browser)]
-    subprocess.run(["npx", "--no-install", "remotion", "render", COMPOSITION_ID, str(raw_video),
-                    "--props", str(props), "--codec", "h264", "--audio-codec", "aac",
-                    "--crf", "18", "--concurrency", "2", *browser_args], cwd=PV, timeout=900, check=True)
+    render_with_remotion(raw_video, props, browser_args)
     audio_report = preserve(public_source(source["localPath"]), raw_video, video, source["sha256"])
     (output / "source-audio-preservation.json").write_text(json.dumps(audio_report, indent=2) + "\n")
     job.update(productionStatus="rendered", outputPath=str(video))
