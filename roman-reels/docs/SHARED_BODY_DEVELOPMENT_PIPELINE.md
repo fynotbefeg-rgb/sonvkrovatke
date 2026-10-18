@@ -63,3 +63,27 @@ specific voice-containing payload/destination requires explicit owner approval.
 успешен, readback подтвердил имя/MIME/parent и размер33726109. Удалённый checksum
 connector metadata не вернул; независимо не сверялся. Публичный доступ не включался,
 это private development preview, не approved production delivery.
+
+## Четыре локальных MP4 одной командой
+
+`run-local-four-part.py` принимает явные пути к `body`, `h1`, `h2`, `h3`, `--topic-id`
+и новую папку `--out`. Без `--execute` он только проверяет входы (существование,
+разные файлы, ffprobe, полное декодирование через ffmpeg, SHA-256, новые папки) и печатает
+план: входные файлы читаются через ffprobe/ffmpeg, но рабочие файлы и папки не создаются,
+ASR и рендер не запускаются. Относительный `--model-path` сразу превращается в абсолютный.
+С `--execute` копирует части в
+`pv/public/rr/incoming/<out>-parts`, пишет `source-set.json`, затем по одному
+запускает существующие `transcribe-development-source.py` (четыре раза) и
+`run-shared-body-development.py` с `--render-concurrency 1` и
+`--offthreadvideo-cache-size-in-bytes 268435456`. Собственной логики ASR или монтажа нет.
+
+```text
+python roman-reels/scripts/run-local-four-part.py --body body.mp4 --h1 h1.mp4 --h2 h2.mp4 --h3 h3.mp4 \
+  --topic-id my-topic --out D:/runs/NEW-RUN \
+  --model-path <faster-whisper-small> --model-revision <rev> --browser-executable <edge/chromium> [--execute]
+```
+
+В `--out`: `launch-report.json` (хеши, метаданные, команды, код выхода и время каждого шага),
+`logs/`, `asr/<part>/speech.json`, `montage/`. Первая ошибка останавливает запуск без повтора.
+Существующие папки не перезаписываются. Утверждения и productionReady не выставляются,
+needsSpeechReview всегда true. Google, Drive и HeyGen не используются.
