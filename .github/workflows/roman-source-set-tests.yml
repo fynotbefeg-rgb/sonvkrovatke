@@ -73,6 +73,7 @@ jobs:
           python roman-reels/scripts/assembled-jobs.test.py
           python roman-reels/scripts/shared-body-development.test.py
           python roman-reels/scripts/shared-body-plans.test.py
+          python roman-reels/scripts/run-local-four-part.test.py
           python roman-reels/scripts/remotion-launch.test.py
           node --experimental-strip-types --test roman-reels/pv/src/factory/director.test.ts roman-reels/pv/src/factory/interface.test.ts roman-reels/pv/src/factory/shared-body.test.ts
           python roman-reels/scripts/factory-contract.test.py
@@ -184,6 +185,8 @@ jobs:
           python roman-reels/scripts/assembled-jobs.test.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python roman-reels/scripts/shared-body-development.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python roman-reels/scripts/run-local-four-part.test.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python roman-reels/scripts/shared-body-plans.test.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
