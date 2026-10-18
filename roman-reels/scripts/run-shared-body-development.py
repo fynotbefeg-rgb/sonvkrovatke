@@ -30,8 +30,9 @@ def write_json(file, data):
 
 
 def run(plan, body, hooks, public_directory, output_directory, browser=None, render_hooks=(1, 2, 3), renderer=None,
-        render_concurrency=montage.DEFAULT_RENDER_CONCURRENCY):
+        render_concurrency=montage.DEFAULT_RENDER_CONCURRENCY, video_cache_size_in_bytes=None):
     montage.check_render_concurrency(render_concurrency)  # before any file, folder or process is created
+    montage.check_video_cache_size(video_cache_size_in_bytes)
     selected = tuple(render_hooks)
     if not selected or len(set(selected)) != len(selected) or any(type(n) is not int or n not in {1, 2, 3} for n in selected):
         raise ValueError('Select distinct hook numbers 1/2/3')
@@ -61,6 +62,7 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
               'freshRecognition': False, 'needsSpeechReview': True,
               'timingMethod': 'verified_cached_part_timings_with_assembly_offset',
               'requestedHooks': list(selected), 'renderConcurrency': render_concurrency,
+              'offthreadVideoCacheSizeInBytes': video_cache_size_in_bytes,
               'complete': False, 'renders': []}
     report_file = output / 'pipeline-report.json'
     write_json(report_file, report)
@@ -77,11 +79,13 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     report['sharedBodyPlan'] = True
     report_file.write_text(json.dumps(report, indent=2) + '\n')
     renderer = renderer or montage.run
+    # Passed only when set, so the default call to the renderer stays exactly as before.
+    cache_option = {} if video_cache_size_in_bytes is None else {'video_cache_size_in_bytes': video_cache_size_in_bytes}
     for job, _ in jobs:
         if job['hookNumber'] not in selected:
             continue
         qc = renderer(job, output / f"h{job['hookNumber']}", browser, montage_plan=plans[job['hookNumber']],
-                      render_concurrency=render_concurrency)
+                      render_concurrency=render_concurrency, **cache_option)
         if qc.get('technicalPassed') is not True:
             raise ValueError('Montage technical QC did not pass')
         report['renders'].append({'hookNumber': job['hookNumber'], 'reelId': job['reelId'],
@@ -108,9 +112,16 @@ if __name__ == '__main__':
     parser.add_argument('--render-concurrency', type=int, choices=montage.ALLOWED_RENDER_CONCURRENCY,
                         default=montage.DEFAULT_RENDER_CONCURRENCY,
                         help='Remotion workers per render: 1 (less memory) or 2 (default)')
+    parser.add_argument('--offthreadvideo-cache-size-in-bytes', type=int, dest='video_cache_size_in_bytes',
+                        help='OffthreadVideo cache limit per render, bytes 67108864..8589934592 '
+                             '(e.g. 268435456); omitted = Remotion default')
     args = parser.parse_args()
+    try:
+        montage.check_video_cache_size(args.video_cache_size_in_bytes)
+    except ValueError as error:
+        parser.error(str(error))  # exit 2 before any file is read or created
     read = lambda file: json.loads(Path(file).read_text(encoding='utf-8'))
     run(read(args.source_set), read(args.body_speech), {n: read(file) for n, file in enumerate(args.hook_speech, 1)},
         args.public_directory, args.out, args.browser_executable, args.render_hooks,
-        render_concurrency=args.render_concurrency)
+        render_concurrency=args.render_concurrency, video_cache_size_in_bytes=args.video_cache_size_in_bytes)
     print('Development pipeline passed. Cached speech still needs review; no publication allowed.')

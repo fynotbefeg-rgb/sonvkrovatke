@@ -17,12 +17,24 @@ COMPOSITION_ID = "RomanFactoryV1"
 RENDER_TIMEOUT_SECONDS = 900
 ALLOWED_RENDER_CONCURRENCY = (1, 2)
 DEFAULT_RENDER_CONCURRENCY = 2
+# OffthreadVideo frame cache; None keeps Remotion's own default (the flag is not passed at all).
+MIN_VIDEO_CACHE_BYTES = 64 * 1024 * 1024
+MAX_VIDEO_CACHE_BYTES = 8 * 1024 * 1024 * 1024
 
 
 def check_render_concurrency(value):
     """Only 1 or 2 parallel Remotion workers; checked before anything is created or started."""
     if type(value) is not int or value not in ALLOWED_RENDER_CONCURRENCY:
         raise ValueError("render_concurrency must be 1 or 2")
+    return value
+
+
+def check_video_cache_size(value):
+    """None (Remotion default) or whole bytes in 64 MiB..8 GiB; checked before anything is created or started."""
+    if value is None:
+        return None
+    if type(value) is not int or not MIN_VIDEO_CACHE_BYTES <= value <= MAX_VIDEO_CACHE_BYTES:
+        raise ValueError("video_cache_size_in_bytes must be a whole number of bytes from 67108864 to 8589934592")
     return value
 
 
@@ -55,17 +67,22 @@ def remotion_cli_entry(pv=PV):
     return path
 
 
-def remotion_render_command(node, entry, raw_video, props, browser_args=(), concurrency=DEFAULT_RENDER_CONCURRENCY):
+def remotion_render_command(node, entry, raw_video, props, browser_args=(), concurrency=DEFAULT_RENDER_CONCURRENCY,
+                            video_cache_size_in_bytes=None):
     """Argument list for the render; every path is one list item, so spaces and non-ASCII need no quoting."""
+    cache = check_video_cache_size(video_cache_size_in_bytes)
+    cache_args = [] if cache is None else ["--offthreadvideo-cache-size-in-bytes", str(cache)]
     return [str(node), str(entry), "render", COMPOSITION_ID, str(raw_video), "--props", str(props),
             "--codec", "h264", "--audio-codec", "aac", "--crf", "18",
-            "--concurrency", str(check_render_concurrency(concurrency)), *browser_args]
+            "--concurrency", str(check_render_concurrency(concurrency)), *cache_args, *browser_args]
 
 
 def render_with_remotion(raw_video, props, browser_args, pv=PV, run=subprocess.run,
-                         concurrency=DEFAULT_RENDER_CONCURRENCY):
+                         concurrency=DEFAULT_RENDER_CONCURRENCY, video_cache_size_in_bytes=None):
     check_render_concurrency(concurrency)
-    command = remotion_render_command(find_node(), remotion_cli_entry(pv), raw_video, props, browser_args, concurrency)
+    check_video_cache_size(video_cache_size_in_bytes)
+    command = remotion_render_command(find_node(), remotion_cli_entry(pv), raw_video, props, browser_args, concurrency,
+                                      video_cache_size_in_bytes)
     return run(command, cwd=pv, timeout=RENDER_TIMEOUT_SECONDS, check=True)  # list, never shell=True
 
 
@@ -100,12 +117,14 @@ def check_input(job):
 
 
 def run(job, output_directory, browser_executable=None, montage_plan=None,
-        render_concurrency=DEFAULT_RENDER_CONCURRENCY):
+        render_concurrency=DEFAULT_RENDER_CONCURRENCY, video_cache_size_in_bytes=None):
     """montage_plan: optional precomputed plan (shared-body mode); it must pass Director validation and the contract.
 
     render_concurrency: 1 or 2 Remotion workers (default 2); quality, resolution and codec settings do not change.
+    video_cache_size_in_bytes: optional OffthreadVideo cache limit; None keeps Remotion's default.
     """
     check_render_concurrency(render_concurrency)
+    check_video_cache_size(video_cache_size_in_bytes)
     check_input(job)
     remotion_cli_entry(PV)  # fail fast, before any output is created
     find_node()
@@ -140,7 +159,8 @@ const plan=await buildMontagePlan(JSON.parse(s));process.stdout.write(JSON.strin
         if not browser.is_file():
             raise ValueError("Browser executable must be a local file")
         browser_args = ["--browser-executable", str(browser)]
-    render_with_remotion(raw_video, props, browser_args, concurrency=render_concurrency)
+    render_with_remotion(raw_video, props, browser_args, concurrency=render_concurrency,
+                         video_cache_size_in_bytes=video_cache_size_in_bytes)
     audio_report = preserve(public_source(source["localPath"]), raw_video, video, source["sha256"])
     (output / "source-audio-preservation.json").write_text(json.dumps(audio_report, indent=2) + "\n")
     job.update(productionStatus="rendered", outputPath=str(video))

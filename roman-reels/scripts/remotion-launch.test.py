@@ -145,6 +145,36 @@ class RemotionLaunchTests(unittest.TestCase):
                         runner.run({"sourceVideo": {"fps": 25}}, out, render_concurrency=bad)
                 self.assertFalse(out.exists())
 
+    def test_video_cache_size_reaches_the_remotion_command_and_default_omits_the_flag(self):
+        pv = fake_pv(self.temp.name)
+        commands = {}
+        with patch.object(runner.shutil, "which", return_value="/fake/node"):
+            for value in (None, 268435456):
+                options = {} if value is None else {"video_cache_size_in_bytes": value}
+                runner.render_with_remotion("o.mp4", "p.json", ["--browser-executable", "/fake/edge"], pv=pv,
+                                            run=lambda command, **kwargs: commands.setdefault(value, command), **options)
+        self.assertNotIn("--offthreadvideo-cache-size-in-bytes", commands[None])  # previous behaviour kept
+        limited = list(commands[268435456])
+        at = limited.index("--offthreadvideo-cache-size-in-bytes")
+        self.assertEqual(limited[at + 1], "268435456")
+        del limited[at:at + 2]
+        self.assertEqual(limited, commands[None])  # only the cache flag is added
+
+    def test_invalid_video_cache_size_is_rejected_before_anything_starts(self):
+        pv = fake_pv(self.temp.name)
+        for bad in (0, -1, 67108863, 8589934593, True, False, 268435456.0, "268435456"):
+            with self.subTest(value=bad):
+                with self.assertRaises(ValueError):
+                    runner.remotion_render_command("node", "entry.js", "o.mp4", "p.json", [], 1, bad)
+                with patch.object(subprocess, "run", side_effect=AssertionError("nothing must be started")):
+                    with self.assertRaises(ValueError):
+                        runner.render_with_remotion("o.mp4", "p.json", [], pv=pv, video_cache_size_in_bytes=bad)
+                out = Path(self.temp.name) / "out-invalid-cache"
+                with patch.object(runner, "check_input", side_effect=AssertionError("must fail before reading the job")):
+                    with self.assertRaises(ValueError):
+                        runner.run({"sourceVideo": {"fps": 25}}, out, video_cache_size_in_bytes=bad)
+                self.assertFalse(out.exists())
+
     def test_runner_source_no_longer_starts_npx(self):
         source = Path(runner.__file__).read_text(encoding="utf-8") if hasattr(runner, "__file__") else \
             Path(__file__).with_name("run-development-montage.py").read_text(encoding="utf-8")

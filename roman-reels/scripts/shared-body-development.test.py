@@ -122,6 +122,40 @@ class PipelineTests(unittest.TestCase):
                 self.assertFalse(self.out.exists())
                 self.assertFalse((self.root / 'rr/incoming/new-run').exists())
 
+    def test_video_cache_size_reaches_every_renderer_and_is_recorded_in_the_report(self):
+        seen = []
+        def renderer(job, *_, montage_plan=None, render_concurrency=None, video_cache_size_in_bytes=None):
+            seen.append((job['hookNumber'], render_concurrency, video_cache_size_in_bytes))
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer, render_concurrency=1, video_cache_size_in_bytes=268435456)
+        self.assertEqual(seen, [(1, 1, 268435456), (2, 1, 268435456), (3, 1, 268435456)])
+        saved = json.loads((self.out / 'pipeline-report.json').read_text(encoding='utf-8'))
+        self.assertEqual(saved['offthreadVideoCacheSizeInBytes'], 268435456)
+        self.assertEqual(report['offthreadVideoCacheSizeInBytes'], 268435456)
+        self.temp.cleanup(); self.setUp(); seen.clear()
+        self.assertIsNone(self.run_pipeline(renderer)['offthreadVideoCacheSizeInBytes'])  # default: Remotion's own
+        self.assertEqual(seen, [(1, 2, None), (2, 2, None), (3, 2, None)])
+
+    def test_invalid_video_cache_size_is_rejected_before_any_output_or_render(self):
+        def renderer(*_, **__): raise AssertionError('no render must start')
+        for bad in [0, -1, 67108863, 8589934593, True, 268435456.0, '268435456']:
+            with self.subTest(value=bad):
+                with self.assertRaises(ValueError): self.run_pipeline(renderer, video_cache_size_in_bytes=bad)
+                self.assertFalse(self.out.exists())
+                self.assertFalse((self.root / 'rr/incoming/new-run').exists())
+
+    def test_command_line_rejects_bad_video_cache_size_before_reading_inputs(self):
+        import subprocess, sys
+        script = Path(__file__).with_name('run-shared-body-development.py')
+        base = [sys.executable, str(script), 'x.json', '--body-speech', 'b.json', '--hook-speech', 'h1.json', 'h2.json', 'h3.json',
+                '--public-directory', 'rr/incoming/never', '--out', str(self.out)]
+        help_text = subprocess.run([sys.executable, str(script), '--help'], capture_output=True, text=True, encoding='utf-8', timeout=60).stdout
+        self.assertIn('--offthreadvideo-cache-size-in-bytes', help_text)
+        for bad in ['0', '-1', '67108863', '8589934593', '256MB', '2.5e8']:
+            run = subprocess.run(base + ['--offthreadvideo-cache-size-in-bytes', bad], capture_output=True, timeout=60)
+            self.assertEqual(run.returncode, 2, bad)  # x.json does not exist: exit 2 means nothing was read
+            self.assertFalse(self.out.exists())
+
     def test_command_line_accepts_only_one_or_two(self):
         import subprocess, sys
         script = Path(__file__).with_name('run-shared-body-development.py')
