@@ -11,6 +11,8 @@ import { MemeCats, MEME_FRAMES } from "./MemeCats";
 import { KitStory, KIT_FRAMES } from "./KitStory";
 import { RM_V1, RM_V2, RM_DUR } from "./IntroRM";
 import { RM2_A, RM2_B, RM2_DUR } from "./IntroRM2";
+import { RM3_IA, RM3_IB, RM3_V1, RM3_V2, RM3_V1_ALL, RM3_V2_ALL, RM3_INTRO, RM3_LESSON } from "./IntroRM3";
+import { ALL as RM_ALL } from "./IntroRM";
 import { FormulaReel, FORMULA_FRAMES } from "./FormulaReel";
 import { FormulaReel3 } from "./FormulaReel3";
 import { LudiVideo, LUDI_FRAMES } from "./LudiVideo";
@@ -60,6 +62,12 @@ export const RemotionRoot: React.FC = () => (
 <Composition id="LudiVideo" component={LudiVideo} durationInFrames={LUDI_FRAMES} fps={30} width={1080} height={1350} />
 <Composition id="FormulaReel3" component={FormulaReel3} durationInFrames={FORMULA_FRAMES} fps={30} width={1080} height={1920} />
     <Composition id="RMv1" component={RM_V1} durationInFrames={RM_DUR*4} fps={30} width={1920} height={1080} />
+    <Composition id="RM3IA" component={RM3_IA} durationInFrames={RM3_INTRO} fps={25} width={1920} height={1080} />
+    <Composition id="RM3IB" component={RM3_IB} durationInFrames={RM3_INTRO} fps={25} width={1920} height={1080} />
+    <Composition id="RM3V1" component={RM3_V1} durationInFrames={RM3_LESSON * 4} fps={30} width={1920} height={1080} />
+    <Composition id="RM3V2" component={RM3_V2} durationInFrames={RM3_LESSON * 4} fps={30} width={1920} height={1080} />
+    <Composition id="RM3V1all" component={RM3_V1_ALL} durationInFrames={RM3_LESSON * RM_ALL.length} fps={30} width={1920} height={1080} />
+    <Composition id="RM3V2all" component={RM3_V2_ALL} durationInFrames={RM3_LESSON * RM_ALL.length} fps={30} width={1920} height={1080} />
     <Composition id="RM2A" component={RM2_A} durationInFrames={RM2_DUR} fps={25} width={1920} height={1080} />
     <Composition id="RM2B" component={RM2_B} durationInFrames={RM2_DUR} fps={25} width={1920} height={1080} />
     <Composition id="RMv2" component={RM_V2} durationInFrames={RM_DUR*4} fps={30} width={1920} height={1080} />
