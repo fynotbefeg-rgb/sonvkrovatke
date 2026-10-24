@@ -10,9 +10,10 @@ import {closeSync,constants,copyFileSync,existsSync,fsyncSync,lstatSync,mkdirSyn
 import {isDeepStrictEqual} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {TELEGRAM_CLOUD_DOWNLOAD_LIMIT,TelegramApiError} from './telegram-bot-api.mjs';
+import {RUN_LABELS,ensureRunTables,hasWork,requestRedelivery,requestRun} from './telegram-executor.mjs';
 
 export const ROLES={body:'Основа',h1:'Хук 1',h2:'Хук 2',h3:'Хук 3'};
-const PARTS=Object.keys(ROLES);
+export const PARTS=Object.keys(ROLES);
 const TOPIC=/^[a-z0-9][a-z0-9_-]{0,63}$/;
 const MAX_FILES=8;
 const OPEN=`state IN ('collecting','plan_ready')`;
@@ -20,7 +21,7 @@ const mb=n=>(n/1048576).toFixed(1).replace('.',',');
 const limitText=`до ${TELEGRAM_CLOUD_DOWNLOAD_LIMIT/1048576} МБ каждый (предел облачного Bot API для ботов)`;
 const REPO=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..','..');
 // Streamed, so local originals larger than memory-friendly sizes are fine; a missing file counts as changed.
-function sha256(file){
+export function sha256(file){
   try{
     const fd=openSync(file,'r'),hash=createHash('sha256'),buffer=Buffer.allocUnsafe(1048576);
     try{let n;while((n=readSync(fd,buffer,0,buffer.length,null))>0)hash.update(buffer.subarray(0,n));}finally{closeSync(fd);}
@@ -38,7 +39,8 @@ const OFFER_TTL_MS=900000;
 
 export class FourPartIntake {
   // db: the existing ProductionQueue SQLite handle; one database and one polling lock for the bot.
-  constructor(db,{root,inbox,plan,now=()=>new Date()}={}) {
+  // startExecutor: starts the detached montage worker (never awaited for the montage itself); without it no montage button.
+  constructor(db,{root,inbox,plan,startExecutor,now=()=>new Date()}={}) {
     if(typeof root!=='string'||!path.isAbsolute(root))throw Error('Absolute private intake folder required');
     if(!outside(path.resolve(root),REPO))throw Error('Intake folder must stay outside the Git work tree');
     if(inbox!==undefined){
@@ -47,7 +49,8 @@ export class FourPartIntake {
       if(!outside(path.resolve(inbox),path.resolve(root))||!outside(path.resolve(root),path.resolve(inbox)))throw Error('Inbox and intake folders must be separate');
     }
     if(typeof plan!=='function')throw Error('Launcher plan runner required');
-    Object.assign(this,{db,root,inbox,plan,now});
+    if(startExecutor!==undefined&&typeof startExecutor!=='function')throw Error('Executor starter must be a function');
+    Object.assign(this,{db,root,inbox,plan,startExecutor,now});
     db.exec(`CREATE TABLE IF NOT EXISTS intake_jobs (
         id TEXT PRIMARY KEY, actor_id TEXT NOT NULL, topic_id TEXT NOT NULL, state TEXT NOT NULL,
         plan_version INTEGER NOT NULL DEFAULT 0, plan TEXT, created_at TEXT NOT NULL, confirmed_at TEXT);
@@ -59,6 +62,7 @@ export class FourPartIntake {
       CREATE TABLE IF NOT EXISTS intake_offers (
         id TEXT PRIMARY KEY, actor_id TEXT NOT NULL, kit TEXT NOT NULL, topic_id TEXT NOT NULL,
         parts TEXT NOT NULL, expires_at INTEGER NOT NULL, job_id TEXT);`);
+    ensureRunTables(db);
   }
   openJob(actor){return this.db.prepare(`SELECT * FROM intake_jobs WHERE actor_id=? AND ${OPEN}`).get(actor);}
   files(jobId){return this.db.prepare('SELECT * FROM intake_files WHERE job_id=? ORDER BY rowid').all(jobId);}
@@ -181,7 +185,7 @@ async function confirm(intake,data,actor,api){
   if(job.state==='confirmed'){
     const restored=ensureConfirmation(intake,job);
     await api.send(actor,`Комплект ${job.id} уже подтверждён (${job.confirmed_at}). Повторное нажатие ничего не запускает.`+
-      (restored?'\nФайл фиксации восстановлен из подтверждённого состояния.':''));
+      (restored?'\nФайл фиксации восстановлен из подтверждённого состояния.':''),montageButton(intake,job.id));
     return {alreadyConfirmed:true,confirmationRestored:restored};
   }
   if(job.state!=='plan_ready'||String(job.plan_version)!==version){
@@ -199,8 +203,60 @@ async function confirm(intake,data,actor,api){
   if(Number(changed)!==1){await api.send(actor,'Кнопка устарела. Открой /intake.');return {stale:true};}
   ensureConfirmation(intake,{...job,state:'confirmed',confirmed_at:at});
   await api.send(actor,`Комплект ${job.id} подтверждён и зафиксирован (хеши четырёх файлов).\n`+
-    'Исполнение — ASR, монтаж трёх рилсов и их отправка — этим участком ещё не подключено и не запущено.');
+    (intake.startExecutor?'Монтаж (ASR и три рилса) запускается отдельной кнопкой «Запустить монтаж».':
+      'Исполнение — ASR, монтаж трёх рилсов и их отправка — на этом координаторе не подключено и не запущено.'),montageButton(intake,job.id));
   return {confirmed:true,executeStarted:false};
+}
+
+// Montage: an explicit request per confirmed job; the worker is started in the background, never awaited here.
+const montageButton=(intake,jobId)=>intake.startExecutor&&!intake.db.prepare('SELECT 1 FROM intake_runs WHERE job_id=?').get(jobId)?
+  {inline_keyboard:[[{text:'Запустить монтаж',callback_data:`ix:${jobId}`}]]}:undefined;
+
+async function kickExecutor(intake,api,actor){
+  try{await intake.startExecutor();return true;}
+  catch{await api.send(actor,'Исполнитель не запустился. Задание осталось в очереди; проверь ноутбук и открой /montage.');return false;}
+}
+
+async function startMontage(intake,data,actor,api){
+  if(!intake.startExecutor){await api.send(actor,'Монтаж на этом координаторе не подключён.');return {blocked:true};}
+  const jobId=data.slice(3),result=requestRun(intake.db,jobId,actor,intake.now());
+  if(result.refused){await api.send(actor,'Монтаж доступен только для подтверждённого комплекта.');return {refused:true};}
+  const run=result.run;
+  await api.send(actor,result.created?`Монтаж ${jobId} поставлен в очередь: ожидает. Бот остаётся доступен; о начале и результате сообщу.`:
+    `Монтаж ${jobId} уже в очереди: ${RUN_LABELS[run.state]}${run.error?` (${run.error})`:''}. Повтор не создаётся.`);
+  const started=run.state==='waiting'&&await kickExecutor(intake,api,actor);
+  return {queued:result.created,state:run.state,executorStarted:!!started};
+}
+
+async function redeliver(intake,data,actor,api){
+  if(!intake.startExecutor){await api.send(actor,'Монтаж на этом координаторе не подключён.');return {blocked:true};}
+  const jobId=data.slice(3),result=requestRedelivery(intake.db,jobId,actor);
+  if(result.refused){await api.send(actor,'Повтор отправки доступен только для готового монтажа.');return {refused:true};}
+  await api.send(actor,result.reset?`Повторяю отправку рилсов задания ${jobId}: ${result.reset}. Монтаж не повторяется.`:'Неотправленных рилсов нет.');
+  const started=result.reset>0&&await kickExecutor(intake,api,actor);
+  return {redelivery:result.reset,executorStarted:!!started};
+}
+
+async function montageStatus(intake,actor,api){
+  if(!intake.startExecutor){await api.send(actor,'Монтаж на этом координаторе не подключён.');return {blocked:true};}
+  const runs=intake.db.prepare(`SELECT r.*,j.topic_id FROM intake_runs r JOIN intake_jobs j ON j.id=r.job_id
+    WHERE r.requested_by=? ORDER BY r.rowid DESC LIMIT 10`).all(String(actor));
+  const ready=intake.db.prepare(`SELECT j.id,j.topic_id FROM intake_jobs j LEFT JOIN intake_runs r ON r.job_id=j.id
+    WHERE j.actor_id=? AND j.state='confirmed' AND r.job_id IS NULL ORDER BY j.rowid DESC LIMIT 5`).all(String(actor));
+  const buttons=[];
+  const lines=runs.map(r=>{
+    const d=intake.db.prepare('SELECT state,count(*) n FROM intake_deliveries WHERE job_id=? GROUP BY state').all(r.job_id);
+    const count=s=>d.find(x=>x.state===s)?.n??0;
+    if(r.state==='done'&&count('failed'))buttons.push([{text:`Повторить отправку ${r.job_id}`,callback_data:`id:${r.job_id}`}]);
+    return `${r.job_id} · ${r.topic_id}: ${RUN_LABELS[r.state]}${r.state==='running'&&r.step?` (шаг ${r.step})`:''}`+
+      (r.state==='done'?` · отправлено ${count('sent')} из ${d.reduce((n,x)=>n+x.n,0)}`:'')+(r.state==='failed'&&r.error?` — ${r.error}`:'');
+  });
+  for(const j of ready)buttons.push([{text:`Запустить монтаж ${j.id}`,callback_data:`ix:${j.id}`}]);
+  await api.send(actor,(lines.length?`Монтаж:\n${lines.join('\n')}`:'Запусков монтажа пока нет.')+
+    (ready.length?`\n\nПодтверждены, монтаж не запускался: ${ready.map(j=>`${j.id} · ${j.topic_id}`).join(', ')}.`:'')+
+    '\nПосле ошибки или перезапуска повтор автоматически не запускается.',buttons.length?{inline_keyboard:buttons}:undefined);
+  if(hasWork(intake.db))await kickExecutor(intake,api,actor);  // e.g. a worker that could not start earlier
+  return {runs:runs.length,ready:ready.length};
 }
 
 // Frozen launch request for the later executor, derived only from the confirmed DB row. An existing file counts
@@ -333,6 +389,7 @@ async function selectLocal(intake,data,actor,api){
 
 async function command(intake,text,actor,api){
   const [cmd,arg,...rest]=text.trim().split(/\s+/);
+  if(cmd==='/montage')return montageStatus(intake,actor,api);
   if(cmd==='/intake_local'){
     if(arg){await api.send(actor,'Пути и аргументы не принимаются: комплекты берутся только из настроенной папки входящих. Отправь /intake_local без текста.');return {rejected:'argument'};}
     return listLocal(intake,actor,api);
@@ -371,7 +428,7 @@ async function command(intake,text,actor,api){
 export async function handleFourPartIntake(update,actor,{api,intake}){
   const message=update.message,data=update.callback_query?.data??message?.text;
   const isFile=!!(message?.document||message?.video||message?.animation);
-  const isIntake=isFile||(typeof data==='string'&&(/^\/intake(_cancel|_local)?(\s|$)/.test(data)||/^il:[a-f0-9-]{36}$/.test(data)||/^ilp:(0|[1-9]\d{0,3})$/.test(data)||/^ir:[a-f0-9-]{36}:(body|h1|h2|h3)$/.test(data)||/^ic:tg-\d{8}-[a-f0-9]{8}:[1-9]\d{0,5}$/.test(data)));
+  const isIntake=isFile||(typeof data==='string'&&(/^\/(intake(_cancel|_local)?|montage)(\s|$)/.test(data)||/^i[xd]:tg-\d{8}-[a-f0-9]{8}$/.test(data)||/^il:[a-f0-9-]{36}$/.test(data)||/^ilp:(0|[1-9]\d{0,3})$/.test(data)||/^ir:[a-f0-9-]{36}:(body|h1|h2|h3)$/.test(data)||/^ic:tg-\d{8}-[a-f0-9]{8}:[1-9]\d{0,5}$/.test(data)));
   if(!isIntake)return null;
   if(!intake){await api.send(actor,'Приём файлов на этом координаторе не подключён.');return {blocked:true};}
   try{
@@ -380,6 +437,8 @@ export async function handleFourPartIntake(update,actor,{api,intake}){
     if(data.startsWith('ic:'))return await confirm(intake,data,actor,api);
     if(data.startsWith('il:'))return await selectLocal(intake,data,actor,api);
     if(data.startsWith('ilp:'))return await listLocal(intake,actor,api,Number(data.slice(4)));
+    if(data.startsWith('ix:'))return await startMontage(intake,data,actor,api);
+    if(data.startsWith('id:'))return await redeliver(intake,data,actor,api);
     return await command(intake,data,actor,api);
   }catch(error){
     // Replies keep the panel's delivery semantics; a transient download error retries the poll from its cursor.

@@ -2,6 +2,9 @@
 // Explicitly deployed persistent trusted coordinator only. Never an Actions runner
 // or a Windows host given copied cloud secrets. No network call at module import.
 import path from 'node:path';
+import {spawn} from 'node:child_process';
+import {closeSync,openSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {mkdir,chmod} from 'node:fs/promises';
 import {ProductionQueue} from './production-queue.mjs';
 import {withLock} from './source-uploader.mjs';
@@ -13,6 +16,18 @@ import {readReviewStatuses} from './review-status-reader.mjs';
 import {runTelegramPoller} from './telegram-poll-recovery.mjs';
 import {readCandidateCatalog} from './telegram-candidates.mjs';
 import {FourPartIntake,launcherPlanner} from './telegram-intake.mjs';
+
+// Montage runs in its own detached process so polling stays responsive during ASR and rendering.
+function detachedExecutor(stateDir){
+  return ()=>new Promise((resolve,reject)=>{
+    const log=openSync(path.join(stateDir,`executor-${new Date().toISOString().replace(/[:.]/g,'-')}.log`),'a');
+    try{
+      const child=spawn(process.execPath,['scripts/run-intake-executor.mjs','--windows'],{cwd:path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),
+        detached:true,windowsHide:true,stdio:['ignore',log,log],env:process.env});
+      child.once('spawn',()=>{child.unref();resolve();});child.once('error',reject);
+    }finally{closeSync(log);}
+  });
+}
 
 async function main(){
   const mode=process.argv[2],windows=mode?.startsWith('--windows-');
@@ -40,7 +55,9 @@ async function main(){
     const intakeRoot=windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-intake'):process.env.ROMAN_TELEGRAM_INTAKE_DIR;
     const inbox=windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-inbox'):process.env.ROMAN_TELEGRAM_INBOX_DIR;
     const intake=intakeRoot&&path.isAbsolute(intakeRoot)?new FourPartIntake(queue.db,{root:intakeRoot,inbox:inbox&&path.isAbsolute(inbox)?inbox:undefined,
-      plan:launcherPlanner({python:process.env.ROMAN_INTAKE_PYTHON||(windows?path.join(process.env.LOCALAPPDATA,'RomanReels','asr-env','Scripts','python.exe'):'python3')})}):undefined;
+      plan:launcherPlanner({python:process.env.ROMAN_INTAKE_PYTHON||(windows?path.join(process.env.LOCALAPPDATA,'RomanReels','asr-env','Scripts','python.exe'):'python3')}),
+      // Only the long-running Windows coordinator offers montage; a one-poll probe never starts it.
+      startExecutor:mode==='--windows-serve'?detachedExecutor(path.dirname(file)):undefined}):undefined;
     try{
       await runTelegramPoller({identify:()=>api.identity(config?.botUsername),
         poll:botId=>pollTelegramPanelOnce({api,botId,queue,allowedOperatorIds:ids,
