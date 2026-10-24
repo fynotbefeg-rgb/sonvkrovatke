@@ -4,7 +4,8 @@
 import path from 'node:path';
 import {execFile} from 'node:child_process';
 import {createHash,randomBytes,randomUUID} from 'node:crypto';
-import {mkdirSync,readFileSync,renameSync,writeFileSync,existsSync} from 'node:fs';
+import {closeSync,existsSync,fsyncSync,mkdirSync,openSync,readFileSync,renameSync,rmSync,writeSync} from 'node:fs';
+import {isDeepStrictEqual} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {TELEGRAM_CLOUD_DOWNLOAD_LIMIT,TelegramApiError} from './telegram-bot-api.mjs';
 
@@ -49,6 +50,13 @@ const roleButtons=fileId=>({inline_keyboard:[
   [{text:ROLES.body,callback_data:`ir:${fileId}:body`}],
   [{text:ROLES.h1,callback_data:`ir:${fileId}:h1`},{text:ROLES.h2,callback_data:`ir:${fileId}:h2`},{text:ROLES.h3,callback_data:`ir:${fileId}:h3`}]]});
 
+// Temp file in the same folder, flushed, then renamed: readers see the old or the complete new file.
+function writeAtomic(file,text){
+  const temp=`${file}.${randomUUID()}.tmp`;
+  try{const fd=openSync(temp,'wx');try{writeSync(fd,text);fsyncSync(fd);}finally{closeSync(fd);}renameSync(temp,file);}
+  finally{rmSync(temp,{force:true});}
+}
+
 function summary(job,report){
   const lines=PARTS.map(p=>{const i=report.inputs[p],m=i.metadata;
     return `${ROLES[p]}: ${mb(i.bytes)} МБ · ${m.duration.toFixed(2)} с · ${m.width}×${m.height} · SHA ${i.sha256.slice(0,8)}`;});
@@ -73,9 +81,15 @@ async function runPlan(intake,job,api,actor){
     .run(version,JSON.stringify(result.report),job.id,job.plan_version).changes;
   if(Number(changed)!==1)return {planned:false};
   const record=path.join(intake.jobDir(job.id),`plan-v${version}.json`);
-  if(!existsSync(record))writeFileSync(record,JSON.stringify(result.report,null,2)+'\n',{flag:'wx'});
-  await api.send(actor,summary(job,result.report),{inline_keyboard:[[{text:'Подтвердить запуск',callback_data:`ic:${job.id}:${version}`}]]});
-  return {planned:true,planVersion:version};
+  if(!existsSync(record))writeAtomic(record,JSON.stringify(result.report,null,2)+'\n');
+  return {planned:true,...await sendSummary(intake,job.id,api,actor)};
+}
+
+// The saved plan is the source of the summary: a lost reply is re-sent from the DB, never planned again.
+async function sendSummary(intake,jobId,api,actor){
+  const job=intake.db.prepare(`SELECT * FROM intake_jobs WHERE id=? AND state='plan_ready'`).get(jobId);
+  await api.send(actor,summary(job,JSON.parse(job.plan)),{inline_keyboard:[[{text:'Подтвердить запуск',callback_data:`ic:${job.id}:${job.plan_version}`}]]});
+  return {summarySent:true,planVersion:job.plan_version};
 }
 
 async function receiveFile(intake,update,actor,api){
@@ -131,6 +145,7 @@ async function assignRole(intake,data,actor,api){
   await api.send(actor,`«${file.name}» → ${ROLES[role]}${changed?'':' (уже было)'}\n${text}`+
     (missing.length?`\n\nНе хватает: ${missing.map(p=>ROLES[p]).join(', ')}. Запуск недоступен, пока комплект неполный.`:''));
   if(!missing.length&&job.state==='collecting')return {assigned:true,...await runPlan(intake,job,api,actor)};
+  if(!missing.length&&job.state==='plan_ready')return {assigned:true,restored:true,...await sendSummary(intake,job.id,api,actor)};
   return {assigned:true,missing:missing.length};
 }
 
@@ -139,9 +154,10 @@ async function confirm(intake,data,actor,api){
   const job=intake.db.prepare('SELECT * FROM intake_jobs WHERE id=? AND actor_id=?').get(jobId,String(actor));
   if(!job){await api.send(actor,'Комплект не найден.');return {stale:true};}
   if(job.state==='confirmed'){
-    ensureConfirmation(intake,job);
-    await api.send(actor,`Комплект ${job.id} уже подтверждён (${job.confirmed_at}). Повторное нажатие ничего не запускает.`);
-    return {alreadyConfirmed:true};
+    const restored=ensureConfirmation(intake,job);
+    await api.send(actor,`Комплект ${job.id} уже подтверждён (${job.confirmed_at}). Повторное нажатие ничего не запускает.`+
+      (restored?'\nФайл фиксации восстановлен из подтверждённого состояния.':''));
+    return {alreadyConfirmed:true,confirmationRestored:restored};
   }
   if(job.state!=='plan_ready'||String(job.plan_version)!==version){
     await api.send(actor,'Кнопка устарела: комплект изменился или отменён. Подтверждай последнюю сводку.');return {stale:true};
@@ -162,15 +178,18 @@ async function confirm(intake,data,actor,api){
   return {confirmed:true,executeStarted:false};
 }
 
-// Frozen launch request for the later executor; written once, never overwritten.
+// Frozen launch request for the later executor, derived only from the confirmed DB row. An existing file counts
+// only if it parses to exactly that content; a missing or damaged file is rewritten atomically. Returns true if rewritten.
 function ensureConfirmation(intake,job){
   const file=path.join(intake.jobDir(job.id),'confirmed.json');
-  if(existsSync(file))return;
   const report=JSON.parse(job.plan);
-  writeFileSync(file,JSON.stringify({schemaVersion:'1.0.0',jobId:job.id,topicId:job.topic_id,confirmedAt:job.confirmed_at,
+  const expected={schemaVersion:'1.0.0',jobId:job.id,topicId:job.topic_id,confirmedAt:job.confirmed_at,
     confirmedBy:job.actor_id,planVersion:job.plan_version,launcher:'run-local-four-part.py',out:report.output,
     parts:Object.fromEntries(PARTS.map(p=>[p,{path:report.inputs[p].path,sha256:report.inputs[p].sha256,bytes:report.inputs[p].bytes}])),
-    executeStarted:false,productionReady:false,approvalStatus:'pending_approval'},null,2)+'\n',{flag:'wx'});
+    executeStarted:false,productionReady:false,approvalStatus:'pending_approval'};
+  try{if(isDeepStrictEqual(JSON.parse(readFileSync(file,'utf8')),expected))return false;}catch{}
+  writeAtomic(file,JSON.stringify(expected,null,2)+'\n');
+  return true;
 }
 
 async function command(intake,text,actor,api){
@@ -187,6 +206,7 @@ async function command(intake,text,actor,api){
     await api.send(actor,`${arg?'Уже открыт комплект':'Комплект'} ${job.id} · тема ${job.topic_id}\n${status}\n\n`+
       (missing.length?`Не хватает: ${missing.map(p=>ROLES[p]).join(', ')}.`:job.state==='plan_ready'?'Комплект проверен, ждёт подтверждения.':'Все роли назначены.')+
       (arg?'\nНовый комплект — после /intake_cancel.':''));
+    if(job.state==='plan_ready')return {status:true,restored:true,...await sendSummary(intake,job.id,api,actor)};
     return {status:true};
   }
   if(!arg||rest.length||!TOPIC.test(arg)){

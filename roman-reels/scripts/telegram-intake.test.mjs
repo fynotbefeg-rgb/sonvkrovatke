@@ -25,11 +25,12 @@ for(const [i,part] of ['body','h1','h2','h3'].entries()){
 test.after(()=>rmSync(fixtures,{recursive:true,force:true}));
 const incomingBefore=existsSync(incoming)?readdirSync(incoming).sort():[];
 
-function setup(t,{plan,files={}}={}){
-  const root=mkdtempSync(path.join(tmpdir(),'intake-root-'));
-  const queue=new ProductionQueue(':memory:');
-  t.after(()=>{queue.close();rmSync(root,{recursive:true,force:true});});
-  const sent=[],calls=[];let batch=[],failFile=null;
+function setup(t,{plan,files={},db=':memory:',root}={}){
+  const owned=!root;root??=mkdtempSync(path.join(tmpdir(),'intake-root-'));
+  const queue=new ProductionQueue(db);let closed=false;
+  const close=()=>{if(!closed){closed=true;queue.close();}};
+  t.after(()=>{close();if(owned)rmSync(root,{recursive:true,force:true});});
+  const sent=[],calls=[];let batch=[],failFile=null,failSend=null;
   const api=telegramApi({token,fetchImpl:async(url,options)=>{
     assert.equal(options.redirect,'error');
     if(url.startsWith(`https://api.telegram.org/file/bot${token}/`)){
@@ -37,7 +38,7 @@ function setup(t,{plan,files={}}={}){
       return new Response(files[name]??readFileSync(sources[name.replace('.mp4','')]));
     }
     const method=url.split('/').at(-1),body=JSON.parse(options.body);calls.push({method,body});
-    if(method==='sendMessage')sent.push(body);
+    if(method==='sendMessage'){if(failSend?.(body)){failSend=null;throw Error('lost reply');}sent.push(body);}
     if(method==='getFile'){
       if(failFile)return new Response(JSON.stringify({ok:false,error_code:failFile,description:'x'}),{status:failFile});
       const name=`${body.file_id.replace('id_','')}.mp4`,size=(files[name]??readFileSync(sources[name.replace('.mp4','')])).length;
@@ -50,7 +51,7 @@ function setup(t,{plan,files={}}={}){
   let nextId=1;
   const deliver=async u=>{batch=[{update_id:nextId++,...u}];return handleTelegramPanel((await api.updates(0))[0],options);};
   const chat={from:{id:123},chat:{id:123,type:'private'}};
-  return {root,queue,intake,api,sent,calls,options,failFile:code=>failFile=code,
+  return {root,queue,intake,api,sent,calls,options,close,failFile:code=>failFile=code,failSend:when=>failSend=when,
     text:text=>deliver({message:{...chat,text}}),
     doc:(part,{name=`HeyGen ${part}.mp4`,size,mime='video/mp4'}={})=>{
       const bytes=files[`${part}.mp4`]??(sources[part]&&readFileSync(sources[part]));
@@ -152,4 +153,45 @@ test('outsiders and group chats get nothing; intake folder must stay outside Git
   for(const u of await fake.updates(0))assert.equal((await handleTelegramPanel(u,h.options)).ignored,true);
   assert.equal(h.sent.length,0);assert.equal(h.intake.db.prepare('SELECT count(*) n FROM intake_jobs').get().n,0);
   assert.throws(()=>new FourPartIntake(h.queue.db,{root:path.resolve(incoming,'..'),plan:()=>{}}),/outside the Git/);
+});
+
+test('lost summary reply is restored from the saved plan after reopening the DB, without planning again',async t=>{
+  const dir=mkdtempSync(path.join(tmpdir(),'intake-reopen-'));
+  const db=path.join(dir,'queue.sqlite'),root=path.join(dir,'intake'),real=launcherPlanner({python});
+  let plans=0;const plan=async args=>{plans++;return real(args);};
+  const h=setup(t,{db,root,plan});let r;
+  t.after(()=>{h.close();r?.close();rmSync(dir,{recursive:true,force:true});});  // Windows: close SQLite before deleting
+  await h.text('/intake roman-seo-01');
+  for(const part of ['body','h1','h2']){await h.doc(part);await h.press(h.lastButtons().find(b=>b.endsWith(`:${part}`)));}
+  await h.doc('h3');const role=h.lastButtons().find(b=>b.endsWith(':h3'));
+  h.failSend(body=>body.text.includes('режиме плана'));
+  await assert.rejects(h.press(role,'cb-h3'),/Telegram request failed/);  // poll stops before advancing its cursor
+  assert.equal(plans,1);assert.equal(h.sent.some(m=>m.text.includes('режиме плана')),false);
+  h.close();
+  r=setup(t,{db,root,plan});
+  await r.press(role,'cb-h3');  // the same callback delivered again
+  const [button]=r.lastButtons();
+  assert.match(button,/^ic:tg-20261024-[a-f0-9]{8}:1$/);assert.match(r.sent.at(-1).text,/режиме плана/);
+  await r.text('/intake');assert.equal(r.lastButtons()[0],button);assert.match(r.sent.at(-1).text,/режиме плана/);
+  assert.equal(plans,1,'no second launcher plan');
+  assert.equal((await r.press(button,'cb-ok')).confirmed,true);
+});
+
+test('confirmed.json is trusted only by content and restored from the DB without a second confirmation',async t=>{
+  const h=setup(t);await fullKit(h);const [button]=h.lastButtons();
+  assert.equal((await h.press(button,'cb-1')).confirmed,true);
+  const job=h.intake.db.prepare('SELECT * FROM intake_jobs').get(),dir=path.join(h.root,job.id),file=path.join(dir,'confirmed.json');
+  const good=readFileSync(file,'utf8');
+  for(const damage of [()=>rmSync(file),()=>writeFileSync(file,good.slice(0,good.length>>1)),
+    ()=>writeFileSync(file,good.replace('"executeStarted": false','"executeStarted": true'))]){
+    damage();
+    const result=await h.press(button,'cb-again');
+    assert.equal(result.alreadyConfirmed,true);assert.equal(result.confirmationRestored,true);
+    assert.match(h.sent.at(-1).text,/уже подтверждён.*восстановлен/s);
+    assert.equal(readFileSync(file,'utf8'),good);
+  }
+  assert.equal((await h.press(button,'cb-intact')).confirmationRestored,false);
+  const after=h.intake.db.prepare('SELECT * FROM intake_jobs').get();
+  assert.equal(after.confirmed_at,job.confirmed_at);assert.equal(after.state,'confirmed');
+  assert.deepEqual(readdirSync(dir).sort(),['confirmed.json','files','plan-v1.json'],'no temp files left');
 });
