@@ -38,7 +38,8 @@ async function main(){
     // Kit folders stay outside Git next to the private DB; the launcher is only called in plan mode,
     // with the same Python environment the laptop's ASR runs use.
     const intakeRoot=windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-intake'):process.env.ROMAN_TELEGRAM_INTAKE_DIR;
-    const intake=intakeRoot&&path.isAbsolute(intakeRoot)?new FourPartIntake(queue.db,{root:intakeRoot,
+    const inbox=windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-inbox'):process.env.ROMAN_TELEGRAM_INBOX_DIR;
+    const intake=intakeRoot&&path.isAbsolute(intakeRoot)?new FourPartIntake(queue.db,{root:intakeRoot,inbox:inbox&&path.isAbsolute(inbox)?inbox:undefined,
       plan:launcherPlanner({python:process.env.ROMAN_INTAKE_PYTHON||(windows?path.join(process.env.LOCALAPPDATA,'RomanReels','asr-env','Scripts','python.exe'):'python3')})}):undefined;
     try{
       await runTelegramPoller({identify:()=>api.identity(config?.botUsername),

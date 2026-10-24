@@ -1,10 +1,12 @@
-// Four-MP4 intake over the authenticated panel: Основа / Хук 1 / Хук 2 / Хук 3 assigned by explicit buttons.
+// Four-MP4 intake over the authenticated panel: Основа / Хук 1 / Хук 2 / Хук 3 assigned by explicit buttons,
+// or a local kit from one configured inbox folder whose kit.json maps the four files to roles.
 // Files go to one new private folder per kit outside Git; the existing run-local-four-part.py checks the kit
 // in plan mode only. Confirmation freezes the checked kit once. No ASR, render, Drive, Google or HeyGen here.
 import path from 'node:path';
 import {execFile} from 'node:child_process';
 import {createHash,randomBytes,randomUUID} from 'node:crypto';
-import {closeSync,existsSync,fsyncSync,mkdirSync,openSync,readFileSync,renameSync,rmSync,writeSync} from 'node:fs';
+import {closeSync,constants,copyFileSync,existsSync,fsyncSync,lstatSync,mkdirSync,openSync,readdirSync,readFileSync,readSync,
+  realpathSync,renameSync,rmSync,writeSync} from 'node:fs';
 import {isDeepStrictEqual} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {TELEGRAM_CLOUD_DOWNLOAD_LIMIT,TelegramApiError} from './telegram-bot-api.mjs';
@@ -17,16 +19,35 @@ const OPEN=`state IN ('collecting','plan_ready')`;
 const mb=n=>(n/1048576).toFixed(1).replace('.',',');
 const limitText=`до ${TELEGRAM_CLOUD_DOWNLOAD_LIMIT/1048576} МБ каждый (предел облачного Bot API для ботов)`;
 const REPO=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..','..');
-const sha256=file=>{try{return createHash('sha256').update(readFileSync(file)).digest('hex');}catch{return null;}};  // missing file counts as changed
+// Streamed, so local originals larger than memory-friendly sizes are fine; a missing file counts as changed.
+function sha256(file){
+  try{
+    const fd=openSync(file,'r'),hash=createHash('sha256'),buffer=Buffer.allocUnsafe(1048576);
+    try{let n;while((n=readSync(fd,buffer,0,buffer.length,null))>0)hash.update(buffer.subarray(0,n));}finally{closeSync(fd);}
+    return hash.digest('hex');
+  }catch{return null;}
+}
+const outside=(child,parent)=>{const r=path.relative(parent,child);return !!r&&(r.startsWith('..')||path.isAbsolute(r));};
+// Local kits: <inbox>/<kit>/kit.json = {"topicId":"…","parts":{"body":"…mp4","h1":…,"h2":…,"h3":…}}.
+// Names come only from the inbox listing and the manifest, never from Telegram text or callbacks.
+const KIT=/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
+const KIT_FILE=/^[\p{L}\p{N}][\p{L}\p{N} ._()-]{0,119}\.mp4$/iu;  // any alphabet; no separators, ':' or control characters
+const LOCAL_MAX_BYTES=4*1024**3;
+const MAX_KITS=10;
+const OFFER_TTL_MS=900000;
 
 export class FourPartIntake {
   // db: the existing ProductionQueue SQLite handle; one database and one polling lock for the bot.
-  constructor(db,{root,plan,now=()=>new Date()}={}) {
+  constructor(db,{root,inbox,plan,now=()=>new Date()}={}) {
     if(typeof root!=='string'||!path.isAbsolute(root))throw Error('Absolute private intake folder required');
-    const inRepo=path.relative(REPO,path.resolve(root));
-    if(!inRepo||!inRepo.startsWith('..')&&!path.isAbsolute(inRepo))throw Error('Intake folder must stay outside the Git work tree');
+    if(!outside(path.resolve(root),REPO))throw Error('Intake folder must stay outside the Git work tree');
+    if(inbox!==undefined){
+      if(typeof inbox!=='string'||!path.isAbsolute(inbox))throw Error('Absolute local kit inbox required');
+      if(!outside(path.resolve(inbox),REPO))throw Error('Local kit inbox must stay outside the Git work tree');
+      if(!outside(path.resolve(inbox),path.resolve(root))||!outside(path.resolve(root),path.resolve(inbox)))throw Error('Inbox and intake folders must be separate');
+    }
     if(typeof plan!=='function')throw Error('Launcher plan runner required');
-    Object.assign(this,{db,root,plan,now});
+    Object.assign(this,{db,root,inbox,plan,now});
     db.exec(`CREATE TABLE IF NOT EXISTS intake_jobs (
         id TEXT PRIMARY KEY, actor_id TEXT NOT NULL, topic_id TEXT NOT NULL, state TEXT NOT NULL,
         plan_version INTEGER NOT NULL DEFAULT 0, plan TEXT, created_at TEXT NOT NULL, confirmed_at TEXT);
@@ -34,7 +55,10 @@ export class FourPartIntake {
       CREATE TABLE IF NOT EXISTS intake_files (
         id TEXT PRIMARY KEY, job_id TEXT NOT NULL, file_unique_id TEXT NOT NULL, role TEXT,
         name TEXT NOT NULL, bytes INTEGER NOT NULL, local_path TEXT NOT NULL, UNIQUE(job_id,file_unique_id));
-      CREATE UNIQUE INDEX IF NOT EXISTS intake_one_role ON intake_files(job_id,role) WHERE role IS NOT NULL;`);
+      CREATE UNIQUE INDEX IF NOT EXISTS intake_one_role ON intake_files(job_id,role) WHERE role IS NOT NULL;
+      CREATE TABLE IF NOT EXISTS intake_offers (
+        id TEXT PRIMARY KEY, actor_id TEXT NOT NULL, kit TEXT NOT NULL, topic_id TEXT NOT NULL,
+        parts TEXT NOT NULL, expires_at INTEGER NOT NULL, job_id TEXT);`);
   }
   openJob(actor){return this.db.prepare(`SELECT * FROM intake_jobs WHERE actor_id=? AND ${OPEN}`).get(actor);}
   files(jobId){return this.db.prepare('SELECT * FROM intake_files WHERE job_id=? ORDER BY rowid').all(jobId);}
@@ -73,7 +97,8 @@ async function runPlan(intake,job,api,actor){
   catch{result={ok:false,error:'запускатель недоступен'};}
   if(!result?.ok){
     await api.send(actor,`Комплект не прошёл проверку запускателем: ${String(result?.error??'неизвестная ошибка').slice(0,300)}\n`+
-      'Замени файл и назначь роль заново (или нажми роль ещё раз, чтобы повторить проверку). Ничего не запущено.');
+      'Замени файл и назначь роль заново (или нажми роль ещё раз, чтобы повторить проверку); локальный комплект — '+
+      '/intake_cancel, исправь папку и /intake_local. Ничего не запущено.');
     return {planned:false};
   }
   const version=job.plan_version+1;
@@ -192,8 +217,126 @@ function ensureConfirmation(intake,job){
   return true;
 }
 
+// One kit folder directly inside the inbox; symlinks and anything resolving elsewhere are refused.
+function readKit(inbox,kit){
+  if(!KIT.test(kit))return {ok:false,reason:'недопустимое имя папки'};
+  const base=realpathSync(inbox),dir=path.join(base,kit);
+  const info=lstatSync(dir,{throwIfNoEntry:false});
+  if(!info?.isDirectory()||info.isSymbolicLink()||path.dirname(realpathSync(dir))!==base)return {ok:false,reason:'не папка внутри входящей'};
+  const manifestFile=path.join(dir,'kit.json'),manifestInfo=lstatSync(manifestFile,{throwIfNoEntry:false});
+  if(!manifestInfo?.isFile()||manifestInfo.size>65536)return {ok:false,reason:'нет kit.json'};
+  let manifest;
+  try{manifest=JSON.parse(readFileSync(manifestFile,'utf8'));}catch{return {ok:false,reason:'kit.json не читается'};}
+  if(!manifest||typeof manifest!=='object'||Object.keys(manifest).some(k=>!['topicId','parts'].includes(k))||
+    typeof manifest.topicId!=='string'||!TOPIC.test(manifest.topicId)||!manifest.parts||typeof manifest.parts!=='object'||Array.isArray(manifest.parts))
+    return {ok:false,reason:'kit.json: нужны topicId латиницей и parts'};
+  const extra=Object.keys(manifest.parts).filter(k=>!PARTS.includes(k));
+  if(extra.length)return {ok:false,reason:`kit.json: лишние роли ${extra.join(', ').slice(0,60)}`};
+  const missing=PARTS.filter(p=>manifest.parts[p]===undefined);
+  if(missing.length)return {ok:false,reason:`неполный, нет: ${missing.map(p=>ROLES[p]).join(', ')}`};
+  const parts={},seen=new Set();
+  for(const p of PARTS){
+    const name=manifest.parts[p];
+    // Plain file name in the kit folder only: no separators, drive letters, '..' or symlinks.
+    if(typeof name!=='string'||!KIT_FILE.test(name)||path.basename(name)!==name||name.includes('..'))
+      return {ok:false,reason:`${ROLES[p]}: недопустимое имя файла`};
+    if(seen.has(name.toLowerCase()))return {ok:false,reason:'один файл назначен двум ролям'};
+    seen.add(name.toLowerCase());
+    const file=path.join(dir,name),stat=lstatSync(file,{throwIfNoEntry:false});
+    if(!stat)return {ok:false,reason:`неполный, нет файла: ${ROLES[p]}`};
+    if(!stat.isFile()||stat.isSymbolicLink()||path.dirname(realpathSync(file))!==realpathSync(dir))return {ok:false,reason:`${ROLES[p]}: файл вне папки комплекта`};
+    if(stat.size<1||stat.size>LOCAL_MAX_BYTES)return {ok:false,reason:`${ROLES[p]}: размер вне допустимого`};
+    parts[p]={name,bytes:stat.size,sha256:sha256(file),source:file};
+  }
+  return {ok:true,topicId:manifest.topicId,parts};
+}
+
+// Pages over every kit folder, valid or not, so old or broken folders never hide later kits.
+async function listLocal(intake,actor,api,page=0){
+  if(!intake.inbox){await api.send(actor,'Папка входящих комплектов на этом координаторе не настроена.');return {blocked:true};}
+  if(intake.openJob(String(actor))){await api.send(actor,'Уже открыт комплект. Сначала заверши его или /intake_cancel.');return {blocked:true};}
+  let all;
+  try{all=readdirSync(intake.inbox,{withFileTypes:true}).filter(e=>e.isDirectory()&&KIT.test(e.name)).map(e=>e.name).sort();}
+  catch{await api.send(actor,'Папка входящих комплектов недоступна.');return {blocked:true};}
+  const pages=Math.max(1,Math.ceil(all.length/MAX_KITS));
+  if(page>=pages){await api.send(actor,'Такой страницы списка нет. Открой /intake_local заново.');return {stale:true};}
+  const entries=all.slice(page*MAX_KITS,(page+1)*MAX_KITS);
+  const now=intake.now().getTime(),buttons=[],rejected=[];
+  for(const kit of entries){
+    let result;
+    try{result=readKit(intake.inbox,kit);}catch{result={ok:false,reason:'не читается'};}
+    if(!result.ok){rejected.push(`✗ ${kit}: ${result.reason}`);continue;}
+    const id=randomUUID(),parts=Object.fromEntries(PARTS.map(p=>[p,{name:result.parts[p].name,bytes:result.parts[p].bytes,sha256:result.parts[p].sha256}]));
+    intake.db.prepare('INSERT INTO intake_offers VALUES (?,?,?,?,?,?,NULL)').run(id,String(actor),kit,result.topicId,JSON.stringify(parts),now+OFFER_TTL_MS);
+    const total=PARTS.reduce((n,p)=>n+parts[p].bytes,0);
+    buttons.push([{text:`${kit} · ${result.topicId} · ${mb(total)} МБ`,callback_data:`il:${id}`}]);
+  }
+  const nav=[...(page>0?[{text:'Назад',callback_data:`ilp:${page-1}`}]:[]),...(page+1<pages?[{text:'Далее',callback_data:`ilp:${page+1}`}]:[])];
+  if(nav.length)buttons.push(nav);
+  await api.send(actor,(pages>1?`Страница ${page+1} из ${pages} (папок: ${all.length}).\n`:'')+
+    (buttons.length-(nav.length?1:0)?`Готовые локальные комплекты: ${buttons.length-(nav.length?1:0)}. Выбери один — файлы будут скопированы в папку задания и проверены запускателем в режиме плана.`:
+    `Готовых локальных комплектов ${pages>1?'на этой странице ':''}нет.`)+(rejected.length?`\n\nНе приняты:\n${rejected.join('\n')}`:''),buttons.length?{inline_keyboard:buttons}:undefined);
+  return {offered:buttons.length-(nav.length?1:0),rejected:rejected.length,page,pages};
+}
+
+async function selectLocal(intake,data,actor,api){
+  const offer=intake.db.prepare('SELECT * FROM intake_offers WHERE id=? AND actor_id=?').get(data.slice(3),String(actor));
+  if(!offer){await api.send(actor,'Кнопка устарела. Открой /intake_local.');return {stale:true};}
+  if(offer.job_id){  // replay or double click: continue the existing job, never copy again
+    const job=intake.db.prepare('SELECT * FROM intake_jobs WHERE id=?').get(offer.job_id);
+    if(job.state==='plan_ready')return {replayed:true,...await sendSummary(intake,job.id,api,actor)};
+    // Saved but the reply was lost before the plan: check the existing copies now.
+    if(job.state==='collecting'&&!intake.status(job).missing.length)return {replayed:true,...await runPlan(intake,job,api,actor)};
+    await api.send(actor,`Этот выбор уже создал комплект ${job.id} (${job.state==='confirmed'?'подтверждён':job.state==='cancelled'?'отменён':'на проверке'}). Повтор ничего не копирует.`);
+    return {replayed:true};
+  }
+  if(offer.expires_at<=intake.now().getTime()){await api.send(actor,'Список устарел. Открой /intake_local заново.');return {stale:true};}
+  if(intake.openJob(String(actor))){await api.send(actor,'Уже открыт комплект. Сначала заверши его или /intake_cancel.');return {blocked:true};}
+  const offered=JSON.parse(offer.parts);
+  const taken=intake.db.prepare(`SELECT o.job_id FROM intake_offers o JOIN intake_jobs j ON j.id=o.job_id
+    WHERE o.kit=? AND o.parts=? AND j.state!='cancelled'`).get(offer.kit,offer.parts);
+  if(taken){await api.send(actor,`Этот комплект уже взят в задание ${taken.job_id}. Повторно не копирую.`);return {duplicate:true};}
+  const current=readKit(intake.inbox,offer.kit);
+  const changed=current.ok?PARTS.find(p=>['name','bytes','sha256'].some(k=>current.parts[p][k]!==offered[p][k])):null;
+  if(!current.ok||changed||current.topicId!==offer.topic_id){
+    await api.send(actor,`Комплект ${offer.kit} изменился после показа списка${changed?`: ${ROLES[changed]}`:current.ok?'':` (${current.reason})`}. `+
+      'Открой /intake_local заново. Ничего не скопировано.');
+    return {stale:true,changed:changed??true};
+  }
+  const day=intake.now().toISOString().slice(0,10).replaceAll('-','');
+  const id=`tg-${day}-${randomBytes(4).toString('hex')}`,files=path.join(intake.jobDir(id),'files');
+  mkdirSync(files,{recursive:true});
+  const copies={};
+  for(const p of PARTS){
+    const target=path.join(files,`${randomUUID()}.mp4`);
+    copyFileSync(current.parts[p].source,target,constants.COPYFILE_EXCL);
+    if(sha256(target)!==offered[p].sha256){
+      rmSync(intake.jobDir(id),{recursive:true,force:true});  // only the folder created just now for this job
+      await api.send(actor,`${ROLES[p]}: копия не совпала по SHA-256 с исходником (файл менялся во время копирования). Открой /intake_local заново.`);
+      return {stale:true,changed:p};
+    }
+    copies[p]=target;
+  }
+  const db=intake.db;
+  db.exec('BEGIN IMMEDIATE');
+  try{
+    if(Number(db.prepare('UPDATE intake_offers SET job_id=? WHERE id=? AND job_id IS NULL').run(id,offer.id).changes)!==1)throw Error('Offer already used');
+    db.prepare(`INSERT INTO intake_jobs (id,actor_id,topic_id,state,created_at) VALUES (?,?,?,'collecting',?)`).run(id,String(actor),offer.topic_id,intake.now().toISOString());
+    for(const p of PARTS)db.prepare('INSERT INTO intake_files VALUES (?,?,?,?,?,?,?)')
+      .run(randomUUID(),id,`local-${p}`,p,`${offer.kit}/${offered[p].name}`,offered[p].bytes,copies[p]);
+    db.exec('COMMIT');
+  }catch(error){db.exec('ROLLBACK');throw error;}
+  const job=intake.openJob(String(actor));
+  await api.send(actor,`Комплект ${id} · тема ${offer.topic_id} из локальной папки ${offer.kit}\n${intake.status(job).text}\nКопии совпали по SHA-256, проверяю запускателем.`);
+  return {local:true,...await runPlan(intake,job,api,actor)};
+}
+
 async function command(intake,text,actor,api){
   const [cmd,arg,...rest]=text.trim().split(/\s+/);
+  if(cmd==='/intake_local'){
+    if(arg){await api.send(actor,'Пути и аргументы не принимаются: комплекты берутся только из настроенной папки входящих. Отправь /intake_local без текста.');return {rejected:'argument'};}
+    return listLocal(intake,actor,api);
+  }
   const job=intake.openJob(String(actor));
   if(cmd==='/intake_cancel'){
     if(!job){await api.send(actor,'Открытого комплекта нет.');return {ignored:true};}
@@ -204,9 +347,10 @@ async function command(intake,text,actor,api){
   if(job){
     const {missing,text:status}=intake.status(job);
     await api.send(actor,`${arg?'Уже открыт комплект':'Комплект'} ${job.id} · тема ${job.topic_id}\n${status}\n\n`+
-      (missing.length?`Не хватает: ${missing.map(p=>ROLES[p]).join(', ')}.`:job.state==='plan_ready'?'Комплект проверен, ждёт подтверждения.':'Все роли назначены.')+
+      (missing.length?`Не хватает: ${missing.map(p=>ROLES[p]).join(', ')}.`:job.state==='plan_ready'?'Комплект проверен, ждёт подтверждения.':'Все роли назначены, проверяю запускателем.')+
       (arg?'\nНовый комплект — после /intake_cancel.':''));
     if(job.state==='plan_ready')return {status:true,restored:true,...await sendSummary(intake,job.id,api,actor)};
+    if(!missing.length)return {status:true,...await runPlan(intake,job,api,actor)};  // e.g. reply lost before the plan
     return {status:true};
   }
   if(!arg||rest.length||!TOPIC.test(arg)){
@@ -219,7 +363,7 @@ async function command(intake,text,actor,api){
   intake.db.prepare(`INSERT INTO intake_jobs (id,actor_id,topic_id,state,created_at) VALUES (?,?,?,'collecting',?)`)
     .run(id,String(actor),arg,intake.now().toISOString());
   await api.send(actor,`Комплект ${id} · тема ${arg}\nПришли четыре MP4 как файлы (документом, не «видео»), ${limitText}. `+
-    'После каждого файла выбери роль: Основа, Хук 1, Хук 2 или Хук 3.');
+    'После каждого файла выбери роль: Основа, Хук 1, Хук 2 или Хук 3. Файлы крупнее — через папку ноутбука: /intake_cancel, затем /intake_local.');
   return {created:id};
 }
 
@@ -227,13 +371,15 @@ async function command(intake,text,actor,api){
 export async function handleFourPartIntake(update,actor,{api,intake}){
   const message=update.message,data=update.callback_query?.data??message?.text;
   const isFile=!!(message?.document||message?.video||message?.animation);
-  const isIntake=isFile||(typeof data==='string'&&(/^\/intake(_cancel)?(\s|$)/.test(data)||/^ir:[a-f0-9-]{36}:(body|h1|h2|h3)$/.test(data)||/^ic:tg-\d{8}-[a-f0-9]{8}:[1-9]\d{0,5}$/.test(data)));
+  const isIntake=isFile||(typeof data==='string'&&(/^\/intake(_cancel|_local)?(\s|$)/.test(data)||/^il:[a-f0-9-]{36}$/.test(data)||/^ilp:(0|[1-9]\d{0,3})$/.test(data)||/^ir:[a-f0-9-]{36}:(body|h1|h2|h3)$/.test(data)||/^ic:tg-\d{8}-[a-f0-9]{8}:[1-9]\d{0,5}$/.test(data)));
   if(!isIntake)return null;
   if(!intake){await api.send(actor,'Приём файлов на этом координаторе не подключён.');return {blocked:true};}
   try{
     if(isFile)return await receiveFile(intake,update,actor,api);
     if(data.startsWith('ir:'))return await assignRole(intake,data,actor,api);
     if(data.startsWith('ic:'))return await confirm(intake,data,actor,api);
+    if(data.startsWith('il:'))return await selectLocal(intake,data,actor,api);
+    if(data.startsWith('ilp:'))return await listLocal(intake,actor,api,Number(data.slice(4)));
     return await command(intake,data,actor,api);
   }catch(error){
     // Replies keep the panel's delivery semantics; a transient download error retries the poll from its cursor.
