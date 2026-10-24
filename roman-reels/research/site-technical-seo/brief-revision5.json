@@ -1,0 +1,219 @@
+{
+  "briefVersion": "1.0.0",
+  "topicId": "ai-seo-audit",
+  "topic": "Технический и SEO-аудит сайта бизнеса: данные, ошибки и приоритет исправления",
+  "scriptRevision": 5,
+  "businessProblem": "Предпринимателю нужен проверяемый список проблем сайта: работает ли путь к заявке и есть ли технические препятствия для обхода и индексации. После исправления нужно повторить те же проверки.",
+  "romanFeedback": "Расширить прежнюю SEO-тему: полноценный технический и SEO-аудит, а не одна кнопка или только тестирование. Практическая автоматизация с фактами и списком задач. Точную речь ещё утвердить.",
+  "topicSelection": "Владелец поручил расширенное исследование и редакцию. Это не утверждение Романом точной версии 5.",
+  "sources": [
+    {
+      "id": "google-noindex",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/block-indexing",
+      "checkedAt": "2026-10-11",
+      "supports": "Доступная Googlebot страница с noindex исключается из индекса после обработки правила. Нельзя заключать текущий статус Google из одного HTML; нужна Search Console."
+    },
+    {
+      "id": "google-robots",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/robots/intro",
+      "checkedAt": "2026-10-11",
+      "supports": "robots.txt управляет обходом, не гарантирует исключения URL из индекса. Не смешивать с noindex."
+    },
+    {
+      "id": "google-canonical",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+      "checkedAt": "2026-10-11",
+      "supports": "canonical — сигнал предпочтительной страницы, не обязательная директива и не доказательство выбора Google."
+    },
+    {
+      "id": "google-sitemap",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview",
+      "checkedAt": "2026-10-11",
+      "supports": "Sitemap помогает находить страницы, не гарантирует обход или индексацию."
+    },
+    {
+      "id": "google-cwv",
+      "url": "https://developers.google.com/search/docs/appearance/core-web-vitals",
+      "checkedAt": "2026-10-11",
+      "supports": "LCP, INP и CLS требуют измерения. Скорость/полевые CWV и рост позиций в нашей демонстрации не измерены."
+    },
+    {
+      "id": "seo-demo",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/blob/feature/codex-pipeline/roman-reels/research/site-technical-seo/evidence/audit-report.json",
+      "checkedAt": "2026-10-11",
+      "supports": "Собственный учебный сайт, 4 URL, 10 заранее написанных проверок: до 1PASS/9FAIL; после 10PASS. Порог title/description/H1 по учебному чек-листу, не универсальные причины санкций."
+    },
+    {
+      "id": "functional-demo",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/blob/956ee69/roman-reels/research/mcp-site-audit-current/evidence/audit-report.json",
+      "checkedAt": "2026-10-11",
+      "supports": "Ранее отдельно проверены 4 учебные страницы и 9 функциональных сценариев: до 1PASS/8FAIL, после 9PASS. Ложное сообщение о получении заявки, мобильное меню и переполнение. Не складывать это как один аудит одного клиентского сайта."
+    }
+  ],
+  "alternatives": [
+    {
+      "method": "Браузерные сценарии Playwright",
+      "use": "Страницы, мобильное меню, форма, запись в приёмнике",
+      "limit": "Согласованные сценарии и тестовый приёмник; не SEO-позиции",
+      "cost": "Собственные вычисления; не измерено"
+    },
+    {
+      "method": "Технический HTTP/DOM чек-лист",
+      "use": "robots, noindex, sitemap, canonical, переходы, метаданные",
+      "limit": "Реализован ограниченный учебный исполнитель. Не общий crawler и не Googlebot",
+      "cost": "Собственные вычисления; тарифы неизвестны"
+    },
+    {
+      "method": "Search Console и PageSpeed/Lighthouse",
+      "use": "Фактическое индексирование, выбранный canonical, полевые и лабораторные метрики",
+      "limit": "Подключение реального сайта и измерения отдельным этапом, не выполнялись",
+      "cost": "Не оценено"
+    },
+    {
+      "method": "ИИ на основе собранных отчётов",
+      "use": "Помогает объяснять данные и готовить задачи, не заменяет измерение",
+      "limit": "Gemini получает этот бриф для речи; отдельный автоматический анализ сайта моделью не тестирован",
+      "cost": "Gemini ранее разрешён; стоимость вызова неизвестна"
+    }
+  ],
+  "demo": {
+    "synthetic": true,
+    "checkedAt": "2026-10-11T08:34:32.795Z",
+    "inputSha256": "806d02ee86b645e725a97ee21a3c237a1303bc3e16683251ee3d93b8762abb39",
+    "method": "10 fixed manually authored Playwright/HTTP checks on seeded owned fixture; separate prior functional demonstration",
+    "candidates": [
+      {
+        "id": "index-directives",
+        "status": "FAIL",
+        "expected": "На главной отсутствует запрет индексации",
+        "observed": {
+          "path": "/",
+          "robots": "noindex"
+        }
+      }
+    ],
+    "findings": [
+      {
+        "id": "index-directives",
+        "priority": "P1",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": [
+          {
+            "path": "/",
+            "robots": "noindex"
+          },
+          {
+            "path": "/services",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/pricing",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/contact",
+            "robots": "index,follow"
+          }
+        ],
+        "observedAfter": [
+          {
+            "path": "/",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/services",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/pricing",
+            "robots": "index,follow"
+          },
+          {
+            "path": "/contact",
+            "robots": "index,follow"
+          }
+        ]
+      },
+      {
+        "id": "canonicals",
+        "priority": "P1",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": [
+          {
+            "path": "/",
+            "canonicalPath": "/"
+          },
+          {
+            "path": "/services",
+            "canonicalPath": "/"
+          },
+          {
+            "path": "/pricing",
+            "canonicalPath": "/pricing"
+          },
+          {
+            "path": "/contact",
+            "canonicalPath": "/contact"
+          }
+        ],
+        "observedAfter": [
+          {
+            "path": "/",
+            "canonicalPath": "/"
+          },
+          {
+            "path": "/services",
+            "canonicalPath": "/services"
+          },
+          {
+            "path": "/pricing",
+            "canonicalPath": "/pricing"
+          },
+          {
+            "path": "/contact",
+            "canonicalPath": "/contact"
+          }
+        ]
+      },
+      {
+        "id": "legacy-redirect",
+        "priority": "P2",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "status": 302,
+          "location": "/"
+        },
+        "observedAfter": {
+          "status": 301,
+          "location": "/services"
+        }
+      }
+    ],
+    "claudeSessionTested": false,
+    "onePromptAuditTested": false,
+    "clientCaseTested": false,
+    "googleIndexVerified": false,
+    "limits": [
+      "4 заданных учебных URL; не полный crawler/Googlebot",
+      "Нет Search Console, Core Web Vitals или измеренного роста трафика",
+      "Статические требования title/description/H1 по учебному чек-листу, не гарантия санкций",
+      "Не автономный запуск ИИ одним промптом; обе демонстрации отдельные"
+    ]
+  },
+  "requirements": [
+    "Одна основа и три разных хука; хук+основа 100–145 слов, окончание добавляется отдельно и полный вариант <=160.",
+    "Не сводить к одной кнопке. Технический и SEO-аудит — рамка темы, показать проверяемые примеры: noindex, canonical или sitemap и путь к заявке из отдельного опыта.",
+    "Фокус на пользе: что конкретно проверить, какие данные собрать, список подтверждённых проблем и повторная проверка после исправления. Не общие советы общаться с ИИ.",
+    "Явно говорить учебный сайт. Автоматические проверки написаны нами; не говорить ИИ сам нашёл ошибки или сделал полный аудит одним промптом.",
+    "В новом SEO-тесте 10 проверок, 9 заложенных ошибок до и 10PASS после. Функциональный тест отдельный, числа можно не зачитывать. Не говорить 19 проверок одного реального сайта.",
+    "Проверка noindex означает обнаружение запрета, не измеренный статус индекса. robots не равно noindex, canonical — подсказка. Не обещать позиции, продажи, штраф за H1 или гарантировать попадание в поиск.",
+    "Скорость и фактическая индексация требуют PageSpeed и Search Console: показать как следующий источник данных, не готовый результат нашего теста.",
+    "Не требовать заново установить MCP если браузер уже доступен. Модель не заменяет краулер и измерения. Отчёт содержит адрес, факт, приоритет и ожидаемое исправление по учебному чек-листу; роль ИИ только как возможная помощь в объяснении/подготовке задач.",
+    "Сама речь должна быть естественной; технические названия только необходимые, без списка из десяти инструментов. Не повторять объёмные ограничения вместо смысла, но сохранить учебность и границы.",
+    "Три хука с разными углами: работает для посетителя но запрет индексации; аудит вместо общих SEO-советов; проверка после изменений. Без выдуманных потерь.",
+    "Не писать окончания. Точная версия 5 pending; никакого переноса утверждения или запуска производства."
+  ]
+}

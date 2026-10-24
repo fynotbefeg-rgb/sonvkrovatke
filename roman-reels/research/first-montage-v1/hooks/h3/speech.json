@@ -1,0 +1,203 @@
+{
+  "artifactVersion": "1.0.0",
+  "mode": "development",
+  "sourceRelativePath": "ai/h3.mp4",
+  "sourceSha256": "e378029223e4f50e96bc3a82384023b8cc1880b3090518960557d83727a3dce6",
+  "sourceMetadata": {
+    "duration": 4.76,
+    "width": 1080,
+    "height": 1920,
+    "fps": 25.0,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "audioChannels": 2
+  },
+  "createdAt": "2026-10-10T05:48:09.961922+00:00",
+  "transcriber": {
+    "model": "Systran/faster-whisper-small",
+    "revision": "536b0662742c02347bc0e980a01041f333bce120",
+    "modelChecksums": {
+      "config.json": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+      "model.bin": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+      "tokenizer.json": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+      "vocabulary.txt": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+    },
+    "packages": {
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "onnxruntime": "1.31.0",
+      "av": "16.1.0",
+      "tokenizers": "0.22.2"
+    },
+    "device": "cpu",
+    "computeType": "int8",
+    "threads": 2,
+    "beamSize": 5,
+    "vadFilter": false,
+    "vocabularyHints": "Claude, Telegram, WhatsApp.",
+    "language": "ru",
+    "elapsedSeconds": 4.864
+  },
+  "transcriptText": "Одна нейросеть может отвечать твоим клиентам вместо тебя. Показываю как.",
+  "wordTimings": [
+    {
+      "text": "Одна",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "text": "нейросеть",
+      "start": 0.6,
+      "end": 1.14
+    },
+    {
+      "text": "может",
+      "start": 1.14,
+      "end": 1.36
+    },
+    {
+      "text": "отвечать",
+      "start": 1.36,
+      "end": 1.9
+    },
+    {
+      "text": "твоим",
+      "start": 1.9,
+      "end": 2.24
+    },
+    {
+      "text": "клиентам",
+      "start": 2.24,
+      "end": 2.76
+    },
+    {
+      "text": "вместо",
+      "start": 2.76,
+      "end": 3.1
+    },
+    {
+      "text": "тебя.",
+      "start": 3.1,
+      "end": 3.38
+    },
+    {
+      "text": "Показываю",
+      "start": 3.64,
+      "end": 4.22
+    },
+    {
+      "text": "как.",
+      "start": 4.22,
+      "end": 4.36
+    }
+  ],
+  "speechSegments": [
+    {
+      "text": "Одна нейросеть может отвечать твоим клиентам вместо",
+      "start": 0.0,
+      "end": 3.1
+    },
+    {
+      "text": "тебя.",
+      "start": 3.1,
+      "end": 3.38
+    },
+    {
+      "text": "Показываю как.",
+      "start": 3.64,
+      "end": 4.36
+    }
+  ],
+  "rawSegments": [
+    {
+      "text": "Одна нейросеть может отвечать твоим клиентам вместо",
+      "start": 0.0,
+      "end": 3.1,
+      "words": [
+        {
+          "text": "Одна",
+          "start": 0.0,
+          "end": 0.6,
+          "probability": 0.8926410675048828
+        },
+        {
+          "text": "нейросеть",
+          "start": 0.6,
+          "end": 1.14,
+          "probability": 0.9341470003128052
+        },
+        {
+          "text": "может",
+          "start": 1.14,
+          "end": 1.36,
+          "probability": 0.9771957397460938
+        },
+        {
+          "text": "отвечать",
+          "start": 1.36,
+          "end": 1.9,
+          "probability": 0.998683363199234
+        },
+        {
+          "text": "твоим",
+          "start": 1.9,
+          "end": 2.24,
+          "probability": 0.9152428805828094
+        },
+        {
+          "text": "клиентам",
+          "start": 2.24,
+          "end": 2.76,
+          "probability": 0.9909667571385702
+        },
+        {
+          "text": "вместо",
+          "start": 2.76,
+          "end": 3.1,
+          "probability": 0.9946945011615753
+        }
+      ],
+      "avgLogprob": -0.15222749908765157,
+      "noSpeechProbability": 0.013571660965681076
+    },
+    {
+      "text": "тебя.",
+      "start": 3.1,
+      "end": 3.38,
+      "words": [
+        {
+          "text": "тебя.",
+          "start": 3.1,
+          "end": 3.38,
+          "probability": 0.9955708384513855
+        }
+      ],
+      "avgLogprob": -0.15222749908765157,
+      "noSpeechProbability": 0.013571660965681076
+    },
+    {
+      "text": "Показываю как.",
+      "start": 3.64,
+      "end": 4.36,
+      "words": [
+        {
+          "text": "Показываю",
+          "start": 3.64,
+          "end": 4.22,
+          "probability": 0.9847495704889297
+        },
+        {
+          "text": "как.",
+          "start": 4.22,
+          "end": 4.36,
+          "probability": 0.9169489145278931
+        }
+      ],
+      "avgLogprob": -0.15222749908765157,
+      "noSpeechProbability": 0.013571660965681076
+    }
+  ],
+  "alignmentMethod": "whisper_word_timestamps_not_forced_alignment",
+  "needsSpeechReview": true,
+  "productionReady": false
+}

@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-11T18:31:56.504255+00:00",
+  "localModelCalls": 3,
+  "remoteModelCalls": 0,
+  "synthetic": true,
+  "reviewer": "Codex",
+  "cases": [
+    {
+      "id": "noindex",
+      "expectedVerdict": "issue",
+      "observedVerdict": "issue",
+      "verdictWasSuppliedInInput": true,
+      "verdictMatches": true,
+      "semanticPassWithinThisScope": false,
+      "reason": "suggestedFix обещает 'ensure the homepage is indexed'; снятие noindex только снимает запрет, а не гарантирует Google-индексацию.",
+      "rawOutputSha256": "cf2abfcb835eec5897ca1507f8853dbda717b109fae5bce5753eea71ca1878ab",
+      "diagnosticExtractionOnly": true
+    },
+    {
+      "id": "fixed",
+      "expectedVerdict": "pass",
+      "observedVerdict": "pass",
+      "verdictWasSuppliedInInput": true,
+      "verdictMatches": true,
+      "semanticPassWithinThisScope": false,
+      "reason": "suggestedFix распространяет index,follow на все страницы; проверялась только главная, а часть реальных страниц может быть намеренно закрыта.",
+      "rawOutputSha256": "2ed32541c802f695ec5e8eff9e8ba1bb3ceebc967b57cb66ce59c716e114300a",
+      "diagnosticExtractionOnly": true
+    },
+    {
+      "id": "unknown-indexing",
+      "expectedVerdict": "unknown",
+      "observedVerdict": "unknown",
+      "verdictWasSuppliedInInput": true,
+      "verdictMatches": true,
+      "semanticPassWithinThisScope": true,
+      "reason": "Корректно признаёт отсутствие данных; полезность полного аудита этим не подтверждается. Формат с лишними символами/Markdown не готов к автоматическому приёму.",
+      "rawOutputSha256": "c97ef06f801ecc8d8772e8c7dbcce5ee2a164b9217fc1ff75bf3d0c6ec203662",
+      "diagnosticExtractionOnly": true
+    }
+  ],
+  "verdictMatches": 3,
+  "semanticPassCases": 1,
+  "eligibleForContent": false,
+  "productionReady": false,
+  "comparisonLimit": "Input now includes explicit authoritative statuses; 3/3 is adherence, not independent issue detection. Same observations and generation controls as baseline.",
+  "factoryComputeCostUsd": null
+}

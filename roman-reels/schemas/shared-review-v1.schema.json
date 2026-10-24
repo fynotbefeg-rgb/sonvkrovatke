@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:roman-reels:shared-review:1.0.0",
+  "title": "Exact pending topic/body/three-hook review packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "topicId", "topicText", "revision", "bodyText", "hooks", "endings"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "topicId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$"},
+    "topicText": {"$ref": "#/$defs/text"},
+    "revision": {"type": "integer", "minimum": 1},
+    "bodyText": {"$ref": "#/$defs/text"},
+    "hooks": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "text"],
+        "properties": {"id": {"enum": [1, 2, 3]}, "text": {"$ref": "#/$defs/text"}}
+      }
+    },
+    "endings": {
+      "type": "array", "minItems": 0, "maxItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["platform", "text"],
+        "properties": {"platform": {"enum": ["instagram", "tiktok"]}, "text": {"$ref": "#/$defs/text"}}
+      },
+      "oneOf": [{"maxItems": 0}, {"minItems": 2}]
+    }
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S", "not": {"pattern": "^\\s*[=+@-]"}}
+  },
+  "$comment": "Server additionally validates unique hook IDs/texts, unique platforms, TikTok DM CTA and serialized UTF-8 packet <=8000 bytes. Registration is not approval. Receipts exist only in trusted server properties."
+}

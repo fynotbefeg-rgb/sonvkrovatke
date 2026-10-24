@@ -1,0 +1,59 @@
+{
+  "comparison": "existing h1 development fixture vs demo input",
+  "unchangedFields": [
+    "scriptHash",
+    "wordTimings",
+    "speechSegments",
+    "sourceVideo",
+    "approvalStatus",
+    "scriptVersion"
+  ],
+  "mode": "development",
+  "approvalStatus": "pending_approval",
+  "sourceSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+  "paidServicesUsed": false,
+  "externalReferenceVideoViewed": false,
+  "tests": {
+    "typescriptTypecheck": "passed",
+    "director": 14,
+    "timing": 7,
+    "interface": 6,
+    "pythonContract": 6,
+    "pythonMedia": 10,
+    "pythonSourceSet": 4,
+    "pythonAssembledJobs": 4,
+    "pythonMontageAssets": 3
+  },
+  "renderStatus": "full h1 render and technical QC passed",
+  "interfaceEvent": {
+    "id": "interface-01",
+    "type": "interface",
+    "start": 17.680000000000003,
+    "end": 20.78,
+    "wordStart": 43,
+    "wordEnd": 43,
+    "animation": "pop",
+    "position": "top",
+    "layer": 2,
+    "transition": "fade",
+    "respectSafeZone": true,
+    "assetId": "tool-claude"
+  },
+  "controlFramesSeconds": [
+    2,
+    19,
+    35,
+    37
+  ],
+  "renderedVariants": [
+    "h1"
+  ],
+  "notRerenderedVariants": [
+    "h2",
+    "h3"
+  ],
+  "visualReview": "Codex inspected full-size extracted frames; not full playback or face tracking",
+  "previewUrl": "https://drive.google.com/file/d/1EeiOWmnJFF1DBCkNYnp29a_rURyldfhf/view?usp=drivesdk",
+  "previewDriveId": "1EeiOWmnJFF1DBCkNYnp29a_rURyldfhf",
+  "sharing": "owner and render service account only; Roman access not inherited"
+}

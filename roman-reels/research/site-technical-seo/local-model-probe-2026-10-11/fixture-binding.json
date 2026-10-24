@@ -1,0 +1,17 @@
+{
+  "path": "roman-reels/research/site-technical-seo/free-route-fixture-2026-10-11/audit-report.json",
+  "sha256": "8fe4e89f8ca46c8f112b278aa13bb6163128bb018371884f13731937558ff507",
+  "inputScope": "Subset: / HTTP status and meta robots. Missing-data question deliberately has no GSC or traffic inputs.",
+  "expectedResultsFile": "expected-results.json",
+  "notEvaluated": [
+    "whole site crawl",
+    "all nine issues",
+    "Search Console access",
+    "ranking",
+    "traffic",
+    "autonomous repairs",
+    "Windows hardware",
+    "Russian output",
+    "MCP tool use"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "recordVersion": "1.0.0",
+  "ownerMessage": "Утвердил",
+  "productionReady": false,
+  "note": "Owner relayed approval of four endings. This is not authenticated Telegram/Sheets approval of full scripts, hooks, or shared bodies.",
+  "endings": [
+    {
+      "topicId": "ai-seo-audit",
+      "platform": "instagram",
+      "text": "Хочешь начать проверку своего сайта? Напиши «САЙТ» в комментариях.",
+      "textHash": "58a015723004ae6aef14ef733df5c717e302b01c99ca4402610c8005197efb00",
+      "revision": 1,
+      "decision": "approved",
+      "approvalSource": "owner_report_in_chat",
+      "reportedApprover": "Roman",
+      "reportedAt": "2026-10-10T12:01:48Z",
+      "scope": "ending_only"
+    },
+    {
+      "topicId": "ai-seo-audit",
+      "platform": "tiktok",
+      "text": "Хочешь начать проверку своего сайта? Напиши «САЙТ» в личные сообщения.",
+      "textHash": "881692a325c5c0d94da53bafcf59472e9adc1f7f75c7de985516d0147431ea9f",
+      "revision": 1,
+      "decision": "approved",
+      "approvalSource": "owner_report_in_chat",
+      "reportedApprover": "Roman",
+      "reportedAt": "2026-10-10T12:01:48Z",
+      "scope": "ending_only"
+    },
+    {
+      "topicId": "ai-cross-platform-content",
+      "platform": "instagram",
+      "text": "Хочешь адаптировать одну идею под три площадки? Напиши «КОНТЕНТ» в комментариях.",
+      "textHash": "769dbfa859eebafbe80e6ae61dd92939cc0e9c70d9a8334cb1dd4f7743a0b975",
+      "revision": 1,
+      "decision": "approved",
+      "approvalSource": "owner_report_in_chat",
+      "reportedApprover": "Roman",
+      "reportedAt": "2026-10-10T12:01:48Z",
+      "scope": "ending_only"
+    },
+    {
+      "topicId": "ai-cross-platform-content",
+      "platform": "tiktok",
+      "text": "Хочешь адаптировать одну идею под три площадки? Напиши «КОНТЕНТ» в личные сообщения.",
+      "textHash": "fb026a3ed8284dc28d7c3585bd858490f15ad559df8a458d0ce395f3d1c03f6d",
+      "revision": 1,
+      "decision": "approved",
+      "approvalSource": "owner_report_in_chat",
+      "reportedApprover": "Roman",
+      "reportedAt": "2026-10-10T12:01:48Z",
+      "scope": "ending_only"
+    }
+  ]
+}

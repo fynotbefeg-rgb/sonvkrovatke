@@ -1,0 +1,247 @@
+{
+  "artifactVersion": "1.0.0",
+  "mode": "development",
+  "sourceRelativePath": "ai/h1.mp4",
+  "sourceSha256": "8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd",
+  "sourceMetadata": {
+    "duration": 6.485,
+    "width": 1080,
+    "height": 1920,
+    "fps": 25.0,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "audioChannels": 2
+  },
+  "createdAt": "2026-10-10T05:47:56.660893+00:00",
+  "transcriber": {
+    "model": "Systran/faster-whisper-small",
+    "revision": "536b0662742c02347bc0e980a01041f333bce120",
+    "modelChecksums": {
+      "config.json": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+      "model.bin": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+      "tokenizer.json": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+      "vocabulary.txt": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+    },
+    "packages": {
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "onnxruntime": "1.31.0",
+      "av": "16.1.0",
+      "tokenizers": "0.22.2"
+    },
+    "device": "cpu",
+    "computeType": "int8",
+    "threads": 2,
+    "beamSize": 5,
+    "vadFilter": false,
+    "vocabularyHints": "Claude, Telegram, WhatsApp.",
+    "language": "ru",
+    "elapsedSeconds": 5.475
+  },
+  "transcriptText": "Ты можешь перестать сам отвечать клиентам в почте, мессенджерах и на сайте. Показываю как.",
+  "wordTimings": [
+    {
+      "text": "Ты",
+      "start": 0.0,
+      "end": 0.4
+    },
+    {
+      "text": "можешь",
+      "start": 0.4,
+      "end": 0.58
+    },
+    {
+      "text": "перестать",
+      "start": 0.58,
+      "end": 1.14
+    },
+    {
+      "text": "сам",
+      "start": 1.14,
+      "end": 1.38
+    },
+    {
+      "text": "отвечать",
+      "start": 1.38,
+      "end": 2.04
+    },
+    {
+      "text": "клиентам",
+      "start": 2.04,
+      "end": 2.58
+    },
+    {
+      "text": "в",
+      "start": 2.58,
+      "end": 2.76
+    },
+    {
+      "text": "почте,",
+      "start": 2.76,
+      "end": 3.18
+    },
+    {
+      "text": "мессенджерах",
+      "start": 3.4,
+      "end": 4.06
+    },
+    {
+      "text": "и",
+      "start": 4.06,
+      "end": 4.22
+    },
+    {
+      "text": "на",
+      "start": 4.22,
+      "end": 4.36
+    },
+    {
+      "text": "сайте.",
+      "start": 4.36,
+      "end": 4.72
+    },
+    {
+      "text": "Показываю",
+      "start": 5.2,
+      "end": 5.88
+    },
+    {
+      "text": "как.",
+      "start": 5.88,
+      "end": 6.1
+    }
+  ],
+  "speechSegments": [
+    {
+      "text": "Ты можешь перестать сам отвечать клиентам в почте,",
+      "start": 0.0,
+      "end": 3.18
+    },
+    {
+      "text": "мессенджерах и на сайте.",
+      "start": 3.4,
+      "end": 4.72
+    },
+    {
+      "text": "Показываю как.",
+      "start": 5.2,
+      "end": 6.1
+    }
+  ],
+  "rawSegments": [
+    {
+      "text": "Ты можешь перестать сам отвечать клиентам в почте,",
+      "start": 0.0,
+      "end": 3.18,
+      "words": [
+        {
+          "text": "Ты",
+          "start": 0.0,
+          "end": 0.4,
+          "probability": 0.46995335817337036
+        },
+        {
+          "text": "можешь",
+          "start": 0.4,
+          "end": 0.58,
+          "probability": 0.9956965446472168
+        },
+        {
+          "text": "перестать",
+          "start": 0.58,
+          "end": 1.14,
+          "probability": 0.9933737715085348
+        },
+        {
+          "text": "сам",
+          "start": 1.14,
+          "end": 1.38,
+          "probability": 0.9936596751213074
+        },
+        {
+          "text": "отвечать",
+          "start": 1.38,
+          "end": 2.04,
+          "probability": 0.8891718685626984
+        },
+        {
+          "text": "клиентам",
+          "start": 2.04,
+          "end": 2.58,
+          "probability": 0.9939728577931722
+        },
+        {
+          "text": "в",
+          "start": 2.58,
+          "end": 2.76,
+          "probability": 0.9691808223724365
+        },
+        {
+          "text": "почте,",
+          "start": 2.76,
+          "end": 3.18,
+          "probability": 0.9871349334716797
+        }
+      ],
+      "avgLogprob": -0.2309867174197466,
+      "noSpeechProbability": 0.010829987935721874
+    },
+    {
+      "text": "мессенджерах и на сайте.",
+      "start": 3.4,
+      "end": 4.72,
+      "words": [
+        {
+          "text": "мессенджерах",
+          "start": 3.4,
+          "end": 4.06,
+          "probability": 0.9395387470722198
+        },
+        {
+          "text": "и",
+          "start": 4.06,
+          "end": 4.22,
+          "probability": 0.9608548879623413
+        },
+        {
+          "text": "на",
+          "start": 4.22,
+          "end": 4.36,
+          "probability": 0.9944433569908142
+        },
+        {
+          "text": "сайте.",
+          "start": 4.36,
+          "end": 4.72,
+          "probability": 0.995851457118988
+        }
+      ],
+      "avgLogprob": -0.2309867174197466,
+      "noSpeechProbability": 0.010829987935721874
+    },
+    {
+      "text": "Показываю как.",
+      "start": 5.2,
+      "end": 6.1,
+      "words": [
+        {
+          "text": "Показываю",
+          "start": 5.2,
+          "end": 5.88,
+          "probability": 0.9884385317564011
+        },
+        {
+          "text": "как.",
+          "start": 5.88,
+          "end": 6.1,
+          "probability": 0.892801821231842
+        }
+      ],
+      "avgLogprob": -0.2309867174197466,
+      "noSpeechProbability": 0.010829987935721874
+    }
+  ],
+  "alignmentMethod": "whisper_word_timestamps_not_forced_alignment",
+  "needsSpeechReview": true,
+  "productionReady": false
+}

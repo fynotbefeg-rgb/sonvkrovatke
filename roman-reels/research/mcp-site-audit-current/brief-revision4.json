@@ -1,0 +1,272 @@
+{
+  "briefVersion": "1.0.0",
+  "topicId": "ai-seo-audit",
+  "topic": "Проверка ключевых сценариев сайта: страницы, мобильный путь и фактическое получение заявки",
+  "scriptRevision": 4,
+  "businessProblem": "Владелец после изменения сайта хочет проверить ключевые пути клиента, найти подтверждённые сбои и повторять сохранённые проверки. Сообщение заявки принято не доказывает её получение.",
+  "romanFeedback": "Направление MCP хорошее, но одна кнопка слишком узко. Проверять сайт шире, исследовать актуальные способы и не делать повторную установку главным результатом. Возможность полного аудита одним промптом пока не подтверждена.",
+  "topicSelection": "Направление дорабатывается по обратной связи Романа и инструкции владельца. Точная версия 4 и расширенный объём ещё требуют утверждения; не выдавать текст за согласованный.",
+  "sources": [
+    {
+      "id": "playwright-mcp",
+      "url": "https://github.com/microsoft/playwright-mcp",
+      "checkedAt": "2026-10-10",
+      "supports": "Браузерный MCP доступен через настройку клиента/плагина; нельзя утверждать, что нужно всегда повторно устанавливать сервер."
+    },
+    {
+      "id": "claude-mcp",
+      "url": "https://code.claude.com/docs/en/mcp",
+      "checkedAt": "2026-10-10",
+      "supports": "При включении плагина Claude Code запускает его MCP автоматически. Это не значит Playwright по умолчанию у всех. Живая Claude-сессия в новом тесте отсутствовала."
+    },
+    {
+      "id": "playwright-agents",
+      "url": "https://playwright.dev/docs/test-agents",
+      "checkedAt": "2026-10-10",
+      "supports": "Planner составляет план, generator создаёт исполняемые тесты. Наличие механизмов не доказывает полный аудит одним запросом. Agents не запускались в нашем опыте."
+    },
+    {
+      "id": "local-audit-evidence",
+      "url": "https://github.com/fynotbefeg-rgb/sonvkrovatke/blob/956ee69/roman-reels/research/mcp-site-audit-current/evidence/audit-report.json",
+      "checkedAt": "2026-10-10",
+      "supports": "Наш программный учебный тест: четыре страницы, девять одинаковых заранее написанных проверок. До:1pass/8fail; после исправлений:9pass. Не AI/Claude/MCP-протокол, не клиентский сайт, не настоящая CRM."
+    }
+  ],
+  "alternatives": [
+    {
+      "method": "Ручная проверка",
+      "use": "Пройти меню и отправить учебную заявку, проверить приёмник",
+      "limit": "Требует повторения после изменений",
+      "cost": "Время, не измерено"
+    },
+    {
+      "method": "Playwright browser tests",
+      "use": "Сохранённые сценарии и повторный запуск",
+      "limit": "Нужны ожидаемые результаты, доступ к тестовой копии и приёмнику. У нас сценарии написаны Codex, не сгенерированы Claude",
+      "cost": "Вычисления и настройка; реальные тарифы/экономия не измерены"
+    },
+    {
+      "method": "Claude + доступный браузер/MCP/CLI",
+      "use": "Исследование и подготовка тестов по задаче",
+      "limit": "Возможности зависят от настроек. Один промпт может задать много действий, но наш такой запуск ещё не выполнен",
+      "cost": "Подписка/токены отдельно, не измерены"
+    }
+  ],
+  "demo": {
+    "synthetic": true,
+    "checkedAt": "2026-10-10T20:24:39.318Z",
+    "inputSha256": "b1634995bd7f958d06584d68f29a7f685558b4826470aa4667c4aca035bf1603",
+    "method": "Saved, manually authored Playwright browser scenarios",
+    "candidates": [
+      {
+        "id": "delivery",
+        "expected": "Заявка действительно появилась в учебном приёмнике",
+        "status": "FAIL",
+        "observed": {
+          "successNotice": "Учебная заявка принята",
+          "receiverRecords": []
+        },
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "screenshot": "broken-delivery.png",
+        "consoleErrors": [],
+        "networkErrors": []
+      }
+    ],
+    "findings": [
+      {
+        "case": "pages",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": [
+          {
+            "route": "/",
+            "httpStatus": 200
+          },
+          {
+            "route": "/services",
+            "httpStatus": 200
+          },
+          {
+            "route": "/pricing",
+            "httpStatus": 404
+          },
+          {
+            "route": "/contact",
+            "httpStatus": 200
+          }
+        ],
+        "observedAfter": [
+          {
+            "route": "/",
+            "httpStatus": 200
+          },
+          {
+            "route": "/services",
+            "httpStatus": 200
+          },
+          {
+            "route": "/pricing",
+            "httpStatus": 200
+          },
+          {
+            "route": "/contact",
+            "httpStatus": 200
+          }
+        ]
+      },
+      {
+        "case": "image",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "loaded": false,
+          "path": "/missing-hero.svg"
+        },
+        "observedAfter": {
+          "loaded": true,
+          "path": "/hero.svg"
+        }
+      },
+      {
+        "case": "desktop-navigation",
+        "before": "PASS",
+        "after": "PASS",
+        "observedBefore": {
+          "path": "/services",
+          "heading": "Услуги"
+        },
+        "observedAfter": {
+          "path": "/services",
+          "heading": "Услуги"
+        }
+      },
+      {
+        "case": "mobile-menu",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "menuVisible": false,
+          "path": "/"
+        },
+        "observedAfter": {
+          "menuVisible": true,
+          "path": "/contact"
+        }
+      },
+      {
+        "case": "mobile-layout",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "viewport": 390,
+          "contentWidth": 696
+        },
+        "observedAfter": {
+          "viewport": 390,
+          "contentWidth": 390
+        }
+      },
+      {
+        "case": "empty",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "browserValid": true,
+          "requestsToReceiver": 1
+        },
+        "observedAfter": {
+          "browserValid": false,
+          "requestsToReceiver": 0
+        }
+      },
+      {
+        "case": "invalid-email",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "browserValid": true,
+          "requestsToReceiver": 1
+        },
+        "observedAfter": {
+          "browserValid": false,
+          "requestsToReceiver": 0
+        }
+      },
+      {
+        "case": "delivery",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "successNotice": "Учебная заявка принята",
+          "receiverRecords": []
+        },
+        "observedAfter": {
+          "successNotice": "Учебная заявка принята",
+          "receiverRecords": [
+            {
+              "name": "Учебный клиент",
+              "email": "demo@fixture.example",
+              "caseId": "delivery"
+            }
+          ]
+        }
+      },
+      {
+        "case": "duplicate",
+        "before": "FAIL",
+        "after": "PASS",
+        "observedBefore": {
+          "requestsToReceiver": 2,
+          "receiverRecords": [
+            {
+              "name": "Учебный клиент",
+              "email": "demo@fixture.example",
+              "caseId": "duplicate"
+            },
+            {
+              "name": "Учебный клиент",
+              "email": "demo@fixture.example",
+              "caseId": "duplicate"
+            }
+          ]
+        },
+        "observedAfter": {
+          "requestsToReceiver": 2,
+          "receiverRecords": [
+            {
+              "name": "Учебный клиент",
+              "email": "demo@fixture.example",
+              "caseId": "duplicate"
+            }
+          ]
+        }
+      }
+    ],
+    "claudeSessionTested": false,
+    "mcpProtocolUsed": false,
+    "onePromptAuditTested": false,
+    "clientCaseTested": false,
+    "limits": [
+      "Четыре учебные страницы и девять заранее написанных сценариев; восемь ошибок заложены намеренно.",
+      "Мобильная эмуляция 390px, не реальный iPhone.",
+      "Приёмник локальный in-memory, не настоящая CRM.",
+      "Не проверены SEO, безопасность, скорость, WCAG и все состояния сайта.",
+      "Исправления заданы автором учебного сайта, не healer."
+    ]
+  },
+  "requirements": [
+    "Одна общая основа и три разных хука, русский. Хук+основа 100–145 слов, чтобы отдельное окончание также помещалось в 160.",
+    "Фокус: проверка ключевых сценариев сайта после правок, а не одна кнопка и не установка инструмента.",
+    "Основной показ: мобильное меню, ошибки формы и ситуация заявка принята но запись отсутствует. Фактическую доставку показываем в учебном приёмнике.",
+    "Явно сказать учебный сайт. Программный тест Playwright не приписывать Claude, MCP-протоколу или автопоиску ИИ. Сохранённые проверки мы написали, они не созданы одним промптом.",
+    "Пояснить роль ИИ как будущую помощь в планировании/подготовке тестов, если она упоминается; не утверждать что он уже сам нашёл ошибки.",
+    "Если браузер уже подключён, повторная установка не нужна. Не обещать автоматическое подключение во всех средах.",
+    "Сохранённые сценарии позволяют повторить проверку после правок. Автоматический CI/расписание в нашем тесте не настроен.",
+    "Не обещать проверку абсолютно всего сайта, рост продаж, точную экономию или бесплатный сервис. Не зачитывать версии/команды и тяжёлый список инструментов.",
+    "Хуки: конкретная ошибка; процесс от проверки к повторяемым тестам; разница между видимым успехом и реальным получением заявки. Без выдуманных потерь и кликбейта.",
+    "Не писать окончания и не включать в производство. Принятые Instagram/TikTok окончания добавляются отдельно; новая точная речь остаётся pending."
+  ]
+}

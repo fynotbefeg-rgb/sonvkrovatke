@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-10",
+  "actor": "apify~instagram-reel-scraper",
+  "approvedTotalMaxChargeUsd": 1,
+  "caps": [
+    0.1,
+    0.1,
+    0.4,
+    0.4
+  ],
+  "actualInvoiceTotalUsd": null,
+  "actualInvoiceNote": "Run usageTotalUsd does not establish the complete event/add-on invoice; do not present it as the final bill. API run caps verified.",
+  "metadataWorkflowRun": 38041724125,
+  "metadataRecoveryRun": 38041873986,
+  "detailWorkflowRun": 38041968344,
+  "mediaInspectionRun": 38042298586,
+  "selected": [
+    {
+      "shortcode": "DZm25XXMZ4I",
+      "owner": "theautomationguy.ai",
+      "plays": 482883,
+      "likes": 8538,
+      "comments": 28235,
+      "duration": 33.713924
+    },
+    {
+      "shortcode": "DeHPwcrhmy4",
+      "owner": "theautomationguy.ai",
+      "plays": 288812,
+      "likes": 5993,
+      "comments": 13346,
+      "duration": 61.136688
+    }
+  ],
+  "inspection": "Transcript read and 20 evenly sampled frames inspected per video; continuous playback and exact cut timing not verified.",
+  "reach": null
+}

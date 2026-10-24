@@ -1,0 +1,113 @@
+{
+  "fixtureVersion": "1.0.0",
+  "synthetic": true,
+  "status": "expected_values_not_pipeline_results",
+  "workflowTested": false,
+  "modelCalled": false,
+  "topicApproved": false,
+  "scriptApproved": false,
+  "lead": {
+    "fixtureId": "lead-001",
+    "deduplicationKey": "<lead-001@fixture.example>",
+    "expectedFields": {
+      "clientName": "Учебный клиент №1",
+      "company": "ДЕМО-мастерская «Пример»",
+      "email": "client-001@fixture.example",
+      "phone": null,
+      "budget": null,
+      "currency": null,
+      "requestedDeadline": "2026-10-26",
+      "request": "Почта → таблица с контактом и запросом; менеджер проверяет ответ перед отправкой."
+    },
+    "mustNotInvent": [
+      "Номер телефона",
+      "Бюджет",
+      "Разрешение на автоотправку",
+      "Гарантию запуска к запрошенному сроку"
+    ],
+    "checks": [
+      "Контакт взят из письма/заголовка.",
+      "Неизвестный бюджет и телефон остаются null.",
+      "Ответ уточняет доступы и бюджет; не обещает согласованный срок.",
+      "Повтор с тем же Message-ID не создаёт вторую карточку."
+    ],
+    "outboundStatus": "draft_only_requires_human_review"
+  },
+  "invoices": {
+    "expectedRows": [
+      {
+        "fixtureId": "invoice-001",
+        "invoiceNumber": "DEMO-2026-001",
+        "supplier": "ДЕМО-мастерская «Пример»",
+        "buyer": "ДЕМО-студия «Тест»",
+        "issuedOn": "2026-10-10",
+        "dueOn": "2026-10-20",
+        "currency": "RUB",
+        "total": "23990.50",
+        "taxAmount": null,
+        "paymentDetails": null
+      },
+      {
+        "fixtureId": "invoice-002",
+        "invoiceNumber": "DEMO-2026-002",
+        "supplier": "DEMO Automation Workshop",
+        "buyer": "ДЕМО-студия «Тест»",
+        "issuedOn": "2026-10-10",
+        "dueOn": "2026-10-24",
+        "currency": "EUR",
+        "total": "1500.00",
+        "taxAmount": null,
+        "paymentDetails": null
+      }
+    ],
+    "expectedUniqueRowCount": 2,
+    "replayFile": "invoice-001-replay.pdf",
+    "expectedReplayAction": "mark_duplicate_do_not_create_third_row",
+    "checks": [
+      "Обрабатывать деньги через Decimal/строки, не binary float.",
+      "Сумма равна сумме строк.",
+      "RUB и EUR не объединяются и не суммируются.",
+      "Отсутствующие налог/реквизиты не выдумываются.",
+      "Оплата запрещена, извлечённые поля ждут проверки человека."
+    ],
+    "approvalStatus": "awaiting_human_check",
+    "paymentAllowed": false
+  },
+  "proposal": {
+    "fixtureId": "proposal-001",
+    "expectedServiceIds": [
+      "inbox_to_sheet",
+      "reply_draft",
+      "handoff"
+    ],
+    "expectedTotal": "17500.00",
+    "currency": "RUB",
+    "budgetLimit": null,
+    "expectedDeliverables": [
+      "Строка заявки с контактом и запросом",
+      "Черновик ответа, без автоматической отправки",
+      "Инструкция и проверка на трёх учебных письмах"
+    ],
+    "requiredTemplateFields": [
+      "proposalTitle",
+      "clientName",
+      "problemSummary",
+      "scopeItems",
+      "priceTable",
+      "totalAmount",
+      "currency",
+      "deliveryTerms",
+      "exclusions",
+      "approvalNote"
+    ],
+    "checks": [
+      "Услуги и суммы совпадают с учебным справочником.",
+      "Срок 7 рабочих дней остаётся условным после доступов, а не обещанием даты.",
+      "Запрошенный старт не превращается в обязательство.",
+      "В предложении нет подключения CRM и автоматической отправки.",
+      "Нужны подтверждение менеджером и пометка учебного документа."
+    ],
+    "proposalStatus": "draft_only_not_for_customer",
+    "outboundAllowed": false
+  }
+}

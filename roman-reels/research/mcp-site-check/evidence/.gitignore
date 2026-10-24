@@ -1,0 +1,4 @@
+# MCP emits timestamped scratch snapshots and console logs; curated evidence below is tracked.
+page-*.yml
+console-*.log
+*.webm

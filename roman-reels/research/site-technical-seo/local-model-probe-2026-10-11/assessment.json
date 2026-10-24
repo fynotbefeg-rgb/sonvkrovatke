@@ -1,0 +1,97 @@
+{
+  "checkedAt": "2026-10-11T18:24:32.052361+00:00",
+  "synthetic": true,
+  "localModelCalls": 6,
+  "remoteModelCalls": 0,
+  "apiChargesIncurred": false,
+  "factoryComputeCostUsd": null,
+  "models": [
+    {
+      "model": "qwen-0.5b",
+      "cases": [
+        {
+          "id": "noindex",
+          "expectedVerdict": "issue",
+          "observedVerdict": "pass",
+          "verdictMatches": false,
+          "reviewer": "Codex",
+          "semanticReady": false,
+          "reason": "Одобряет noindex вопреки intendedIndexable=true; делает недоказанный вывод о фактической индексации.",
+          "diagnosticJsonExtractionOnly": true,
+          "rawOutputSha256": "e8257379ffd871a94f78f38c620132db109b329d212b8e9cf5f3c8afb5dd2c46",
+          "seconds": 7.104
+        },
+        {
+          "id": "fixed",
+          "expectedVerdict": "pass",
+          "observedVerdict": "pass",
+          "verdictMatches": true,
+          "reviewer": "Codex",
+          "semanticReady": false,
+          "reason": "Правильный pass по директиве, но недоказанные утверждения, что сайт индексируется и уже проиндексирован.",
+          "diagnosticJsonExtractionOnly": true,
+          "rawOutputSha256": "466b35619335e279258256b5645e43d6c966b1572535c09c37a741943a56b4bd",
+          "seconds": 7.826
+        },
+        {
+          "id": "unknown-indexing",
+          "expectedVerdict": "unknown",
+          "observedVerdict": "pass",
+          "verdictMatches": false,
+          "reviewer": "Codex",
+          "semanticReady": false,
+          "reason": "Выдумывает индексацию и рост трафика при отсутствии данных.",
+          "diagnosticJsonExtractionOnly": true,
+          "rawOutputSha256": "c612aa55adfcbba736ca39de5d58f6231558125c99c44a217d40952748aee841",
+          "seconds": 6.068
+        }
+      ],
+      "verdictMatches": 1,
+      "eligibleForContent": false
+    },
+    {
+      "model": "qwen-1.5b",
+      "cases": [
+        {
+          "id": "noindex",
+          "expectedVerdict": "issue",
+          "observedVerdict": "pass",
+          "verdictMatches": false,
+          "reviewer": "Codex",
+          "semanticReady": false,
+          "reason": "Одобряет noindex и ошибочно трактует намерение владельца; ответ содержит лишний префикс и Markdown.",
+          "diagnosticJsonExtractionOnly": true,
+          "rawOutputSha256": "b16e5e323eb8968732c6baeaa2f2208396152a2f48c152ddef137dfd0e0520ba",
+          "seconds": 20.398
+        },
+        {
+          "id": "fixed",
+          "expectedVerdict": "pass",
+          "observedVerdict": "pass",
+          "verdictMatches": true,
+          "reviewer": "Codex",
+          "semanticReady": false,
+          "reason": "Правильный pass по директиве; утверждения о всех best practices и отсутствии дальнейших действий выходят за данные. Лишний префикс и Markdown.",
+          "diagnosticJsonExtractionOnly": true,
+          "rawOutputSha256": "e04378d7ffa6faf102783df965b774beae201b1f811a92398303623d507db870",
+          "seconds": 20.413
+        },
+        {
+          "id": "unknown-indexing",
+          "expectedVerdict": "unknown",
+          "observedVerdict": "unknown",
+          "verdictMatches": true,
+          "reviewer": "Codex",
+          "semanticReady": false,
+          "reason": "Правильно unknown. Дополнительно предлагает непроверенные инструменты и добавляет незаказанное поле suggestedAction; это не готовый бесплатный путь.",
+          "diagnosticJsonExtractionOnly": true,
+          "rawOutputSha256": "5ae62abf1cae4f8615927457259697116d5810486bea5dd96d4d9aa78a4b21b7",
+          "seconds": 29.82
+        }
+      ],
+      "verdictMatches": 2,
+      "eligibleForContent": false
+    }
+  ],
+  "conclusion": "Both candidates rejected for the tested instructions. This does not establish failure of all local models. No production or Roman approval."
+}

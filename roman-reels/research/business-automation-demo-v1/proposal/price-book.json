@@ -1,0 +1,34 @@
+{
+  "fixtureVersion": "1.0.0",
+  "synthetic": true,
+  "priceBookId": "DEMO-PRICES-001",
+  "commercialOfferValid": false,
+  "currency": "RUB",
+  "items": [
+    {
+      "serviceId": "inbox_to_sheet",
+      "label": "Одна учебная почта → одна таблица",
+      "quantity": 1,
+      "unitPrice": "10000.00"
+    },
+    {
+      "serviceId": "reply_draft",
+      "label": "Черновик ответа с ручным подтверждением",
+      "quantity": 1,
+      "unitPrice": "5000.00"
+    },
+    {
+      "serviceId": "handoff",
+      "label": "Проверка на трёх учебных письмах и инструкция",
+      "quantity": 1,
+      "unitPrice": "2500.00"
+    }
+  ],
+  "deliveryTerms": "7 рабочих дней после предоставления учебных доступов; это условие вымышленного примера, не гарантия реального проекта.",
+  "excluded": [
+    "Подключение настоящей CRM",
+    "Автоматическая отправка писем",
+    "Платные API, хостинг и лицензии",
+    "Обработка реальной клиентской базы"
+  ]
+}

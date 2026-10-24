@@ -1,0 +1,13 @@
+{
+  "reviewStatus": "needs_revision",
+  "generatedArtifact": "generated-v2.json",
+  "generationRun": "38061905345",
+  "issues": [
+    "Misattributes deterministic filtering to AI",
+    "Does not provide a concrete proposed page title",
+    "Hook 2 conflates average position with every impression in top 10",
+    "Refers to query text as the page name"
+  ],
+  "sharedWithRoman": false,
+  "newGenerationAuthorized": true
+}

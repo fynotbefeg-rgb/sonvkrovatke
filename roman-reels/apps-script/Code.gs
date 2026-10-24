@@ -81,6 +81,9 @@ function romanRevokeRow_(sheet, rowNumber, versionId, decision) {
 // Installable edit trigger. e.user is the editor; the trigger owner's identity
 // must never be used as a fallback. If Google hides the editor, approval fails closed.
 function onRomanApprovalEdit(e) {
+  if (typeof RomanSharedReview !== 'undefined' && RomanSharedReview.handles(e)) {
+    return RomanSharedReview.edit(e, romanApprovers_(), romanLock_);
+  }
   if (!e || !e.range || !e.source || e.source.getId() !== SPREADSHEET_ID || e.range.getSheet().getName() !== 'Сценарии') return;
   const firstRow = Math.max(2, e.range.getRow());
   const lastRow = e.range.getLastRow();
@@ -138,7 +141,12 @@ function romanQueue_() {
   return queue;
 }
 
-function getApprovedProductionQueue() { return romanLock_(romanQueue_); }
+function getApprovedProductionQueue() {
+  return romanLock_(function() {
+    const legacy = romanQueue_();
+    return typeof RomanSharedReview !== 'undefined' ? RomanSharedReview.queue(legacy, romanApprovers_()) : legacy;
+  });
+}
 function getProductionQueueResponse() { return {ok: true, items: getApprovedProductionQueue()}; }
 
 function checkProductionSafety() {
@@ -195,6 +203,22 @@ function doPost(e) {
     const body = JSON.parse(e.postData.contents);
     const token = PropertiesService.getScriptProperties().getProperty('ROMAN_REELS_WEBHOOK_TOKEN');
     if (!token || !body || typeof body.token !== 'string' || body.token !== token) return romanJson_({ok: false, error: 'Unauthorized'});
+    if (body.action === 'add_shared_review') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.register(body.packet, romanLock_, romanApprovers_()));
+    }
+    if (body.action === 'add_topic_review') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.registerTopic(body.packet, romanLock_));
+    }
+    if (body.action === 'get_topic_research_snapshot') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.topicSnapshot(romanApprovers_(), romanLock_));
+    }
+    if (body.action === 'get_review_status_snapshot') {
+      if (typeof RomanSharedReview === 'undefined') throw Error('Shared review unavailable');
+      return romanJson_(RomanSharedReview.reviewStatusSnapshot(romanApprovers_(), romanLock_));
+    }
     if (body.action === 'get_production_queue') return romanJson_(getProductionQueueResponse());
     if (body.action && body.action !== 'add_drafts') return romanJson_({ok: false, error: 'Unknown action'});
     return romanJson_(romanAddDrafts_(body.items));
@@ -204,7 +228,58 @@ function doPost(e) {
   }
 }
 
-function doGet() { return romanJson_({ok: false, error: 'Use authenticated POST'}); }
+function romanHtml_(value) {
+  return String(value).replace(/[&<>"']/g, function(ch) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]; });
+}
+// Topic choice page: only meaningful in a separate deployment that executes as the user accessing the web app,
+// where Google authenticates the visitor. Every other GET keeps the previous refusal.
+function doGet(e) {
+  if (e && e.parameter && e.parameter.view === 'review' && typeof RomanSharedReview !== 'undefined') return romanReviewPage_();
+  if (!(e && e.parameter && e.parameter.view === 'topics') || typeof RomanSharedReview === 'undefined') {
+    return romanJson_({ok: false, error: 'Use authenticated POST'});
+  }
+  const choices = RomanSharedReview.selfTopicChoices(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(), romanApprovers_());
+  const items = choices.map(function(c) {
+    return '<li><p>' + romanHtml_(c.title) + ' (строка ' + c.row + ')</p><button onclick="pick(' +
+      romanHtml_(JSON.stringify([c.topicId, c.revision, c.topicHash])) + ')">Утвердить эту тему</button></li>';
+  }).join('');
+  const html = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<body style="font-family:sans-serif;max-width:640px;margin:16px">' +
+    '<h2>Выбор темы</h2>' + (items ? '<ul>' + items + '</ul>' : '<p>Нет тем для выбора или Google не подтвердил аккаунт.</p>') +
+    '<p id="r"></p><script>function pick(a){document.getElementById("r").textContent="Сохраняю…";' +
+    'google.script.run.withSuccessHandler(function(x){document.getElementById("r").textContent=x.ok?"Тема утверждена. Строка "+x.row:"Не сохранено: "+x.error;})' +
+    '.withFailureHandler(function(){document.getElementById("r").textContent="Ошибка, обновите страницу";}).romanSelfApproveTopic(a[0],a[1],a[2]);}</script></body>';
+  return HtmlService.createHtmlOutput(html).setTitle('Выбор темы');
+}
+// Called from the page above; identity comes only from Google Session, never from parameters.
+function selfApproveTopic(topicId, revision, hash) {
+  if (typeof RomanSharedReview === 'undefined') return {ok: false, error: 'Shared review unavailable'};
+  return RomanSharedReview.selfApproveTopic(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(),
+    romanApprovers_(), topicId, revision, hash, romanLock_);
+}
+function romanSelfApproveTopic(topicId, revision, hash) { return selfApproveTopic(topicId, revision, hash); }
+
+function romanReviewPage_() {
+  const choices = RomanSharedReview.selfReviewChoices(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(), romanApprovers_());
+  const items = choices.map(function(c) {
+    const label = c.part === 'body' ? 'основу' : 'хук ' + c.part.slice(4);
+    return '<li><h3>' + romanHtml_(c.title) + '</h3><p style="white-space:pre-wrap">' + romanHtml_(c.text) +
+      '</p><button onclick="confirmPart(' + romanHtml_(JSON.stringify([c.topicId, c.revision, c.part, c.hash])) +
+      ')">Подтвердить ' + label + '</button></li>';
+  }).join('');
+  return HtmlService.createHtmlOutput('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<body style="font-family:sans-serif;max-width:640px;margin:16px"><h2>Основа и хуки</h2>' +
+    (items ? '<ul>' + items + '</ul>' : '<p>Нет доступных текстов. Сначала подтвердите тему; затем основа и каждый хук подтверждаются отдельно.</p>') +
+    '<p id="r"></p><script>function confirmPart(a){document.getElementById("r").textContent="Сохраняю…";' +
+    'google.script.run.withSuccessHandler(function(x){document.getElementById("r").textContent=x.ok?"Подтверждение сохранено. Обновите страницу для следующего текста.":"Не сохранено: "+x.error;})' +
+    '.withFailureHandler(function(){document.getElementById("r").textContent="Ошибка. Обновите страницу.";}).romanSelfApprovePart(a[0],a[1],a[2],a[3]);}</script></body>').setTitle('Основа и хуки');
+}
+function selfApprovePart(topicId, revision, part, hash) {
+  if (typeof RomanSharedReview === 'undefined') return {ok: false, error: 'Shared review unavailable'};
+  return RomanSharedReview.selfApprovePart(Session.getActiveUser().getEmail(), Session.getEffectiveUser().getEmail(),
+    romanApprovers_(), topicId, revision, part, hash, romanLock_);
+}
+function romanSelfApprovePart(topicId, revision, part, hash) { return selfApprovePart(topicId, revision, part, hash); }
 
 // Run once after setting ROMAN_APPROVER_EMAILS in Script Properties.
 // Retains existing time triggers and does not change sharing or sheet protection.

@@ -1,0 +1,10 @@
+
+{
+  "id": "noindex",
+  "verdict": "issue",
+  "evidence": "The homepage meta robots directive is set to 'noindex', but the intended indexable attribute is set to true.",
+  "explanation": "This check identifies a discrepancy between the meta robots directive and the intended indexable attribute.",
+  "suggestedFix": "Update the meta robots directive to 'index' to ensure the homepage is indexed."
+} [end of text]
+
+

@@ -1,0 +1,170 @@
+{
+  "planVersion": "1.0.0",
+  "checkedAt": "2026-10-12T04:29:27.005Z",
+  "topicId": "ai-seo-audit",
+  "topicRevision": 1,
+  "scopeHash": "800f45a87e09a96aca520ee8f2f70f72d6f7402d227a6195c320ddf421bb7c0c",
+  "batchHash": "a0181b5ad564dc3f96f392a3c9d937394e0efcc3198e8974fb2fbe32f1df016d",
+  "jobKey": "b36f7b0d484d4d11b4802cd3860181c852e7c7b349fff48d3408b18ce1e62f48",
+  "status": "no_metadata_candidates",
+  "policy": {
+    "maxPublicationAgeDays": 60,
+    "maxMetricAgeDays": 7,
+    "minPublicViewsOrPlays": 100000,
+    "maxDetailCandidates": 2
+  },
+  "queries": [
+    {
+      "platform": "instagram",
+      "query": "AI technical SEO audit robots canonical sitemap"
+    },
+    {
+      "platform": "instagram",
+      "query": "ИИ аудит сайта noindex robots sitemap"
+    },
+    {
+      "platform": "tiktok",
+      "query": "AI website SEO audit actionable fixes"
+    },
+    {
+      "platform": "tiktok",
+      "query": "ИИ техническая проверка сайта SEO"
+    },
+    {
+      "platform": "youtube",
+      "query": "Claude technical SEO audit Search Console export"
+    },
+    {
+      "platform": "youtube",
+      "query": "ИИ аудит сайта экспорт Google Search Console"
+    }
+  ],
+  "discoveryAdapterStatus": {
+    "instagram": "existing profile/direct-Reel collector; keyword discovery not connected",
+    "tiktok": "not_connected",
+    "youtube": "not_connected"
+  },
+  "candidates": [],
+  "rejected": [
+    {
+      "shortcode": "DeGMNGXvwhZ",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeOA9NsJXs4",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeLgn1itpX6",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeVvHFjSogL",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeSg7A0SoIC",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeEBgXyNoL7",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeP9_Ngycdh",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeBX-t7gMhX",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "DeJFEFuMaVo",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "Dd-OCDMBmUn",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "Dd9HW2TBY-o",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "Dd5QDn0AgTb",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "Dd8QHxjhn3l",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "Dd-rJYhhSOV",
+      "reasons": [
+        "below_100000",
+        "narrow_topic_terms_missing"
+      ]
+    },
+    {
+      "shortcode": "Dd-GaSEMi78",
+      "reasons": [
+        "narrow_topic_terms_missing"
+      ]
+    }
+  ],
+  "identicalDuplicatesSkipped": 0,
+  "proposedDetailUrls": [],
+  "topicApprovalVerificationRequired": true,
+  "paidBudgetVerificationRequired": true,
+  "networkExecutionAllowed": false,
+  "geminiGenerationAllowed": false,
+  "eligibleForRomanReview": false,
+  "romanApprovalGranted": false,
+  "productionReady": false,
+  "nextChecks": [
+    "Fresh authenticated topic selection and revision",
+    "Approved bounded research budget and applicable Actor schema/pricing",
+    "Actually inspect video and speech for concrete process relevance",
+    "Verify counters against source and disclose unknown reach",
+    "Test free audience workflow and complete factual/editorial review before script generation"
+  ]
+}

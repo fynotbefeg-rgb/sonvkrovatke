@@ -1,4 +1,4 @@
-import { AbsoluteFill, OffthreadVideo, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig, staticFile } from "remotion";
+import { AbsoluteFill, OffthreadVideo, interpolate, spring, useCurrentFrame, useVideoConfig, staticFile } from "remotion";
 const font = `@font-face{font-family:G;src:url(${staticFile("fonts/golos-cyr.woff2")})}@font-face{font-family:G;src:url(${staticFile("fonts/golos-lat.woff2")});unicode-range:U+0000-00FF}`;
 const C = { gold: "#E3C186", gold2: "#F8E7C2", goldd: "#C9A266", green: "#024D2F" };
 const CAP: [number, number, string][] = [

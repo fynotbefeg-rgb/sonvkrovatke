@@ -1,0 +1,70 @@
+name: Roman shared review — offline checks
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/codex-pipeline]
+    paths:
+      - 'roman-reels/apps-script/**'
+      - 'roman-reels/scripts/*review*'
+      - 'roman-reels/scripts/apps-script.test.mjs'
+      - 'roman-reels/scripts/*editorial*'
+      - 'roman-reels/scripts/build-seo-evidence-report*'
+      - 'roman-reels/scripts/topic-reference-plan*'
+      - 'roman-reels/scripts/topic-selection-reader*'
+      - 'roman-reels/scripts/topic-only-review*'
+      - 'roman-reels/scripts/plan-selected-topic-research.mjs'
+      - 'roman-reels/schemas/topic-research-snapshot-v1.schema.json'
+      - 'roman-reels/research/narrow-topic-search/**'
+      - 'roman-reels/research/seo-reference-cooper-probe-results.json'
+      - 'roman-reels/scripts/researched-gemini-drafts*'
+      - 'roman-reels/scripts/send-drafts-to-sheet.mjs'
+      - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
+      - '.github/workflows/roman-shared-review-check.yml'
+  pull_request:
+    branches: [feature/codex-pipeline, automation/roman-reels-v1]
+    paths:
+      - 'roman-reels/apps-script/**'
+      - 'roman-reels/scripts/*review*'
+      - 'roman-reels/scripts/apps-script.test.mjs'
+      - 'roman-reels/scripts/*editorial*'
+      - 'roman-reels/scripts/build-seo-evidence-report*'
+      - 'roman-reels/scripts/topic-reference-plan*'
+      - 'roman-reels/scripts/topic-selection-reader*'
+      - 'roman-reels/scripts/topic-only-review*'
+      - 'roman-reels/scripts/plan-selected-topic-research.mjs'
+      - 'roman-reels/schemas/topic-research-snapshot-v1.schema.json'
+      - 'roman-reels/research/narrow-topic-search/**'
+      - 'roman-reels/research/seo-reference-cooper-probe-results.json'
+      - 'roman-reels/scripts/researched-gemini-drafts*'
+      - 'roman-reels/scripts/send-drafts-to-sheet.mjs'
+      - 'roman-reels/docs/GEMINI_EDITORIAL_RULES.md'
+      - '.github/workflows/roman-shared-review-check.yml'
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Shared and legacy approval gates; queue and intake
+        run: |
+          node roman-reels/scripts/shared-review.test.mjs
+          node roman-reels/scripts/topic-only-review.test.mjs
+          node roman-reels/scripts/topic-self-approval.test.mjs
+          node roman-reels/scripts/prepare-shared-review.test.mjs
+          node roman-reels/scripts/production-queue.test.mjs
+          node roman-reels/scripts/manual-intake.test.mjs
+          node roman-reels/scripts/editorial-release.test.mjs
+          node roman-reels/scripts/build-seo-evidence-report.test.mjs
+          node roman-reels/scripts/topic-reference-plan.test.mjs
+          node roman-reels/scripts/topic-selection-reader.test.mjs
+          node roman-reels/scripts/disabled-topic-snapshot.test.mjs
+          node roman-reels/scripts/researched-gemini-drafts.test.mjs
+      - name: Additive installer must match source
+        run: |
+          node roman-reels/scripts/build-approval-addon.mjs
+          git diff --exit-code -- roman-reels/apps-script/RomanApproval.gs

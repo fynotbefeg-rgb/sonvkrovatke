@@ -1,0 +1,59 @@
+{
+  "draftVersion": "3.0.0",
+  "mode": "editorial",
+  "productionReady": false,
+  "syntheticFixtures": true,
+  "sourceSet": {
+    "topic_id": "windows-receipt-test-20261012",
+    "recordingParts": 4,
+    "status": "pending_approval",
+    "body_text": "СИНТЕТИЧЕСКИЙ ТЕСТ. Вымышленная основа для проверки квитанции. Не речь Романа и не для публикации.",
+    "body_text_hash": "58fdbe81f622f7464094fcb1b5736028c3abb348cd5db2d90147ea2fac9b0d44",
+    "hooks": [
+      {
+        "hook_id": 1,
+        "hook_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 1."
+      },
+      {
+        "hook_id": 2,
+        "hook_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 2."
+      },
+      {
+        "hook_id": 3,
+        "hook_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 3."
+      }
+    ]
+  },
+  "items": [
+    {
+      "version_id": "R-windows-receipt-test-20261012-h1",
+      "topic_id": "windows-receipt-test-20261012",
+      "hook_id": 1,
+      "script_revision": 1,
+      "hook_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 1.",
+      "script_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 1.\n\nСИНТЕТИЧЕСКИЙ ТЕСТ. Вымышленная основа для проверки квитанции. Не речь Романа и не для публикации.",
+      "status": "pending_approval",
+      "script_hash": "c25b75f9d3e1eb2938c792e8da0984d3c3db6e2e17848db05e911e00b2accbb6"
+    },
+    {
+      "version_id": "R-windows-receipt-test-20261012-h2",
+      "topic_id": "windows-receipt-test-20261012",
+      "hook_id": 2,
+      "script_revision": 1,
+      "hook_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 2.",
+      "script_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 2.\n\nСИНТЕТИЧЕСКИЙ ТЕСТ. Вымышленная основа для проверки квитанции. Не речь Романа и не для публикации.",
+      "status": "pending_approval",
+      "script_hash": "53888a815088fddd49cad6e336eade94ea71ab5f7b4ef62f786dbeb35f20dea4"
+    },
+    {
+      "version_id": "R-windows-receipt-test-20261012-h3",
+      "topic_id": "windows-receipt-test-20261012",
+      "hook_id": 3,
+      "script_revision": 1,
+      "hook_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 3.",
+      "script_text": "СИНТЕТИЧЕСКИЙ ТЕСТ: вымышленный хук 3.\n\nСИНТЕТИЧЕСКИЙ ТЕСТ. Вымышленная основа для проверки квитанции. Не речь Романа и не для публикации.",
+      "status": "pending_approval",
+      "script_hash": "122c80f67e5506a056f0814c36a03104cd9889ae106e843ff2bc6523e22962a3"
+    }
+  ]
+}

@@ -18,8 +18,8 @@ export function prepareClaudeJob(task) {
 Это уточнение заменяет указания задания о commit/push и запуске тестов.
 После изменений кратко опиши результат и оставшиеся проверки.\n\n`;
   return {prompt: constraints + task, metadata: {
-    task_id: 'roman-full-clip-01', task_sha256: hash,
-    branch: 'automation/roman-reels-v1', mode: 'proposal_only',
+    task_id: 'roman-factory-p1-v1', task_sha256: hash,
+    branch: 'feature/claude-montage', integration_branch: 'automation/roman-reels-v1', mode: 'proposal_only',
     approval_granted: false, ai_started: false,
     automatic_push: false, max_turns: 20,
   }};
@@ -28,7 +28,7 @@ export function prepareClaudeJob(task) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const outputDir = process.argv[2];
   if (!outputDir || process.argv.length !== 3) throw Error('Usage: prepare-claude-job.mjs NEW-output-directory');
-  const task = readFileSync(new URL('../docs/CLAUDE_CODE_TASK_01.md', import.meta.url), 'utf8');
+  const task = readFileSync(new URL('../docs/CLAUDE_P1_EXECUTION.md', import.meta.url), 'utf8');
   const result = prepareClaudeJob(task);
   mkdirSync(outputDir);
   writeFileSync(resolve(outputDir, 'prompt.txt'), result.prompt, {flag: 'wx'});

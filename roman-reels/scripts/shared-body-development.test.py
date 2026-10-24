@@ -1,0 +1,172 @@
+"""Development orchestration guards and partial failures, no actual renderer/network."""
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+import tempfile
+import unittest
+from unittest.mock import patch
+
+import factory_media as media
+
+
+def load(name, file):
+    spec = importlib.util.spec_from_file_location(name, Path(__file__).with_name(file))
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+pipeline = load('dev_pipeline', 'run-shared-body-development.py')
+helpers = load('assembly_helpers', 'assembled-jobs.test.py')
+
+
+class PipelineTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls): helpers.AssembledJobTests.setUpClass()
+    @classmethod
+    def tearDownClass(cls): helpers.AssembledJobTests.tearDownClass()
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(); self.root = Path(self.temp.name) / 'public'; self.root.mkdir()
+        for file in helpers.AssembledJobTests.root.glob('*.mp4'):
+            shutil.copyfile(file, self.root / file.name)
+        self.speech = copy.deepcopy(helpers.AssembledJobTests.speech)
+        self.plan = {'assemblyVersion': '1.0.0', 'mode': 'development', 'topicId': 'test',
+                     'body': {'localPath': 'body.mp4', 'sha256': self.speech['body']['sourceSha256']},
+                     'hooks': [{'hookNumber': n, 'localPath': f'h{n}.mp4', 'sha256': self.speech[f'h{n}']['sourceSha256']} for n in [1, 2, 3]]}
+        self.out = Path(self.temp.name) / 'output'
+    def tearDown(self): self.temp.cleanup()
+    def run_pipeline(self, renderer, hooks=(1, 2, 3), **options):
+        with patch.object(media, 'PUBLIC', self.root):
+            return pipeline.run(self.plan, self.speech['body'], {n: self.speech[f'h{n}'] for n in [1, 2, 3]},
+                                'rr/incoming/new-run', self.out, render_hooks=hooks, renderer=renderer, **options)
+
+    def test_three_distinct_jobs_and_no_approval_or_fresh_asr_claim(self):
+        jobs = []
+        def renderer(job, *_, **__):
+            jobs.append(job)
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer)
+        self.assertTrue(report['complete']); self.assertTrue(report['allThreeRendered'])
+        self.assertFalse(report['freshRecognition']); self.assertFalse(report['productionReady'])
+        self.assertEqual([j['hookNumber'] for j in jobs], [1, 2, 3])
+        for job in jobs:
+            self.assertEqual(job['approvalStatus'], 'pending_approval')
+            self.assertNotIn('approval', job)
+            self.assertGreater(job['wordTimings'][1]['start'], job['wordTimings'][0]['start'])
+
+    def test_renderer_failure_leaves_complete_false_and_preserves_originals(self):
+        calls = []
+        def renderer(job, *_, **__):
+            calls.append(job['hookNumber'])
+            if len(calls) == 2: raise ValueError('Render failure')
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        with self.assertRaises(ValueError): self.run_pipeline(renderer)
+        report = json.loads((self.out / 'pipeline-report.json').read_text())
+        self.assertFalse(report['complete']); self.assertEqual(len(report['renders']), 1)
+        for source in [self.plan['body'], *self.plan['hooks']]:
+            self.assertEqual(media.sha256(self.root / source['localPath']), source['sha256'])
+
+    def test_unsafe_directory_production_or_wrong_hook_selection_fail_before_outputs(self):
+        self.plan['mode'] = 'production'
+        with self.assertRaises(ValueError): self.run_pipeline(lambda *_: None)
+        self.assertFalse(self.out.exists())
+        self.plan['mode'] = 'development'
+        for hooks in [(), (1, 1), (4,), (True,)]:
+            with self.assertRaises(ValueError): self.run_pipeline(lambda *_: None, hooks)
+        with patch.object(media, 'PUBLIC', self.root), self.assertRaises(ValueError):
+            pipeline.run(self.plan, {}, {}, '../escape', self.out)
+        self.assertFalse(self.out.exists())
+
+    def test_changed_speech_cache_blocks_before_assembly(self):
+        self.speech['h2']['sourceSha256'] = '0' * 64
+        with self.assertRaises(ValueError): self.run_pipeline(lambda *_: None)
+        self.assertFalse(self.out.exists())
+        self.assertFalse((self.root / 'rr/incoming/new-run').exists())
+
+    def test_body_planned_once_and_shifted_into_each_variant(self):
+        received = {}
+        def renderer(job, *_, montage_plan=None, **__):
+            received[job['hookNumber']] = (job, montage_plan)
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer)
+        self.assertTrue(report['sharedBodyPlan']); self.assertEqual(sorted(received), [1, 2, 3])
+        body_plan = json.loads((self.out / 'shared-body-plan.json').read_text(encoding='utf-8'))
+        for n, (job, plan) in received.items():
+            evidence = json.loads((self.out / f"{job['reelId']}-speech.json").read_text(encoding='utf-8'))
+            hw, start = evidence['hookWordCount'], evidence['bodyStart']
+            body = [e for e in plan['events'] if e['wordStart'] >= hw]
+            self.assertEqual([e['id'] for e in body], ['body-' + e['id'] for e in body_plan['events']])
+            for e, r in zip(body, body_plan['events']):
+                self.assertEqual((e['type'], e['wordStart'] - hw, e['wordEnd'] - hw), (r['type'], r['wordStart'], r['wordEnd']))
+                self.assertAlmostEqual(e['start'] - start, r['start'], delta=2e-6)
+            self.assertEqual(plan, json.loads((self.out / f"{job['reelId']}-plan.json").read_text(encoding='utf-8')))
+
+    def test_render_concurrency_reaches_every_renderer_and_defaults_to_two(self):
+        seen = []
+        def renderer(job, *_, montage_plan=None, render_concurrency=None):
+            seen.append((job['hookNumber'], render_concurrency))
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer, render_concurrency=1)
+        self.assertEqual(seen, [(1, 1), (2, 1), (3, 1)])
+        self.assertEqual(report['renderConcurrency'], 1)
+        self.assertTrue(report['complete'])  # processing order of the three variants is unchanged
+        self.temp.cleanup(); self.setUp(); seen.clear()
+        self.assertEqual(self.run_pipeline(renderer)['renderConcurrency'], 2)
+        self.assertEqual(seen, [(1, 2), (2, 2), (3, 2)])
+
+    def test_invalid_render_concurrency_is_rejected_before_any_output_or_render(self):
+        def renderer(*_, **__): raise AssertionError('no render must start')
+        for bad in [0, 3, -1, True, False, 1.0, '2', None]:
+            with self.subTest(value=bad):
+                with self.assertRaises(ValueError): self.run_pipeline(renderer, render_concurrency=bad)
+                self.assertFalse(self.out.exists())
+                self.assertFalse((self.root / 'rr/incoming/new-run').exists())
+
+    def test_video_cache_size_reaches_every_renderer_and_is_recorded_in_the_report(self):
+        seen = []
+        def renderer(job, *_, montage_plan=None, render_concurrency=None, video_cache_size_in_bytes=None):
+            seen.append((job['hookNumber'], render_concurrency, video_cache_size_in_bytes))
+            return {'technicalPassed': True, 'outputSha256': job['sourceVideo']['sha256']}
+        report = self.run_pipeline(renderer, render_concurrency=1, video_cache_size_in_bytes=268435456)
+        self.assertEqual(seen, [(1, 1, 268435456), (2, 1, 268435456), (3, 1, 268435456)])
+        saved = json.loads((self.out / 'pipeline-report.json').read_text(encoding='utf-8'))
+        self.assertEqual(saved['offthreadVideoCacheSizeInBytes'], 268435456)
+        self.assertEqual(report['offthreadVideoCacheSizeInBytes'], 268435456)
+        self.temp.cleanup(); self.setUp(); seen.clear()
+        self.assertIsNone(self.run_pipeline(renderer)['offthreadVideoCacheSizeInBytes'])  # default: Remotion's own
+        self.assertEqual(seen, [(1, 2, None), (2, 2, None), (3, 2, None)])
+
+    def test_invalid_video_cache_size_is_rejected_before_any_output_or_render(self):
+        def renderer(*_, **__): raise AssertionError('no render must start')
+        for bad in [0, -1, 67108863, 8589934593, True, 268435456.0, '268435456']:
+            with self.subTest(value=bad):
+                with self.assertRaises(ValueError): self.run_pipeline(renderer, video_cache_size_in_bytes=bad)
+                self.assertFalse(self.out.exists())
+                self.assertFalse((self.root / 'rr/incoming/new-run').exists())
+
+    def test_command_line_rejects_bad_video_cache_size_before_reading_inputs(self):
+        import subprocess, sys
+        script = Path(__file__).with_name('run-shared-body-development.py')
+        base = [sys.executable, str(script), 'x.json', '--body-speech', 'b.json', '--hook-speech', 'h1.json', 'h2.json', 'h3.json',
+                '--public-directory', 'rr/incoming/never', '--out', str(self.out)]
+        help_text = subprocess.run([sys.executable, str(script), '--help'], capture_output=True, text=True, encoding='utf-8', timeout=60).stdout
+        self.assertIn('--offthreadvideo-cache-size-in-bytes', help_text)
+        for bad in ['0', '-1', '67108863', '8589934593', '256MB', '2.5e8']:
+            run = subprocess.run(base + ['--offthreadvideo-cache-size-in-bytes', bad], capture_output=True, timeout=60)
+            self.assertEqual(run.returncode, 2, bad)  # x.json does not exist: exit 2 means nothing was read
+            self.assertFalse(self.out.exists())
+
+    def test_command_line_accepts_only_one_or_two(self):
+        import subprocess, sys
+        script = Path(__file__).with_name('run-shared-body-development.py')
+        base = [sys.executable, str(script), 'x.json', '--body-speech', 'b.json', '--hook-speech', 'h1.json', 'h2.json', 'h3.json',
+                '--public-directory', 'rr/incoming/never', '--out', str(self.out)]
+        help_text = subprocess.run([sys.executable, str(script), '--help'], capture_output=True, text=True, encoding='utf-8', timeout=60).stdout
+        self.assertIn('--render-concurrency', help_text)
+        for bad in ['0', '3', 'two']:
+            run = subprocess.run(base + ['--render-concurrency', bad], capture_output=True, timeout=60)
+            self.assertEqual(run.returncode, 2, bad)  # argparse rejects it before anything is read or created
+            self.assertFalse(self.out.exists())
+
+
+if __name__ == '__main__': unittest.main()

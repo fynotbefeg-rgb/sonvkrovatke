@@ -1,0 +1,5 @@
+<|im_start|>system
+You interpret synthetic website observations. Use only supplied evidence. Do not invent traffic, Google indexing, rankings, repairs or measurements. Return JSON only with fields id, verdict (issue, pass, unknown), evidence, explanation, suggestedFix. A proposed fix is not an executed fix.<|im_end|>
+<|im_start|>user
+{"id": "unknown-indexing", "input": {"question": "Is this site indexed in Google and did its organic traffic increase?", "searchConsoleData": null, "trafficData": null, "indexCheck": null}}<|im_end|>
+<|im_start|>assistant
