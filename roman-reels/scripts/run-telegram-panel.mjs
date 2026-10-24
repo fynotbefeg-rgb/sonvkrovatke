@@ -12,6 +12,7 @@ import {loadWindowsTelegramConfig} from './windows-telegram-config.mjs';
 import {readReviewStatuses} from './review-status-reader.mjs';
 import {runTelegramPoller} from './telegram-poll-recovery.mjs';
 import {readCandidateCatalog} from './telegram-candidates.mjs';
+import {FourPartIntake,launcherPlanner} from './telegram-intake.mjs';
 
 async function main(){
   const mode=process.argv[2],windows=mode?.startsWith('--windows-');
@@ -34,10 +35,15 @@ async function main(){
   process.umask(0o077);await mkdir(path.dirname(file),{recursive:true,mode:0o700});
   await withLock(`${file}.lock`,async()=>{
     const queue=new ProductionQueue(file);await chmod(file,0o600);
+    // Kit folders stay outside Git next to the private DB; the launcher is only called in plan mode,
+    // with the same Python environment the laptop's ASR runs use.
+    const intakeRoot=windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-intake'):process.env.ROMAN_TELEGRAM_INTAKE_DIR;
+    const intake=intakeRoot&&path.isAbsolute(intakeRoot)?new FourPartIntake(queue.db,{root:intakeRoot,
+      plan:launcherPlanner({python:process.env.ROMAN_INTAKE_PYTHON||(windows?path.join(process.env.LOCALAPPDATA,'RomanReels','asr-env','Scripts','python.exe'):'python3')})}):undefined;
     try{
       await runTelegramPoller({identify:()=>api.identity(config?.botUsername),
         poll:botId=>pollTelegramPanelOnce({api,botId,queue,allowedOperatorIds:ids,
-          readCurrentApprovals:()=>readApprovedQueue({url,token}),readReviewStatus:()=>readReviewStatuses({url,token}),
+          readCurrentApprovals:()=>readApprovedQueue({url,token}),intake,readReviewStatus:()=>readReviewStatuses({url,token}),
           readCandidates:()=>readCandidateCatalog(windows?path.join(process.env.LOCALAPPDATA,'RomanReels','telegram-panel','candidate-topics.json'):process.env.ROMAN_TELEGRAM_CANDIDATES_PATH)}),
         continuous:['--serve','--windows-serve'].includes(mode),log:record=>console.log(JSON.stringify(record))});
     }finally{queue.close();}

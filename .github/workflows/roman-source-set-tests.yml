@@ -51,6 +51,7 @@ jobs:
           node roman-reels/scripts/queue-delivery-bridge.test.mjs
           node roman-reels/scripts/production-queue.test.mjs
           node roman-reels/scripts/telegram-panel.test.mjs
+          node roman-reels/scripts/telegram-intake.test.mjs
           node roman-reels/scripts/telegram-candidates.test.mjs
           node roman-reels/scripts/telegram-poll-recovery.test.mjs
           node roman-reels/scripts/review-status.test.mjs
