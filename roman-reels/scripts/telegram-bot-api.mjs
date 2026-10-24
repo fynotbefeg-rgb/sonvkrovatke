@@ -1,7 +1,10 @@
 // Authenticated Bot API long polling only; this is NOT an HTTP webhook handler.
+import {open,rm} from 'node:fs/promises';
 const verified=new WeakSet();
+// Cloud Bot API serves bots files of at most 20 MB through getFile; larger originals cannot be received this way.
+export const TELEGRAM_CLOUD_DOWNLOAD_LIMIT=20*1024*1024;
 export const isVerifiedTelegramUpdate=update=>!!update&&verified.has(update);
-const methods=['getMe','getUpdates','sendMessage','answerCallbackQuery'];
+const methods=['getMe','getUpdates','sendMessage','answerCallbackQuery','getFile','downloadFile'];
 const kinds=['network','rate_limit','rate_limit_deferred','server_error','auth_failed','access_denied','conflict','invalid_request','protocol'];
 const networkCodes=['ENOTFOUND','EAI_AGAIN','ECONNRESET','ETIMEDOUT','ECONNREFUSED','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','ABORT_ERR'];
 export class TelegramApiError extends Error {
@@ -67,6 +70,30 @@ export function telegramApi({token,fetchImpl=fetch}={}) {
     async send(chatId,text,reply_markup){
       if(!Number.isSafeInteger(chatId)||chatId<=0||typeof text!=='string'||text.length>4000)throw Error('Invalid panel message');
       return call('sendMessage',{chat_id:chatId,text,...(reply_markup?{reply_markup}:{}),disable_web_page_preview:true});
+    },
+    async fileInfo(fileId){
+      if(typeof fileId!=='string'||!/^[A-Za-z0-9_-]{1,256}$/.test(fileId))throw Error('Invalid file ID');
+      const file=await call('getFile',{file_id:fileId}),filePath=file?.file_path;
+      if(typeof filePath!=='string'||!/^[A-Za-z0-9_-][A-Za-z0-9_./-]{0,255}$/.test(filePath)||filePath.split('/').includes('..')||
+        !Number.isSafeInteger(file.file_size)||file.file_size<1)throw new TelegramApiError('protocol',{method:'getFile'});
+      return {filePath,size:file.file_size};
+    },
+    // Streams one file to a new local path; never overwrites, removes a partial file on any failure.
+    async download(filePath,destination,maxBytes=TELEGRAM_CLOUD_DOWNLOAD_LIMIT){
+      if(typeof filePath!=='string'||!/^[A-Za-z0-9_-][A-Za-z0-9_./-]{0,255}$/.test(filePath)||filePath.split('/').includes('..'))throw Error('Invalid file path');
+      if(!Number.isSafeInteger(maxBytes)||maxBytes<1||maxBytes>TELEGRAM_CLOUD_DOWNLOAD_LIMIT)throw Error('Invalid download limit');
+      let response;
+      try{response=await fetchImpl(`https://api.telegram.org/file/bot${token}/${filePath}`,{method:'GET',redirect:'error',signal:AbortSignal.timeout(300000)});}
+      catch(error){throw new TelegramApiError('network',{method:'downloadFile',networkCode:error?.cause?.code??error?.code});}
+      if(!response.ok||!response.body)throw response.ok?new TelegramApiError('protocol',{method:'downloadFile'}):httpError(response.status,'downloadFile');
+      const declared=Number(response.headers.get('content-length'));
+      if(Number.isFinite(declared)&&declared>maxBytes)throw new TelegramApiError('protocol',{method:'downloadFile'});
+      const target=await open(destination,'wx');let size=0,done=false;
+      try{
+        for await(const chunk of response.body){size+=chunk.length;if(size>maxBytes)throw new TelegramApiError('protocol',{method:'downloadFile'});await target.write(chunk);}
+        done=true;return size;
+      }catch(error){if(error instanceof TelegramApiError)throw error;throw new TelegramApiError('network',{method:'downloadFile',networkCode:error?.cause?.code??error?.code});}
+      finally{await target.close();if(!done)await rm(destination,{force:true});}
     },
     async answer(id){if(typeof id!=='string'||!/^[a-zA-Z0-9_-]{1,128}$/.test(id))throw Error('Invalid callback ID');return call('answerCallbackQuery',{callback_query_id:id});}
   };

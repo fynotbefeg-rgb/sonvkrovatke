@@ -5,6 +5,7 @@ import {validateManifest} from './approval-manifest.mjs';
 import {handleVerifiedStart} from './telegram-start-controller.mjs';
 import {validateReviewStatusSnapshot} from './review-status-reader.mjs';
 import {validateCandidateCatalog} from './telegram-candidates.mjs';
+import {handleFourPartIntake} from './telegram-intake.mjs';
 
 const pageSize=10;
 const displayId=id=>id.length>100?`${id.slice(0,97)}…`:id;
@@ -24,12 +25,14 @@ const pageControls=(kind,page,total,size=pageSize)=>({inline_keyboard:[
   [{text:'Меню',callback_data:'panel:menu'}]]});
 function currentApproved(data){const items=validateManifest(data);if(items.length>180||items.some(i=>i.status!=='approved'||Date.parse(i.approved_at)>Date.now()))throw Error('Current approved queue required');return items;}
 
-export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,readCurrentApprovals,readReviewStatus,readCandidates}={}) {
+export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,readCurrentApprovals,readReviewStatus,readCandidates,intake}={}) {
   if(!isVerifiedTelegramUpdate(update))throw Error('Authenticated Telegram transport required');
   const actor=authorized(update,allowedOperatorIds);if(!actor)return {ignored:true};
   if(typeof readCurrentApprovals!=='function')throw Error('Authenticated approval reader required');
   const callback=update.callback_query;
   if(callback)await api.answer(callback.id);
+  const intakeResult=await handleFourPartIntake(update,actor,{api,intake});
+  if(intakeResult)return intakeResult;
   const data=callback?.data??update.message?.text;
   if(typeof data!=='string')return {ignored:true};
   if(data.startsWith('start:')) {
@@ -61,7 +64,7 @@ export async function handleTelegramPanel(update,{api,queue,allowedOperatorIds,r
   }
   const approvals=data==='/approvals'||match?.[1]==='approvals';
   const menu=['/start','/run','panel:menu'].includes(data);
-  if(!approvals&&!menu){await api.send(actor,'Открой /start, /candidates, /approvals или /production.');return {ignored:true};}
+  if(!approvals&&!menu){await api.send(actor,'Открой /start, /candidates, /approvals, /production или /intake.');return {ignored:true};}
   if(approvals&&typeof readReviewStatus==='function'){
     let snapshot;
     try{snapshot=validateReviewStatusSnapshot(await readReviewStatus());}
