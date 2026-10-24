@@ -1,10 +1,13 @@
 // Authenticated Bot API long polling only; this is NOT an HTTP webhook handler.
-import {open,rm} from 'node:fs/promises';
+import {open,rm,stat} from 'node:fs/promises';
+import {openAsBlob} from 'node:fs';
 const verified=new WeakSet();
 // Cloud Bot API serves bots files of at most 20 MB through getFile; larger originals cannot be received this way.
 export const TELEGRAM_CLOUD_DOWNLOAD_LIMIT=20*1024*1024;
+// sendDocument via multipart/form-data: "Bots can currently send files of any type of up to 50 MB in size".
+export const TELEGRAM_CLOUD_UPLOAD_LIMIT=50*1024*1024;
 export const isVerifiedTelegramUpdate=update=>!!update&&verified.has(update);
-const methods=['getMe','getUpdates','sendMessage','answerCallbackQuery','getFile','downloadFile'];
+const methods=['getMe','getUpdates','sendMessage','answerCallbackQuery','getFile','downloadFile','sendDocument'];
 const kinds=['network','rate_limit','rate_limit_deferred','server_error','auth_failed','access_denied','conflict','invalid_request','protocol'];
 const networkCodes=['ENOTFOUND','EAI_AGAIN','ECONNRESET','ETIMEDOUT','ECONNREFUSED','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','ABORT_ERR'];
 export class TelegramApiError extends Error {
@@ -33,12 +36,12 @@ function httpError(status,method,retryAfter){
 }
 export function telegramApi({token,fetchImpl=fetch}={}) {
   if(typeof token!=='string'||!/^\d{5,16}:[A-Za-z0-9_-]{20,200}$/.test(token))throw Error('Private bot token required');
-  async function call(method,body) {
+  async function call(method,body,{form,timeoutMs=45000}={}) {
     let response;
     try {
       response=await fetchImpl(`https://api.telegram.org/bot${token}/${method}`,{
-        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),
-        redirect:'error',signal:AbortSignal.timeout(45000)});
+        method:'POST',...(form?{body:form}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),
+        redirect:'error',signal:AbortSignal.timeout(timeoutMs)});
     }catch(error){throw new TelegramApiError('network',{method,networkCode:error?.cause?.code??error?.code});}
     if(!response.body)throw response.ok?new TelegramApiError('protocol',{method}):httpError(response.status,method);
     const chunks=[];let size=0;
@@ -94,6 +97,18 @@ export function telegramApi({token,fetchImpl=fetch}={}) {
         done=true;return size;
       }catch(error){if(error instanceof TelegramApiError)throw error;throw new TelegramApiError('network',{method:'downloadFile',networkCode:error?.cause?.code??error?.code});}
       finally{await target.close();if(!done)await rm(destination,{force:true});}
+    },
+    // One local file as a document (no recompression); refuses anything over the cloud upload limit.
+    async sendDocument(chatId,file,{caption,fileName}={}){
+      if(!Number.isSafeInteger(chatId)||chatId<=0||(caption!==undefined&&(typeof caption!=='string'||caption.length>1024)))throw Error('Invalid document message');
+      const size=(await stat(file)).size;
+      if(size<1||size>TELEGRAM_CLOUD_UPLOAD_LIMIT)throw Error('Document outside Telegram upload limit');
+      const form=new FormData();
+      form.append('chat_id',String(chatId));
+      if(caption)form.append('caption',caption);
+      form.append('document',await openAsBlob(file,{type:'video/mp4'}),fileName??'video.mp4');
+      const message=await call('sendDocument',null,{form,timeoutMs:600000});
+      return {messageId:Number.isSafeInteger(message?.message_id)?message.message_id:null};
     },
     async answer(id){if(typeof id!=='string'||!/^[a-zA-Z0-9_-]{1,128}$/.test(id))throw Error('Invalid callback ID');return call('answerCallbackQuery',{callback_query_id:id});}
   };
