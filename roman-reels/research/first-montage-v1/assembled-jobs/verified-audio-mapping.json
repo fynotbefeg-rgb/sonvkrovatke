@@ -1,0 +1,212 @@
+{
+  "artifactVersion": "1.0.0",
+  "mode": "development",
+  "method": "decoded_PCM_16k_mono_zero_lag_Pearson",
+  "minimumCorrelation": 0.95,
+  "checks": [
+    {
+      "hookNumber": 1,
+      "role": "hook",
+      "sourceSha256": "8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd",
+      "assembledSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "sourcePosition": 0.2,
+      "assembledPosition": 0.2,
+      "windowSeconds": 1,
+      "correlation": 0.999979,
+      "passed": true
+    },
+    {
+      "hookNumber": 1,
+      "role": "hook",
+      "sourceSha256": "8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd",
+      "assembledSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "sourcePosition": 3.243,
+      "assembledPosition": 3.243,
+      "windowSeconds": 1,
+      "correlation": 0.999943,
+      "passed": true
+    },
+    {
+      "hookNumber": 1,
+      "role": "hook",
+      "sourceSha256": "8e38af9700bf27ff05a107150dab5539133d39bfcd38d7ebd1a2c39679a4a5dd",
+      "assembledSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "sourcePosition": 5.285,
+      "assembledPosition": 5.285,
+      "windowSeconds": 1,
+      "correlation": 0.999961,
+      "passed": true
+    },
+    {
+      "hookNumber": 1,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "sourcePosition": 0.2,
+      "assembledPosition": 6.72,
+      "windowSeconds": 1,
+      "correlation": 0.999751,
+      "passed": true
+    },
+    {
+      "hookNumber": 1,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "sourcePosition": 16.86,
+      "assembledPosition": 23.38,
+      "windowSeconds": 1,
+      "correlation": 0.999902,
+      "passed": true
+    },
+    {
+      "hookNumber": 1,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "cd47629f41cfb1f94f6b03695753b3d54bdb825829f46f9353f1931657a026fe",
+      "sourcePosition": 32.52,
+      "assembledPosition": 39.04,
+      "windowSeconds": 1,
+      "correlation": 0.999902,
+      "passed": true
+    },
+    {
+      "hookNumber": 2,
+      "role": "hook",
+      "sourceSha256": "5ab06283c1f28c3d01da9ee2ac2720a66d4fcc4697f2ef28da36cacf4a43ca2e",
+      "assembledSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "sourcePosition": 0.2,
+      "assembledPosition": 0.2,
+      "windowSeconds": 1,
+      "correlation": 0.999967,
+      "passed": true
+    },
+    {
+      "hookNumber": 2,
+      "role": "hook",
+      "sourceSha256": "5ab06283c1f28c3d01da9ee2ac2720a66d4fcc4697f2ef28da36cacf4a43ca2e",
+      "assembledSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "sourcePosition": 3.882,
+      "assembledPosition": 3.882,
+      "windowSeconds": 1,
+      "correlation": 0.999992,
+      "passed": true
+    },
+    {
+      "hookNumber": 2,
+      "role": "hook",
+      "sourceSha256": "5ab06283c1f28c3d01da9ee2ac2720a66d4fcc4697f2ef28da36cacf4a43ca2e",
+      "assembledSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "sourcePosition": 6.565,
+      "assembledPosition": 6.565,
+      "windowSeconds": 1,
+      "correlation": 0.999919,
+      "passed": true
+    },
+    {
+      "hookNumber": 2,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "sourcePosition": 0.2,
+      "assembledPosition": 8.0,
+      "windowSeconds": 1,
+      "correlation": 0.999747,
+      "passed": true
+    },
+    {
+      "hookNumber": 2,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "sourcePosition": 16.86,
+      "assembledPosition": 24.66,
+      "windowSeconds": 1,
+      "correlation": 0.999882,
+      "passed": true
+    },
+    {
+      "hookNumber": 2,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "699880168a6a7f79d155f140162959342ad0f7f614bf48998bc41a9278d532c9",
+      "sourcePosition": 32.52,
+      "assembledPosition": 40.32,
+      "windowSeconds": 1,
+      "correlation": 0.999902,
+      "passed": true
+    },
+    {
+      "hookNumber": 3,
+      "role": "hook",
+      "sourceSha256": "e378029223e4f50e96bc3a82384023b8cc1880b3090518960557d83727a3dce6",
+      "assembledSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "sourcePosition": 0.2,
+      "assembledPosition": 0.2,
+      "windowSeconds": 1,
+      "correlation": 0.99997,
+      "passed": true
+    },
+    {
+      "hookNumber": 3,
+      "role": "hook",
+      "sourceSha256": "e378029223e4f50e96bc3a82384023b8cc1880b3090518960557d83727a3dce6",
+      "assembledSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "sourcePosition": 2.38,
+      "assembledPosition": 2.38,
+      "windowSeconds": 1,
+      "correlation": 0.999904,
+      "passed": true
+    },
+    {
+      "hookNumber": 3,
+      "role": "hook",
+      "sourceSha256": "e378029223e4f50e96bc3a82384023b8cc1880b3090518960557d83727a3dce6",
+      "assembledSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "sourcePosition": 3.56,
+      "assembledPosition": 3.56,
+      "windowSeconds": 1,
+      "correlation": 0.999986,
+      "passed": true
+    },
+    {
+      "hookNumber": 3,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "sourcePosition": 0.2,
+      "assembledPosition": 4.96,
+      "windowSeconds": 1,
+      "correlation": 0.999834,
+      "passed": true
+    },
+    {
+      "hookNumber": 3,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "sourcePosition": 16.86,
+      "assembledPosition": 21.62,
+      "windowSeconds": 1,
+      "correlation": 0.999927,
+      "passed": true
+    },
+    {
+      "hookNumber": 3,
+      "role": "body",
+      "sourceSha256": "f3dfcfe479eea52eb216d7434ac33174d760ce18ac6b5224169ca6076040d92e",
+      "assembledSha256": "43f9c35bb85404dda2b6edb33edaed24c3a6afebbd3da8dd005e45922e69814a",
+      "sourcePosition": 32.52,
+      "assembledPosition": 37.28,
+      "windowSeconds": 1,
+      "correlation": 0.999936,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "productionReady": false,
+  "limitations": [
+    "Sampled windows, not all audio",
+    "Does not validate transcript wording or word alignment precision"
+  ]
+}

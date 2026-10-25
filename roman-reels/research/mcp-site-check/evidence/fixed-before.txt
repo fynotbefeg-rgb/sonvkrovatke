@@ -1,0 +1,14 @@
+### Ran Playwright code
+```js
+await page.goto('http://127.0.0.1:34421/fixed');
+```
+### Page
+- Page URL: http://127.0.0.1:34421/fixed
+- Page Title: CRM для бизнеса — учебный сайт
+### Snapshot
+- [Snapshot](research/mcp-site-check/evidence/page-2026-10-10T15-23-42-463Z.yml)
+- generic [active] [ref=f2e1]:
+  - heading "Настройка CRM для малого бизнеса" [level=1] [ref=f2e2]
+  - paragraph [ref=f2e3]: Учебный сайт для проверки MCP. Никаких реальных заявок.
+  - link "Оставить заявку" [ref=f2e4] [cursor=pointer]:
+    - /url: /contact

@@ -1,6 +1,5 @@
 import { AbsoluteFill, Img, Sequence, OffthreadVideo, interpolate, spring, useCurrentFrame, useVideoConfig, staticFile } from "remotion";
 import { S, FORMULA_FRAMES } from "./FormulaReel";
-const F = 30;
 const C = { acc: "#E3C186", acc2: "#F8E7C2", gold: "#C9A266", green: "#024D2F", txt: "#FFFFFF", mut: "#DCE6DF" };
 const font = `@font-face{font-family:G;src:url(${staticFile("fonts/golos-cyr.woff2")})}@font-face{font-family:G;src:url(${staticFile("fonts/golos-lat.woff2")});unicode-range:U+0000-00FF}`;
 const ITEMS = ["Новые клиенты","Новые партнёрства","Выход на нужных людей","Личный бренд собственника","Доверие к вам и компании","Презентация продукта ЦА","Коллаборации между компаниями","Новые точки продаж и роста","Сильная позиция на рынке"];
@@ -44,7 +43,7 @@ export const FormulaReel3: React.FC = () => {
     </Low></Sequence>
     <Sequence from={Math.round(S.list)} durationInFrames={Math.round(S.not-S.list)}><Low bottom={330}>
       {(()=>{const loc=lf-ii*S.item; return <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-        <div style={{fontFamily:"G",fontSize:150,fontWeight:800,lineHeight:1,color:C.acc,textShadow:shadow,fontFamily:"G"}}>{String(ii+1).padStart(2,"0")}</div>
+        <div style={{fontFamily:"G",fontSize:150,fontWeight:800,lineHeight:1,color:C.acc,textShadow:shadow}}>{String(ii+1).padStart(2,"0")}</div>
         <div key={ii} style={{...H,fontSize:76,lineHeight:1.1,marginTop:10,transform:`translateY(${interpolate(loc,[0,7],[40,0],{extrapolateRight:"clamp"})}px)`,opacity:interpolate(loc,[0,5],[0,1],{extrapolateRight:"clamp"})}}>{ITEMS[ii]}</div>
         <div style={{display:"flex",gap:12,marginTop:46}}>{ITEMS.map((_,k)=><div key={k} style={{width:k===ii?54:16,height:16,borderRadius:8,background:k<=ii?C.acc:"#ffffff55"}}/>)}</div></div>;})()}
     </Low></Sequence>

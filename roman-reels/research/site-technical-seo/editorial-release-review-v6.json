@@ -1,0 +1,102 @@
+{
+  "reviewVersion": "1.0.0",
+  "rulesVersion": "1.2.0",
+  "rulesSha256": "80243e06b1687cdd6cc0865e46185676c4a35c568704a1f3846fba8c8a526b64",
+  "reviewer": "Codex preflight — incomplete editorial review",
+  "semanticReviewCompleted": false,
+  "romanApprovalGranted": false,
+  "scriptHashes": [
+    {
+      "versionId": "R-ai-seo-audit-h1",
+      "scriptHash": "bf59c2c20370666cf059283a814057d83547ff4244c47a652a07252b88d5cfba"
+    },
+    {
+      "versionId": "R-ai-seo-audit-h2",
+      "scriptHash": "4206def226229a2dc0763b38f59ef8d4e9c833a35c77356b3fae34d5dc6cf064"
+    },
+    {
+      "versionId": "R-ai-seo-audit-h3",
+      "scriptHash": "40d684d48ca3dcb2a584988643d2fb9e7f740948a26f68ad653b75d772bc000b"
+    }
+  ],
+  "businessTask": {
+    "actor": "Предприниматель",
+    "input": "Чек-лист и данные сайта",
+    "operation": "Передать данные Claude и запросить задачи с доказательствами",
+    "output": "Ожидаемый список URL, ошибок, правок и перепроверок",
+    "extraValue": "Проверяемые задачи вместо общих рекомендаций; результат Claude пока не получен"
+  },
+  "reference": {
+    "platform": "instagram",
+    "inspectionMode": "frames_and_transcript",
+    "relevance": "Claude SEO setup: соответствует общей теме, но старше критерия свежести",
+    "evidence": {
+      "path": "roman-reels/research/seo-reference-cooper-public-evidence.json",
+      "sha256": "7a7684b41a8139f84adfe2c498a6094c2856ab1ab8bb75b2838f0f590f1aee44"
+    }
+  },
+  "demonstration": {
+    "status": "prepared",
+    "workflowMatchesScript": false,
+    "syntheticDisclosed": true,
+    "artifacts": [],
+    "steps": [],
+    "reason": "Технический учебный HTTP/DOM тест выполнен отдельно; предлагаемая инструкция Claude не испытана."
+  },
+  "criteria": [
+    {
+      "id": "task",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "reference",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "setup",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "demo",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "claims",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "costs_limits",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "body_hooks",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    },
+    {
+      "id": "approval",
+      "status": "pending",
+      "note": "Нужно закончить редакторскую проверку до отправки Роману",
+      "evidence": []
+    }
+  ],
+  "costReview": {
+    "status": "unknown",
+    "scope": "viewer_workflow",
+    "workflowMatchesScript": false,
+    "reason": "Не проверены стоимость MCP, доступ к модели, бесплатный путь и его применимые лимиты; это не утверждение платности конкретного MCP."
+  }
+}

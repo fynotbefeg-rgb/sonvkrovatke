@@ -1,6 +1,5 @@
 import { AbsoluteFill, Sequence, OffthreadVideo, interpolate, spring, useCurrentFrame, useVideoConfig, staticFile } from "remotion";
 import { S, FORMULA_FRAMES } from "./FormulaReel";
-const F = 30;
 const C = { acc: "#5BF2C4", acc2: "#3D7BFF", txt: "#FFFFFF", mut: "#D5DDEA" };
 const font = `@font-face{font-family:G;src:url(${staticFile("fonts/golos-cyr.woff2")})}@font-face{font-family:G;src:url(${staticFile("fonts/golos-lat.woff2")});unicode-range:U+0000-00FF}`;
 const ITEMS = ["Новые клиенты","Новые партнёрства","Выход на нужных людей","Личный бренд собственника","Доверие к вам и компании","Презентация продукта ЦА","Коллаборации между компаниями","Новые точки продаж и роста","Сильная позиция на рынке"];

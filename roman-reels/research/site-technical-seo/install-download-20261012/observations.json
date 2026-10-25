@@ -1,0 +1,497 @@
+[
+  {
+    "url": "https://install.download/",
+    "finalUrl": "https://install.download/",
+    "status": 200,
+    "xRobotsTag": null,
+    "bytesRead": 492140,
+    "title": "Download free programs for any device",
+    "h1": [
+      "Software search"
+    ],
+    "canonical": [],
+    "robots": [],
+    "descriptionPresent": true,
+    "descriptionLengths": [
+      245
+    ]
+  },
+  {
+    "url": "https://install.download/robots.txt",
+    "finalUrl": "https://install.download/robots.txt",
+    "status": 200,
+    "xRobotsTag": null,
+    "bytesRead": 489,
+    "textPreview": "User-agent: *\nDisallow: /login\nDisallow: /dashboard\nDisallow: /seo-backlinks\nDisallow: /*?*\nDisallow: *?s=\nDisallow: *?p=\nAllow: *?page=\nSitemap: https://install.download/sitemaps/index_sitemap.xml\n\nUser-agent: Yandex\nDisallow: /login\nDisallow: /dashboard\nDisallow: /seo-backlinks\nDisallow: /*?*\nDisallow: *?s=\nDisallow: *?p=\nAllow: *?page=\n\nUser-agent: Googlebot\nDisallow: /login\nDisallow: /dashboard\nDisallow: /seo-backlinks\nDisallow: /*?*\nDisallow: *?s=\nDisallow: *?p=\nAllow: *?page=\n\n\n"
+  },
+  {
+    "url": "https://install.download/sitemap.xml",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://install.download/sitemaps/index_sitemap.xml",
+    "finalUrl": "https://install.download/sitemaps/index_sitemap.xml",
+    "status": 200,
+    "contentType": "text/xml; charset=utf-8",
+    "xRobotsTag": null,
+    "bytesRead": 81114
+  },
+  {
+    "url": "https://install.download/windows/business",
+    "finalUrl": "https://install.download/windows/business",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "xRobotsTag": null,
+    "bytesRead": 237645,
+    "title": "Download software in category Business, Finance for Windows",
+    "h1": [
+      "Business, Finance"
+    ],
+    "canonical": [],
+    "robots": [],
+    "hreflang": [
+      {
+        "lang": "x-default",
+        "url": "https://install.download/windows/business"
+      },
+      {
+        "lang": "ru",
+        "url": "https://install.download/ru/windows/business"
+      },
+      {
+        "lang": "en",
+        "url": "https://install.download/windows/business"
+      },
+      {
+        "lang": "fr",
+        "url": "https://install.download/fr/windows/business"
+      },
+      {
+        "lang": "de",
+        "url": "https://install.download/de/windows/business"
+      },
+      {
+        "lang": "es",
+        "url": "https://install.download/es/windows/business"
+      },
+      {
+        "lang": "pt",
+        "url": "https://install.download/pt/windows/business"
+      },
+      {
+        "lang": "it",
+        "url": "https://install.download/it/windows/business"
+      },
+      {
+        "lang": "zh",
+        "url": "https://install.download/zh/windows/business"
+      },
+      {
+        "lang": "uk",
+        "url": "https://install.download/uk/windows/business"
+      },
+      {
+        "lang": "nl",
+        "url": "https://install.download/nl/windows/business"
+      },
+      {
+        "lang": "id",
+        "url": "https://install.download/id/windows/business"
+      },
+      {
+        "lang": "tr",
+        "url": "https://install.download/tr/windows/business"
+      },
+      {
+        "lang": "ja",
+        "url": "https://install.download/ja/windows/business"
+      },
+      {
+        "lang": "ko",
+        "url": "https://install.download/ko/windows/business"
+      },
+      {
+        "lang": "cs",
+        "url": "https://install.download/cs/windows/business"
+      },
+      {
+        "lang": "lv",
+        "url": "https://install.download/lv/windows/business"
+      }
+    ],
+    "descriptionPresent": true,
+    "descriptionLengths": [
+      131
+    ]
+  },
+  {
+    "url": "https://install.download/windows/browsers",
+    "finalUrl": "https://install.download/windows/browsers",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "xRobotsTag": null,
+    "bytesRead": 247240,
+    "title": "Download browsers for Windows",
+    "h1": [
+      "Web browsers"
+    ],
+    "canonical": [],
+    "robots": [],
+    "hreflang": [
+      {
+        "lang": "x-default",
+        "url": "https://install.download/windows/browsers"
+      },
+      {
+        "lang": "ru",
+        "url": "https://install.download/ru/windows/browsers"
+      },
+      {
+        "lang": "en",
+        "url": "https://install.download/windows/browsers"
+      },
+      {
+        "lang": "fr",
+        "url": "https://install.download/fr/windows/browsers"
+      },
+      {
+        "lang": "de",
+        "url": "https://install.download/de/windows/browsers"
+      },
+      {
+        "lang": "es",
+        "url": "https://install.download/es/windows/browsers"
+      },
+      {
+        "lang": "pt",
+        "url": "https://install.download/pt/windows/browsers"
+      },
+      {
+        "lang": "it",
+        "url": "https://install.download/it/windows/browsers"
+      },
+      {
+        "lang": "zh",
+        "url": "https://install.download/zh/windows/browsers"
+      },
+      {
+        "lang": "uk",
+        "url": "https://install.download/uk/windows/browsers"
+      },
+      {
+        "lang": "nl",
+        "url": "https://install.download/nl/windows/browsers"
+      },
+      {
+        "lang": "id",
+        "url": "https://install.download/id/windows/browsers"
+      },
+      {
+        "lang": "tr",
+        "url": "https://install.download/tr/windows/browsers"
+      },
+      {
+        "lang": "ja",
+        "url": "https://install.download/ja/windows/browsers"
+      },
+      {
+        "lang": "ko",
+        "url": "https://install.download/ko/windows/browsers"
+      },
+      {
+        "lang": "cs",
+        "url": "https://install.download/cs/windows/browsers"
+      },
+      {
+        "lang": "lv",
+        "url": "https://install.download/lv/windows/browsers"
+      }
+    ],
+    "descriptionPresent": true,
+    "descriptionLengths": [
+      72
+    ]
+  },
+  {
+    "url": "https://install.download/roman-reels-seo-check-nonexistent-20261012",
+    "status": 404,
+    "error": "Not Found"
+  },
+  {
+    "url": "https://install.download/windows/opera-gx",
+    "finalUrl": "https://install.download/windows/opera-gx",
+    "status": 200,
+    "bytesRead": 287529,
+    "linkHeader": null,
+    "xRobotsTag": null,
+    "title": "Download Opera GX for Windows: download the latest version for free",
+    "h1": [
+      "Install Opera GX for Windows"
+    ],
+    "canonical": [
+      "https://install.download/windows/opera-gx"
+    ],
+    "robots": [],
+    "hreflang": [
+      {
+        "lang": "x-default",
+        "url": "https://install.download/windows/opera-gx"
+      },
+      {
+        "lang": "ru",
+        "url": "https://install.download/ru/windows/opera-gx"
+      },
+      {
+        "lang": "en",
+        "url": "https://install.download/windows/opera-gx"
+      },
+      {
+        "lang": "fr",
+        "url": "https://install.download/fr/windows/opera-gx"
+      },
+      {
+        "lang": "de",
+        "url": "https://install.download/de/windows/opera-gx"
+      },
+      {
+        "lang": "es",
+        "url": "https://install.download/es/windows/opera-gx"
+      },
+      {
+        "lang": "pt",
+        "url": "https://install.download/pt/windows/opera-gx"
+      },
+      {
+        "lang": "it",
+        "url": "https://install.download/it/windows/opera-gx"
+      },
+      {
+        "lang": "zh",
+        "url": "https://install.download/zh/windows/opera-gx"
+      },
+      {
+        "lang": "uk",
+        "url": "https://install.download/uk/windows/opera-gx"
+      },
+      {
+        "lang": "nl",
+        "url": "https://install.download/nl/windows/opera-gx"
+      },
+      {
+        "lang": "id",
+        "url": "https://install.download/id/windows/opera-gx"
+      },
+      {
+        "lang": "tr",
+        "url": "https://install.download/tr/windows/opera-gx"
+      },
+      {
+        "lang": "ja",
+        "url": "https://install.download/ja/windows/opera-gx"
+      },
+      {
+        "lang": "ko",
+        "url": "https://install.download/ko/windows/opera-gx"
+      },
+      {
+        "lang": "cs",
+        "url": "https://install.download/cs/windows/opera-gx"
+      },
+      {
+        "lang": "lv",
+        "url": "https://install.download/lv/windows/opera-gx"
+      }
+    ],
+    "schemaCount": 1,
+    "imageCount": 75,
+    "missingAltCount": 6,
+    "descriptionPresent": true,
+    "descriptionLengths": [
+      408
+    ]
+  },
+  {
+    "url": "https://install.download/ru/windows/opera-gx",
+    "finalUrl": "https://install.download/ru/windows/opera-gx",
+    "status": 200,
+    "bytesRead": 283895,
+    "linkHeader": null,
+    "xRobotsTag": null,
+    "title": "Скачать Opera GX для Windows: загрузить последнюю версию бесплатно",
+    "h1": [
+      "Установить Opera GX для Windows"
+    ],
+    "canonical": [
+      "https://install.download/ru/windows/opera-gx"
+    ],
+    "robots": [],
+    "hreflang": [
+      {
+        "lang": "x-default",
+        "url": "https://install.download/windows/opera-gx"
+      },
+      {
+        "lang": "ru",
+        "url": "https://install.download/ru/windows/opera-gx"
+      },
+      {
+        "lang": "en",
+        "url": "https://install.download/windows/opera-gx"
+      },
+      {
+        "lang": "fr",
+        "url": "https://install.download/fr/windows/opera-gx"
+      },
+      {
+        "lang": "de",
+        "url": "https://install.download/de/windows/opera-gx"
+      },
+      {
+        "lang": "es",
+        "url": "https://install.download/es/windows/opera-gx"
+      },
+      {
+        "lang": "pt",
+        "url": "https://install.download/pt/windows/opera-gx"
+      },
+      {
+        "lang": "it",
+        "url": "https://install.download/it/windows/opera-gx"
+      },
+      {
+        "lang": "zh",
+        "url": "https://install.download/zh/windows/opera-gx"
+      },
+      {
+        "lang": "uk",
+        "url": "https://install.download/uk/windows/opera-gx"
+      },
+      {
+        "lang": "nl",
+        "url": "https://install.download/nl/windows/opera-gx"
+      },
+      {
+        "lang": "id",
+        "url": "https://install.download/id/windows/opera-gx"
+      },
+      {
+        "lang": "tr",
+        "url": "https://install.download/tr/windows/opera-gx"
+      },
+      {
+        "lang": "ja",
+        "url": "https://install.download/ja/windows/opera-gx"
+      },
+      {
+        "lang": "ko",
+        "url": "https://install.download/ko/windows/opera-gx"
+      },
+      {
+        "lang": "cs",
+        "url": "https://install.download/cs/windows/opera-gx"
+      },
+      {
+        "lang": "lv",
+        "url": "https://install.download/lv/windows/opera-gx"
+      }
+    ],
+    "schemaCount": 1,
+    "imageCount": 77,
+    "missingAltCount": 6,
+    "descriptionPresent": true,
+    "descriptionLengths": [
+      436
+    ]
+  },
+  {
+    "url": "https://install.download/ru",
+    "finalUrl": "https://install.download/ru",
+    "status": 200,
+    "bytesRead": 483585,
+    "linkHeader": null,
+    "xRobotsTag": null,
+    "title": "Скачать бесплатно программы для любого устройства",
+    "h1": [
+      "Поиск программного обеспечения"
+    ],
+    "canonical": [],
+    "robots": [],
+    "hreflang": [
+      {
+        "lang": "x-default",
+        "url": "https://install.download/"
+      },
+      {
+        "lang": "ru",
+        "url": "https://install.download/ru"
+      },
+      {
+        "lang": "en",
+        "url": "https://install.download/"
+      },
+      {
+        "lang": "fr",
+        "url": "https://install.download/fr"
+      },
+      {
+        "lang": "de",
+        "url": "https://install.download/de"
+      },
+      {
+        "lang": "es",
+        "url": "https://install.download/es"
+      },
+      {
+        "lang": "pt",
+        "url": "https://install.download/pt"
+      },
+      {
+        "lang": "it",
+        "url": "https://install.download/it"
+      },
+      {
+        "lang": "zh",
+        "url": "https://install.download/zh"
+      },
+      {
+        "lang": "uk",
+        "url": "https://install.download/uk"
+      },
+      {
+        "lang": "nl",
+        "url": "https://install.download/nl"
+      },
+      {
+        "lang": "id",
+        "url": "https://install.download/id"
+      },
+      {
+        "lang": "tr",
+        "url": "https://install.download/tr"
+      },
+      {
+        "lang": "ja",
+        "url": "https://install.download/ja"
+      },
+      {
+        "lang": "ko",
+        "url": "https://install.download/ko"
+      },
+      {
+        "lang": "cs",
+        "url": "https://install.download/cs"
+      },
+      {
+        "lang": "lv",
+        "url": "https://install.download/lv"
+      }
+    ],
+    "schemaCount": 0,
+    "imageCount": 455,
+    "missingAltCount": 6,
+    "descriptionPresent": true,
+    "descriptionLengths": [
+      247
+    ]
+  }
+]

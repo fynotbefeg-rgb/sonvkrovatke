@@ -1,0 +1,27 @@
+
+{
+  "id": "noindex",
+  "verdict": "pass",
+  "evidence": [
+    {
+      "field": "httpStatus",
+      "value": 200
+    },
+    {
+      "field": "metaRobots",
+      "value": "noindex"
+    },
+    {
+      "field": "intendedIndexable",
+      "value": true
+    },
+    {
+      "field": "searchConsoleData",
+      "value": null
+    }
+  ],
+  "explanation": "The website is not indexed by search engines due to the 'noindex' directive.",
+  "suggestedFix": "Remove the 'noindex' directive from the website's metadata to allow it to be indexed by search engines."
+} [end of text]
+
+

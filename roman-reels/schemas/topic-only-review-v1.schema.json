@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Topic-only research review, not script approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "topicId", "topicText", "revision", "analysis", "statistics", "referenceUrl"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "topicId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$"},
+    "topicText": {"type": "string", "minLength": 1, "pattern": "^(?!\\s*[=+@-])(?=[\\s\\S]*\\S)[\\s\\S]+$"},
+    "revision": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "analysis": {"type": "string", "minLength": 1, "pattern": "^(?!\\s*[=+@-])(?=[\\s\\S]*\\S)[\\s\\S]+$"},
+    "statistics": {"type": "string", "minLength": 1, "pattern": "^(?!\\s*[=+@-])(?=[\\s\\S]*\\S)[\\s\\S]+$"},
+    "referenceUrl": {"type": "string", "pattern": "^https://[^\\s]+$"}
+  },
+  "$comment": "Server additionally limits serialized UTF-8 packet to 8000 bytes. Analysis/statistics are operator-supplied; schema does not prove their truth or viral eligibility. No body, hooks or approval fields."
+}

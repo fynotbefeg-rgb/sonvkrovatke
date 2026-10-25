@@ -1,0 +1,24 @@
+{
+  "tool": "geo-optimizer-skill",
+  "version": "4.19.0",
+  "url": "https://install.download",
+  "timestamp": "2026-10-12T08:59:24.533178+00:00",
+  "exitCode": 0,
+  "error": null,
+  "toolScore": 36,
+  "scoreIsNotGoogleMetric": true,
+  "canonicalFound": false,
+  "sitemapCheck": {
+    "id": "G-SITEMAP",
+    "status": "pass",
+    "points": 1,
+    "max_points": 1,
+    "evidence": "Sitemap declared: https://install.download/sitemaps/index_sitemap.xml",
+    "source_url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+    "evidence_level": "google-official"
+  },
+  "rawHtmlHasContent": true,
+  "uncheckedRecommendationsExcluded": true,
+  "noGoogleAccountConnected": true,
+  "noRankingMeasured": true
+}

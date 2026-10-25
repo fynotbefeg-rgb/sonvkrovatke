@@ -1,0 +1,112 @@
+{
+  "briefVersion": "1.0.0",
+  "topicId": "ai-seo-audit",
+  "topic": "Проверка кнопки заявки на сайте через Playwright MCP",
+  "scriptRevision": 3,
+  "proposedNarrowing": true,
+  "businessProblem": "Предприниматель хочет проверить, открывается ли страница заявки после нажатия кнопки на сайте, и получить конкретный адрес ошибки. Нужна автоматизация действий браузера, а не общий SEO-анализ.",
+  "romanFeedback": "Предыдущую информацию могут получить все. Нужен узкий рабочий процесс, например установка MCP и автоматизация конкретного действия.",
+  "sources": [
+    {
+      "id": "playwright-mcp",
+      "url": "https://github.com/microsoft/playwright-mcp",
+      "checkedAt": "2026-10-10",
+      "supports": "Официальный Microsoft MCP сервер управляет браузером; Node.js >=18, подключение через stdio. Проверена npm версия 0.0.83."
+    },
+    {
+      "id": "claude-mcp",
+      "url": "https://code.claude.com/docs/en/mcp",
+      "checkedAt": "2026-10-10",
+      "supports": "Claude Code поддерживает локальные stdio MCP через claude mcp add; успешная запись конфигурации не доказывает подключение. Проверить /mcp."
+    }
+  ],
+  "alternatives": [
+    {
+      "method": "Ручная проверка",
+      "use": "Открыть сайт и нажать кнопку",
+      "limit": "Повторять маршрут вручную; для одной кнопки этого может быть достаточно.",
+      "cost": "Время владельца; не измерено."
+    },
+    {
+      "method": "Playwright MCP",
+      "use": "MCP клиент получает состояние страницы и вызывает браузерные действия; гибкий диалоговый маршрут",
+      "limit": "Нужны Node.js, браузер и MCP-клиент. Установка не добавляет расписание; Claude здесь не запускался.",
+      "cost": "Код сервера Apache-2.0; тариф ИИ-клиента и вычисления отдельно."
+    },
+    {
+      "method": "Обычный Playwright тест/CLI",
+      "use": "Регулярная проверка заранее известного маршрута",
+      "limit": "Для фиксированных тестов проще и дешевле по токенам; требует описанного теста и отдельного запуска по расписанию.",
+      "cost": "Вычисления и разработка, стоимость не измерена."
+    }
+  ],
+  "demo": {
+    "checkedAt": "2026-10-10T15:23:43.177Z",
+    "synthetic": true,
+    "realClientSiteTested": false,
+    "mcpPackage": "@playwright/mcp",
+    "mcpVersion": "0.0.83",
+    "browserSandbox": false,
+    "inputSha256": "6003b7b1e8f8ee69a1951fedeb7c1669b4bbceb0622f0acb94db75c771667262",
+    "method": "Actual MCP stdio tools; programmatic driver, not a connected Claude session",
+    "candidates": [
+      {
+        "fixture": "broken",
+        "button": "Оставить заявку",
+        "destination": "/missing-lead",
+        "httpStatus": 404,
+        "snapshotFile": "broken-after.txt",
+        "screenshotFile": "broken-after.png"
+      }
+    ],
+    "findings": [
+      {
+        "fixture": "broken",
+        "button": "Оставить заявку",
+        "destination": "/missing-lead",
+        "httpStatus": 404,
+        "snapshotFile": "broken-after.txt",
+        "screenshotFile": "broken-after.png"
+      },
+      {
+        "fixture": "fixed",
+        "button": "Оставить заявку",
+        "destination": "/contact",
+        "httpStatus": 200,
+        "snapshotFile": "fixed-after.txt",
+        "screenshotFile": "fixed-after.png"
+      }
+    ],
+    "calls": [
+      "browser_navigate",
+      "browser_take_screenshot",
+      "browser_click",
+      "browser_take_screenshot",
+      "browser_navigate",
+      "browser_take_screenshot",
+      "browser_click",
+      "browser_take_screenshot"
+    ],
+    "generationCalls": 0,
+    "limits": [
+      "Учебный сайт с намеренно сломанной ссылкой.",
+      "Claude Code здесь не запускался; его конфигурация проверена только по официальной документации.",
+      "Проверка не измеряет потерянные заявки, продажи или SEO-позиции.",
+      "Установка MCP сама по себе не создаёт ежедневное расписание."
+    ]
+  },
+  "installationCommand": "claude mcp add --transport stdio playwright -- npx -y @playwright/mcp@0.0.83 --headless --isolated",
+  "verificationCommand": "/mcp — проверить статус подключения; добавление записи не означает connected",
+  "exampleTask": "Открой мой тестовый сайт, нажми «Оставить заявку», проверь адрес назначения и ошибку страницы. Сохрани адрес кнопки и скриншот. Не отправляй форму и не делай покупку.",
+  "delivery": "На учебном сайте реальный MCP браузер открыл страницу и нажал ссылку по ref из accessibility snapshot. /missing-lead дал HTTP404 и страницу ошибки; после изменения ссылки /contact дал HTTP200 и видимую страницу. Сохранены скриншоты и отчёт. Драйвер написан программно, а не отдельная подключённая Claude-сессия. Не приписывать Claude или Роману действия, которых не было. Не обещать обнаружение всех ошибок сайта, ежедневный автозапуск, увеличение продаж и потерянных заявок.",
+  "requirements": [
+    "Одна основа и ровно три разных хука на русском; полный вариант без окончания 100–160 слов.",
+    "Показать конкретную связку: установка Playwright MCP → проверка подключения → задание проверки кнопки → адрес 404 и скриншот → повторная проверка после исправления.",
+    "Код команды показывается на экране, не зачитывать длинную строку в речи.",
+    "Явно указать учебный сайт, а не кейс клиента.",
+    "MCP предоставляет действия браузера; для запуска по расписанию нужна отдельная настройка, в демо её нет.",
+    "Не говорить, что Claude уже запускался в тесте или что весь сайт был проанализирован.",
+    "Хуки про конкретную кнопку заявки и проверку после изменений сайта, не про ИИ в целом.",
+    "Окончания пока не писать; новая общая речь и тема требуют проверки Романом."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "gateVersion": "1.0.0",
+  "checkedAt": "2026-10-11T18:05:47.502Z",
+  "eligibleForRomanReview": false,
+  "productionReady": false,
+  "romanApprovalGranted": false,
+  "semanticFactCheckAutomated": false,
+  "blockers": [
+    {
+      "id": "reference",
+      "message": "Reference older than 60 days or publication date unknown"
+    },
+    {
+      "id": "demo",
+      "message": "Run the actual proposed workflow and document verified output; a prepared prompt is not a tested demonstration"
+    },
+    {
+      "id": "costs",
+      "message": "Verified end-to-end viewer workflow pricing required"
+    },
+    {
+      "id": "editorial",
+      "message": "All eight criteria need a substantive reviewer decision and supporting evidence"
+    },
+    {
+      "id": "semantic",
+      "message": "Separate semantic/factual review must be completed; structural checks cannot prove usefulness"
+    }
+  ]
+}

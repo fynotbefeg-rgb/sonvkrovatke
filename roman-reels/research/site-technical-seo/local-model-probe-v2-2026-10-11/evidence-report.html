@@ -1,0 +1,249 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Учебная техническая SEO-проверка</title><style>body{max-width:850px;margin:24px auto;padding:0 16px;font:17px/1.5 system-ui;color:#172033}article{border:1px solid #ccd4df;border-radius:10px;padding:12px;margin:12px 0}h3{font-size:18px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}aside{background:#fff3d5;padding:14px;border-radius:10px}</style><h1>Учебная техническая SEO-проверка</h1><aside>Вымышленный сайт. Статусы рассчитаны скриптом по ограниченному чек-листу. Два состояния подготовлены заранее; ИИ не исправлял сайт. Фактическая индексация Google, трафик, позиции, скорость и полный аудит не измерены. Предложения ниже не выполнялись автоматически.</aside><section><h2>До: учебные ошибки</h2><p>Проверок без замечаний: 1. С замечаниями: 9.</p><article><h3>page-status — Проверка пройдена</h3><p>Четыре заявленные страницы возвращают 200</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;status&quot;: 200
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>robots-crawl — Нужна проверка/правка</h3><p>Учебная коммерческая /services не закрыта от обхода</p><details><summary>Наблюдение</summary><pre>&quot;User-agent: *\nDisallow: /services\nSitemap: http://127.0.0.1:45849/sitemap.xml\n&quot;</pre></details><p>Предлагаемый шаг: Если учебная /services должна быть открыта для обхода, убрать её запрет и повторить проверку robots.txt. Это не подтверждает индексацию.</p></article><article><h3>index-directives — Нужна проверка/правка</h3><p>На ожидаемых открытых страницах отсутствует noindex</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;robots&quot;: &quot;noindex&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  }
+]</pre></details><p>Предлагаемый шаг: Для страниц, которые в этом стенде должны быть открыты для индексации, снять noindex и повторить проверку директив. Попадание в Google этим не гарантируется.</p></article><article><h3>sitemap — Нужна проверка/правка</h3><p>Все 4 ожидаемые канонические страницы перечислены, записи возвращают 200</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/gone&quot;,
+    &quot;status&quot;: 404
+  }
+]</pre></details><p>Предлагаемый шаг: В учебной карте перечислить ожидаемые канонические страницы, исключить отсутствующие URL; проверить их HTTP-ответы.</p></article><article><h3>page-titles — Нужна проверка/правка</h3><p>Непустые разные title по согласованному учебному требованию</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;title&quot;: &quot;Учебная мастерская&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;title&quot;: &quot;Учебная мастерская&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;title&quot;: &quot;Учебные цены&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;title&quot;: &quot;Контакты&quot;
+  }
+]</pre></details><p>Предлагаемый шаг: По требованиям этого стенда задать непустые разные title; повторно проверить значения.</p></article><article><h3>descriptions — Нужна проверка/правка</h3><p>Описания заданы на всех страницах по учебному чек-листу</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;description&quot;: &quot;Учебная мастерская: вымышленная учебная страница, не предложение услуг.&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;description&quot;: &quot;&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;description&quot;: &quot;Учебные цены: вымышленная учебная страница, не предложение услуг.&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;description&quot;: &quot;Контакты: вымышленная учебная страница, не предложение услуг.&quot;
+  }
+]</pre></details><p>Предлагаемый шаг: По учебному чек-листу добавить описания; проверить наличие. Это не гарантия ранжирования.</p></article><article><h3>canonicals — Нужна проверка/правка</h3><p>В этой модели каждая отличающаяся страница указывает на себя</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;canonicalPath&quot;: &quot;/&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;canonicalPath&quot;: &quot;/&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;canonicalPath&quot;: &quot;/pricing&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;canonicalPath&quot;: &quot;/contact&quot;
+  }
+]</pre></details><p>Предлагаемый шаг: В этом стенде разные самостоятельные страницы должны ссылаться canonical на себя; проверить адреса. Не переносить правило на дубликаты без анализа.</p></article><article><h3>heading-structure — Нужна проверка/правка</h3><p>Один основной заголовок по договорённости для этого сайта</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;h1Count&quot;: 2
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;h1Count&quot;: 1
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;h1Count&quot;: 1
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;h1Count&quot;: 1
+  }
+]</pre></details><p>Предлагаемый шаг: Проверить заголовки по требованиям этого стенда; число H1 само по себе не доказывает SEO-ошибку на любом сайте.</p></article><article><h3>legacy-redirect — Нужна проверка/правка</h3><p>Постоянный переезд /old-services → /services: 301 или 308</p><details><summary>Наблюдение</summary><pre>{
+  &quot;status&quot;: 302,
+  &quot;location&quot;: &quot;/&quot;
+}</pre></details><p>Предлагаемый шаг: Настроить ожидаемый редирект учебного старого URL и перепроверить статус и Location.</p></article><article><h3>missing-status — Нужна проверка/правка</h3><p>Заведомо отсутствующая страница возвращает 404, не 200</p><details><summary>Наблюдение</summary><pre>{
+  &quot;status&quot;: 200
+}</pre></details><p>Предлагаемый шаг: Отсутствующий учебный URL должен возвращать 404; после правки повторить запрос.</p></article></section><section><h2>После: заранее исправленный стенд</h2><p>Проверок без замечаний: 10. С замечаниями: 0.</p><article><h3>page-status — Проверка пройдена</h3><p>Четыре заявленные страницы возвращают 200</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;status&quot;: 200
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>robots-crawl — Проверка пройдена</h3><p>Учебная коммерческая /services не закрыта от обхода</p><details><summary>Наблюдение</summary><pre>&quot;User-agent: *\nDisallow: \nSitemap: http://127.0.0.1:35901/sitemap.xml\n&quot;</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>index-directives — Проверка пройдена</h3><p>На ожидаемых открытых страницах отсутствует noindex</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;robots&quot;: &quot;index,follow&quot;
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>sitemap — Проверка пройдена</h3><p>Все 4 ожидаемые канонические страницы перечислены, записи возвращают 200</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;status&quot;: 200
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;status&quot;: 200
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>page-titles — Проверка пройдена</h3><p>Непустые разные title по согласованному учебному требованию</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;title&quot;: &quot;Учебная мастерская&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;title&quot;: &quot;Услуги автоматизации&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;title&quot;: &quot;Учебные цены&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;title&quot;: &quot;Контакты&quot;
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>descriptions — Проверка пройдена</h3><p>Описания заданы на всех страницах по учебному чек-листу</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;description&quot;: &quot;Учебная мастерская: вымышленная учебная страница, не предложение услуг.&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;description&quot;: &quot;Услуги автоматизации: вымышленная учебная страница, не предложение услуг.&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;description&quot;: &quot;Учебные цены: вымышленная учебная страница, не предложение услуг.&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;description&quot;: &quot;Контакты: вымышленная учебная страница, не предложение услуг.&quot;
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>canonicals — Проверка пройдена</h3><p>В этой модели каждая отличающаяся страница указывает на себя</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;canonicalPath&quot;: &quot;/&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;canonicalPath&quot;: &quot;/services&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;canonicalPath&quot;: &quot;/pricing&quot;
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;canonicalPath&quot;: &quot;/contact&quot;
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>heading-structure — Проверка пройдена</h3><p>Один основной заголовок по договорённости для этого сайта</p><details><summary>Наблюдение</summary><pre>[
+  {
+    &quot;path&quot;: &quot;/&quot;,
+    &quot;h1Count&quot;: 1
+  },
+  {
+    &quot;path&quot;: &quot;/services&quot;,
+    &quot;h1Count&quot;: 1
+  },
+  {
+    &quot;path&quot;: &quot;/pricing&quot;,
+    &quot;h1Count&quot;: 1
+  },
+  {
+    &quot;path&quot;: &quot;/contact&quot;,
+    &quot;h1Count&quot;: 1
+  }
+]</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>legacy-redirect — Проверка пройдена</h3><p>Постоянный переезд /old-services → /services: 301 или 308</p><details><summary>Наблюдение</summary><pre>{
+  &quot;status&quot;: 301,
+  &quot;location&quot;: &quot;/services&quot;
+}</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article><article><h3>missing-status — Проверка пройдена</h3><p>Заведомо отсутствующая страница возвращает 404, не 200</p><details><summary>Наблюдение</summary><pre>{
+  &quot;status&quot;: 404
+}</pre></details><p>Замечаний по этой проверке нет; это не результат полного аудита.</p></article></section><p>Данные наблюдения: 2026-10-11T18:10:47.631Z. Без вызовов модели или платных API.</p></html>

@@ -1,0 +1,2 @@
+# Offline candidate-contract validation, not production pipeline dependencies.
+jsonschema==4.26.0

@@ -1,0 +1,92 @@
+{
+  "cpuThreads": 2,
+  "maxOutputTokensPerCase": 256,
+  "timeoutSecondsPerCase": 90,
+  "temperature": 0,
+  "seed": 42,
+  "checkedAt": "2026-10-11T18:23:00.771538+00:00",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "synthetic": true,
+  "remoteModelCalls": 0,
+  "productionReady": false,
+  "fullSeoAudit": false,
+  "modelSha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "results": [
+    {
+      "id": "noindex",
+      "exitCode": 0,
+      "seconds": 20.398,
+      "command": [
+        "/workspace/scratch/roman-local-seo/engine/llama-b11558/llama-completion",
+        "-m",
+        "/workspace/scratch/roman-local-seo/qwen-1.5b.gguf",
+        "-f",
+        "/workspace/scratch/roman-local-seo/probe-results-1.5b/noindex-prompt.txt",
+        "-n",
+        "256",
+        "-c",
+        "2048",
+        "-t",
+        "2",
+        "--temp",
+        "0",
+        "--seed",
+        "42",
+        "--no-conversation",
+        "--no-display-prompt"
+      ],
+      "output": "]\n```json\n{\n  \"id\": \"noindex\",\n  \"verdict\": \"pass\",\n  \"evidence\": [\n    \"The website's meta tag 'noindex' is present in the HTML header.\",\n    \"The 'noindex' tag is explicitly set to 'noindex' and not 'nofollow'.\"\n  ],\n  \"explanation\": \"The website's meta tag 'noindex' is correctly implemented, indicating that the website is not intended to be indexed by search engines.\",\n  \"suggestedFix\": \"Remove the 'noindex' tag from the HTML header to allow the website to be indexed.\"\n}\n``` [end of text]\n\n\n"
+    },
+    {
+      "id": "fixed",
+      "exitCode": 0,
+      "seconds": 20.413,
+      "command": [
+        "/workspace/scratch/roman-local-seo/engine/llama-b11558/llama-completion",
+        "-m",
+        "/workspace/scratch/roman-local-seo/qwen-1.5b.gguf",
+        "-f",
+        "/workspace/scratch/roman-local-seo/probe-results-1.5b/fixed-prompt.txt",
+        "-n",
+        "256",
+        "-c",
+        "2048",
+        "-t",
+        "2",
+        "--temp",
+        "0",
+        "--seed",
+        "42",
+        "--no-conversation",
+        "--no-display-prompt"
+      ],
+      "output": "]\n```json\n{\n  \"id\": \"fixed\",\n  \"verdict\": \"pass\",\n  \"evidence\": [\n    \"The website path is '/'.\",\n    \"The HTTP status code is 200.\",\n    \"The meta robots tag is set to 'index,follow'.\",\n    \"The intended indexable flag is set to true.\",\n    \"There is no search console data provided.\"\n  ],\n  \"explanation\": \"The website meets all the criteria for being indexable and follows Google's best practices.\",\n  \"suggestedFix\": \"No further action is needed.\"\n}\n``` [end of text]\n\n\n"
+    },
+    {
+      "id": "unknown-indexing",
+      "exitCode": 0,
+      "seconds": 29.82,
+      "command": [
+        "/workspace/scratch/roman-local-seo/engine/llama-b11558/llama-completion",
+        "-m",
+        "/workspace/scratch/roman-local-seo/qwen-1.5b.gguf",
+        "-f",
+        "/workspace/scratch/roman-local-seo/probe-results-1.5b/unknown-indexing-prompt.txt",
+        "-n",
+        "256",
+        "-c",
+        "2048",
+        "-t",
+        "2",
+        "--temp",
+        "0",
+        "--seed",
+        "42",
+        "--no-conversation",
+        "--no-display-prompt"
+      ],
+      "output": "\n{\n  \"id\": \"unknown-indexing\",\n  \"verdict\": \"unknown\",\n  \"evidence\": \"The input provided does not contain any information about Google indexing or organic traffic.\",\n  \"explanation\": \"The evidence provided is insufficient to determine whether the site is indexed in Google or if its organic traffic has increased. The input does not include data from Google Search Console or any other sources that could provide insights into Google indexing or organic traffic.\",\n  \"suggestedFix\": \"To determine if the site is indexed in Google and if its organic traffic has increased, the following steps can be taken: 1. Check Google Search Console for indexing data. 2. Analyze website traffic using Google Analytics or similar tools. 3. Monitor search engine rankings using tools like Ahrefs or SEMrush. 4. Use Google's Search Console to track organic traffic and analyze the performance of the website.\",\n  \"suggestedAction\": \"The suggested action is to gather more data on Google indexing and organic traffic through the steps mentioned above.\"\n} [end of text]\n\n\n"
+    }
+  ]
+}

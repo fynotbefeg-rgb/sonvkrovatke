@@ -12,12 +12,13 @@ const draft = () => ({topic_id: 'test-hooks', hook_id: 1, version_id: 'R-test-ho
 const rowOf = item => [item.topic_id, item.hook_id, item.version_id, item.script_revision, item.hook_text,
   item.script_text, 'На проверке', '', '', '', 'Ожидает утверждения'];
 
-function harness(scriptSource = source) {
+export function harness(scriptSource = source, {shared = false} = {}) {
   const rows = [Array(11).fill('header'), rowOf(draft())];
   const properties = new Map([['ROMAN_REELS_WEBHOOK_TOKEN', 'local-test-token'], ['ROMAN_APPROVER_EMAILS', 'roman@example.test']]);
   const triggers = [{getHandlerFunction: () => 'checkApprovedScripts'}, {getHandlerFunction: () => 'checkProductionSafety'}];
   let locked = false;
-  const sheet = {getName: () => 'Сценарии', getLastRow: () => rows.length,
+  function makeSheet(name, id, rows) {
+  const sheet = {getName: () => name, getSheetId: () => id, getLastRow: () => rows.length,
     getRange: (r, c, nr = 1, nc = 1) => ({
       getSheet: () => sheet, getRow: () => r, getColumn: () => c, getLastRow: () => r + nr - 1,
       getNumRows: () => nr, getNumColumns: () => nc,
@@ -26,6 +27,7 @@ function harness(scriptSource = source) {
         const value = rows[r + i - 1]?.[c + j - 1];
         return typeof value === 'string' && value.startsWith('=') ? value : '';
       })),
+      setDataValidation() { return this; }, setWrap() { return this; },
       setValue(value) { this.setValues([[value]]); },
       setValues(values) {
         for (let i = 0; i < nr; i++) {
@@ -35,17 +37,24 @@ function harness(scriptSource = source) {
       },
     }),
   };
+  return sheet;
+  }
+  const sheet = makeSheet('Сценарии', 1, rows);
+  const reviewRows = [Array(7).fill('header')];
+  const reviewSheet = makeSheet('Темы и хуки', 323200067, reviewRows);
   const context = vm.createContext({
-    SpreadsheetApp: {openById: id => { assert.equal(id, sheetId); return {getSheetByName: () => sheet}; }, flush() {}},
+    SpreadsheetApp: {openById: id => { assert.equal(id, sheetId); return {getSheetByName: name => name === 'Темы и хуки' ? reviewSheet : sheet, getSheets: () => [sheet, reviewSheet]}; }, flush() {},
+      newDataValidation: () => ({requireValueInList() {return this;}, setAllowInvalid() {return this;}, build() {return {};}})},
     PropertiesService: {getScriptProperties: () => ({getProperty: key => properties.get(key) ?? null,
-      setProperty: (key, value) => properties.set(key, value), deleteProperty: key => properties.delete(key)})},
+      setProperty: (key, value) => properties.set(key, value), deleteProperty: key => properties.delete(key), getProperties: () => Object.fromEntries(properties)})},
     LockService: {getScriptLock: () => ({tryLock: () => { assert.equal(locked, false, 'nested lock'); locked = true; return true; }, releaseLock: () => { locked = false; }})},
-    Utilities: {DigestAlgorithm: {SHA_256: 'sha256'}, Charset: {UTF_8: 'utf8'},
+    Utilities: {newBlob: value => ({getBytes: () => [...Buffer.from(value, 'utf8')]}), DigestAlgorithm: {SHA_256: 'sha256'}, Charset: {UTF_8: 'utf8'},
       computeDigest: (algorithm, payload) => [...createHash(algorithm).update(payload).digest()].map(b => b > 127 ? b - 256 : b)},
     ContentService: {MimeType: {JSON: 'json'}, createTextOutput: content => ({content, setMimeType() { return this; }})},
     Logger: {log() {}},
     ScriptApp: {getProjectTriggers: () => triggers, newTrigger: handler => ({forSpreadsheet: () => ({onEdit: () => ({create: () => triggers.push({getHandlerFunction: () => handler})})})})},
   });
+  if (shared) vm.runInContext(readFileSync(new URL('../apps-script/SharedReview.gs', import.meta.url), 'utf8'), context);
   vm.runInContext(scriptSource, context);
   const edit = (column, email = 'roman@example.test', options = {}) => context.onRomanApprovalEdit({
     range: sheet.getRange(2, column, options.numRows ?? 1, options.numColumns ?? 1),
@@ -53,7 +62,12 @@ function harness(scriptSource = source) {
     user: email === null ? undefined : {getEmail: () => email}, oldValue: options.oldValue,
   });
   const post = body => JSON.parse(context.doPost({postData: {contents: JSON.stringify(body)}}).content);
-  return {context, rows, properties, triggers, edit, post};
+  const editReview = (row, column, email = 'roman@example.test', options = {}) => context.onRomanApprovalEdit({
+    range: reviewSheet.getRange(row, column, options.numRows ?? 1, options.numColumns ?? 1),
+    source: {getId: () => options.sheetId ?? sheetId},
+    user: email === null ? undefined : {getEmail: () => email},
+  });
+  return {context, rows, properties, triggers, edit, post, reviewRows, editReview};
 }
 
 test('authorized edit creates a receipt and a queue compatible with Node approval validator', () => {
@@ -184,7 +198,9 @@ test('additive file coexists with legacy globals while the POST queue enforces r
     function testConnection() { return 'old-test'; }`;
   const h = harness(legacy + '\n' + addon);
   assert.equal(h.context.legacyDoPost(), 'old-post');
-  assert.equal(h.context.doGet(), 'old-get-denies-scripts');
+  // The addon now owns doGet (topic self-approval page). The live legacy doGet only refused GET; the addon keeps
+  // that refusal for every request except ?view=topics.
+  assert.equal(JSON.parse(h.context.doGet().content).error, 'Use authenticated POST');
   assert.equal(h.context.checkProductionSafety(), 'old-safety');
   assert.equal(h.context.getApprovedProductionQueue()[0], 'old-unverified-queue');
   h.rows[1][6] = 'Утверждено';

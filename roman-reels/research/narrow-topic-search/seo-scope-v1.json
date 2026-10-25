@@ -1,0 +1,25 @@
+{
+  "scopeVersion": "1.0.0",
+  "topicId": "ai-seo-audit",
+  "topicRevision": 1,
+  "title": "Техническая и SEO-проверка сайта: задачи с доказательствами",
+  "businessTask": {
+    "actor": "Предприниматель или владелец сайта",
+    "input": "Адреса сайта, чек-лист и доступные данные Search Console",
+    "operation": "Получить проверяемые задачи: адрес, наблюдение, предлагаемая правка и перепроверка",
+    "output": "Список конкретных проверок и неизвестных данных без обещания роста трафика"
+  },
+  "focusGroups": [
+    ["SEO", "сео", "сайт", "website", "Search Console"],
+    ["audit", "auditing", "аудит", "проверка", "проверить", "robots.txt", "noindex", "sitemap", "canonical", "broken links", "technical", "технический", "экспорт"],
+    ["AI", "ИИ", "Claude", "MCP", "automation", "автоматизация", "Gemini", "ChatGPT"]
+  ],
+  "queries": [
+    {"platform": "instagram", "query": "AI technical SEO audit robots canonical sitemap"},
+    {"platform": "instagram", "query": "ИИ аудит сайта noindex robots sitemap"},
+    {"platform": "tiktok", "query": "AI website SEO audit actionable fixes"},
+    {"platform": "tiktok", "query": "ИИ техническая проверка сайта SEO"},
+    {"platform": "youtube", "query": "Claude technical SEO audit Search Console export"},
+    {"platform": "youtube", "query": "ИИ аудит сайта экспорт Google Search Console"}
+  ]
+}

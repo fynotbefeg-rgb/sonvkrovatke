@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "roman-topic-research-snapshot-v1",
+  "title": "Authenticated topic choice, never speech approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "snapshotVersion",
+    "source",
+    "capturedAt",
+    "enabled",
+    "topics",
+    "scriptApprovalGranted",
+    "productionAllowed"
+  ],
+  "properties": {
+    "ok": {
+      "const": true
+    },
+    "snapshotVersion": {
+      "const": "1.0.0"
+    },
+    "source": {
+      "const": "apps_script_shared_review"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "scriptApprovalGranted": {
+      "const": false
+    },
+    "productionAllowed": {
+      "const": false
+    },
+    "topics": {
+      "type": "array",
+      "maxItems": 90,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "topicId",
+          "topicText",
+          "reviewRevision",
+          "topicHash",
+          "approvedBy",
+          "approvedAt",
+          "status"
+        ],
+        "properties": {
+          "topicId": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$"
+          },
+          "topicText": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "topicHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "approvedBy": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "const": "selected_for_research"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "topics": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "description": "Schema/JSON cannot establish authority. Client requires authenticated transport, current capture <=5min, unique IDs, approval timestamps and exact shared topic hashes. Disabled snapshot cannot start research."
+}
