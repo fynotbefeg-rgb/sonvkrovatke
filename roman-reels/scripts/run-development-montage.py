@@ -116,6 +116,21 @@ def check_input(job):
     check_visual_assets(job.get("visualAssets", []))
 
 
+def with_render_settings(job):
+    source = job["sourceVideo"]
+    return {**job, "visualAssets": job.get("visualAssets", []), "renderSettings": {
+        "width": 1080, "height": 1920, "fps": source["fps"], "codec": "h264", "audioCodec": "aac",
+        "safeZone": {"top": 200, "right": 120, "bottom": 320, "left": 100}}}
+
+
+def check_supplied_plan(job, plan):
+    """The checks run() applies to a supplied plan, without creating anything: used before the first render."""
+    check_input(job)
+    job = with_render_settings(job)
+    shared_plans.validate(job, plan)
+    contract.validate({**job, "montagePlan": plan, "productionStatus": "montage_ready"})
+
+
 def run(job, output_directory, browser_executable=None, montage_plan=None,
         render_concurrency=DEFAULT_RENDER_CONCURRENCY, video_cache_size_in_bytes=None):
     """montage_plan: optional precomputed plan (shared-body mode); it must pass Director validation and the contract.
@@ -129,9 +144,7 @@ def run(job, output_directory, browser_executable=None, montage_plan=None,
     remotion_cli_entry(PV)  # fail fast, before any output is created
     find_node()
     source = job["sourceVideo"]
-    job = {**job, "visualAssets": job.get("visualAssets", []), "renderSettings": {
-        "width": 1080, "height": 1920, "fps": source["fps"], "codec": "h264", "audioCodec": "aac",
-        "safeZone": {"top": 200, "right": 120, "bottom": 320, "left": 100}}}
+    job = with_render_settings(job)
     bridge = """import {pathToFileURL} from 'node:url';
 const {buildMontagePlan}=await import(pathToFileURL(process.argv[1]).href);
 let s='';for await(const chunk of process.stdin)s+=chunk;

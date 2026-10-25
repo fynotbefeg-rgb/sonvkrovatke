@@ -2,12 +2,15 @@
 
 No fresh ASR, Google, approvals or publication. Reuses the existing assembler,
 cache binder, Claude Director/Remotion wrapper and original-audio preservation.
+An optional editorial plan (editorial_plan.py) replaces the automatic subtitles and plans of all three variants;
+it is fully checked before the first render, and a mismatch stops the run without the automatic plan as fallback.
 """
 import argparse
 import importlib.util
 import json
 from pathlib import Path
 
+import editorial_plan as editorial
 import factory_media as media
 import shared_body_plans
 
@@ -29,8 +32,25 @@ def write_json(file, data):
         stream.write(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
 
 
+def editorial_inputs(plan, editorial_plan_file, editorial_directory, editorial_sha256=None):
+    """Optional editorial plan: both arguments or neither; checked before any output is created."""
+    if editorial_plan_file is None and editorial_directory is None and editorial_sha256 is None:
+        return None
+    if not isinstance(editorial_directory, str) or not editorial_directory or any(c in editorial_directory for c in ['\\', ':']) \
+            or '..' in Path(editorial_directory).parts or editorial_plan_file is None:
+        raise ValueError('Editorial plan needs its PNG copy folder under rr/incoming')
+    folder = (media.PUBLIC / editorial_directory).resolve()
+    if not folder.is_relative_to((media.PUBLIC / 'rr/incoming').resolve()) or not folder.is_dir():
+        raise ValueError('Editorial PNG copy folder must exist under rr/incoming')
+    edit = editorial.load(editorial_plan_file, editorial_sha256)
+    editorial.check_parts(edit[0], plan.get('topicId'), {'body': plan['body']['sha256'],
+                          **{f"h{h['hookNumber']}": h['sha256'] for h in plan['hooks']}})
+    return edit
+
+
 def run(plan, body, hooks, public_directory, output_directory, browser=None, render_hooks=(1, 2, 3), renderer=None,
-        render_concurrency=montage.DEFAULT_RENDER_CONCURRENCY, video_cache_size_in_bytes=None):
+        render_concurrency=montage.DEFAULT_RENDER_CONCURRENCY, video_cache_size_in_bytes=None,
+        editorial_plan_file=None, editorial_directory=None, editorial_sha256=None):
     montage.check_render_concurrency(render_concurrency)  # before any file, folder or process is created
     montage.check_video_cache_size(video_cache_size_in_bytes)
     selected = tuple(render_hooks)
@@ -46,6 +66,7 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     allowed = (media.PUBLIC / 'rr/incoming').resolve()
     if not source_dir.is_relative_to(allowed) or source_dir == allowed:
         raise ValueError('Assembled sources must be under rr/incoming')
+    edit = editorial_inputs(plan, editorial_plan_file, editorial_directory, editorial_sha256)
     output = Path(output_directory).resolve()
     if output.exists() or source_dir.exists():
         raise ValueError('New source and output directories required; no overwrite')
@@ -77,13 +98,27 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     for job, _ in jobs:
         write_json(output / f"{job['reelId']}-plan.json", plans[job['hookNumber']])
     report['sharedBodyPlan'] = True
+    jobs = [job for job, _ in jobs]
+    if edit is not None:
+        # All three variants are bound and validated before the first render; any error stops here, with no
+        # fallback to the automatic plans written above (they stay only as a record).
+        edited, plans = editorial.apply(*edit, editorial_directory, manifest, [(job, None) for job in jobs])
+        for number in sorted(edited):
+            montage.check_supplied_plan(edited[number], plans[number])
+        jobs = [edited[number] for number in sorted(edited)]
+        for job in jobs:
+            write_json(output / f"{job['reelId']}-editorial-job.json", job)
+            write_json(output / f"{job['reelId']}-editorial-plan.json", plans[job['hookNumber']])
+        report['editorialPlan'] = {'sha256': edit[1]['sha256'], 'files': edit[1]['files']}
     report_file.write_text(json.dumps(report, indent=2) + '\n')
     renderer = renderer or montage.run
     # Passed only when set, so the default call to the renderer stays exactly as before.
     cache_option = {} if video_cache_size_in_bytes is None else {'video_cache_size_in_bytes': video_cache_size_in_bytes}
-    for job, _ in jobs:
+    for job in jobs:
         if job['hookNumber'] not in selected:
             continue
+        if edit is not None:
+            editorial.verify_copies(edit[1], editorial_directory)
         qc = renderer(job, output / f"h{job['hookNumber']}", browser, montage_plan=plans[job['hookNumber']],
                       render_concurrency=render_concurrency, **cache_option)
         if qc.get('technicalPassed') is not True:
@@ -94,6 +129,8 @@ def run(plan, body, hooks, public_directory, output_directory, browser=None, ren
     for relative, checksum in original.items():
         if media.sha256(media.public_source(relative)) != checksum:
             raise ValueError('Original part changed during pipeline')
+    if edit is not None:
+        editorial.verify_copies(edit[1], editorial_directory)  # an insert replaced during a render fails the run
     report['complete'] = len(report['renders']) == len(selected)
     report['allThreeRendered'] = {v['hookNumber'] for v in report['renders']} == {1, 2, 3}
     report_file.write_text(json.dumps(report, indent=2) + '\n')
@@ -109,6 +146,9 @@ if __name__ == '__main__':
     parser.add_argument('--out', required=True)
     parser.add_argument('--browser-executable')
     parser.add_argument('--render-hooks', nargs='+', type=int, default=[1, 2, 3])
+    parser.add_argument('--editorial-plan', help='Optional reviewed editorial plan (JSON next to its PNG files)')
+    parser.add_argument('--editorial-public-directory', help='rr/incoming folder with the copies of its PNG files')
+    parser.add_argument('--editorial-plan-sha256', help='Confirmed SHA-256 the editorial plan must have')
     parser.add_argument('--render-concurrency', type=int, choices=montage.ALLOWED_RENDER_CONCURRENCY,
                         default=montage.DEFAULT_RENDER_CONCURRENCY,
                         help='Remotion workers per render: 1 (less memory) or 2 (default)')
@@ -123,5 +163,7 @@ if __name__ == '__main__':
     read = lambda file: json.loads(Path(file).read_text(encoding='utf-8'))
     run(read(args.source_set), read(args.body_speech), {n: read(file) for n, file in enumerate(args.hook_speech, 1)},
         args.public_directory, args.out, args.browser_executable, args.render_hooks,
-        render_concurrency=args.render_concurrency, video_cache_size_in_bytes=args.video_cache_size_in_bytes)
+        render_concurrency=args.render_concurrency, video_cache_size_in_bytes=args.video_cache_size_in_bytes,
+        editorial_plan_file=args.editorial_plan, editorial_directory=args.editorial_public_directory,
+        editorial_sha256=args.editorial_plan_sha256)
     print('Development pipeline passed. Cached speech still needs review; no publication allowed.')

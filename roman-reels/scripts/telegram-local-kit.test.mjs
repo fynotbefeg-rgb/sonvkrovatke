@@ -10,7 +10,7 @@ import {fileURLToPath} from 'node:url';
 import {ProductionQueue} from './production-queue.mjs';
 import {telegramApi,TELEGRAM_CLOUD_DOWNLOAD_LIMIT} from './telegram-bot-api.mjs';
 import {handleTelegramPanel} from './telegram-panel.mjs';
-import {FourPartIntake,launcherPlanner} from './telegram-intake.mjs';
+import {FourPartIntake,launcherPlanner,sha256} from './telegram-intake.mjs';
 
 const token='123456:only_offline_fake_token_123456789';
 const python=process.env.ROMAN_INTAKE_PYTHON||(process.platform==='win32'?'python':'python3');
@@ -201,4 +201,94 @@ test('the eleventh kit is reachable by paging past old and broken folders',async
   assert.match(h.sent.at(-2).text,/из локальной папки kit-11/);assert.match(h.sent.at(-1).text,/режиме плана/);
   assert.equal(h.intake.db.prepare('SELECT topic_id FROM intake_jobs').get().topic_id,'roman-seo-02');
   assert.equal((await h.press('ilp:0','cb-open')).blocked,true,'no listing while a job is open');
+});
+
+// Optional editorial plan next to the four MP4s: structurally valid for the launcher, bound to the kit's originals.
+const pngBytes=Buffer.from('89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de','hex');
+function editorialKit(h,name,{plan:change=x=>x,planName='editorial-plan.json'}={}){
+  const folder=h.kit(name,{small:true});
+  writeFileSync(path.join(folder,'insert-a.png'),pngBytes);
+  const parts=Object.fromEntries(Object.entries(kitFiles).map(([p,f])=>[p,sha256(path.join(folder,f))]));
+  const variant={assembledSha256:'0'.repeat(64),hookText:'Хук',scriptText:'Хук\n\nОснова',wordTimings:[],speechSegments:[],
+    visualAssets:[{id:'insert-a',type:'image',file:'insert-a.png',rightsReference:'Own test card'}],montagePlan:{events:[]}};
+  const plan=change({editorialPlanVersion:'1.0.0',topicId:'roman-seo-02',parts,
+    files:{'insert-a.png':sha256(path.join(folder,'insert-a.png'))},variants:{1:variant,2:variant,3:variant}});
+  writeFileSync(path.join(folder,'editorial-plan.json'),JSON.stringify(plan));
+  writeFileSync(path.join(folder,'kit.json'),JSON.stringify({topicId:'roman-seo-02',parts:kitFiles,editorialPlan:planName}));
+  return folder;
+}
+
+test('kit with an editorial plan: plan and PNG copied into the job, checked by the launcher and frozen by hashes',async t=>{
+  const h=setup(t),folder=editorialKit(h,'with-plan');h.kit('without-plan',{small:true});
+  await h.text('/intake_local');
+  assert.ok(h.buttons().some(b=>b.text.startsWith('with-plan ·')&&b.text.endsWith('· план монтажа')));
+  assert.ok(h.buttons().some(b=>b.text.startsWith('without-plan ·')&&!b.text.includes('план')));
+  await h.press(offerFor(h,'with-plan'),'cb-a');
+  assert.match(h.sent.at(-1).text,/План монтажа: SHA [0-9a-f]{8} · PNG 1/);
+  const job=h.intake.db.prepare('SELECT * FROM intake_jobs').get(),jobDir=path.join(h.root,job.id),copy=path.join(jobDir,'editorial');
+  assert.deepEqual(readdirSync(copy).sort(),['editorial-plan.json','insert-a.png']);
+  assert.equal(sha256(path.join(copy,'insert-a.png')),sha256(path.join(folder,'insert-a.png')));
+  assert.equal(sha256(path.join(copy,'editorial-plan.json')),sha256(path.join(folder,'editorial-plan.json')));
+  const report=JSON.parse(readFileSync(path.join(jobDir,'plan-v1.json'),'utf8'));
+  assert.equal(realpathSync.native(path.dirname(report.editorialPlan.path)),realpathSync.native(copy),'launcher checked the job copy');
+  assert.deepEqual(report.editorialPlan.files,{'insert-a.png':{sha256:sha256(path.join(folder,'insert-a.png')),bytes:pngBytes.length}});
+  assert.match(report.steps.at(-1).command.join(' '),/--editorial-plan .*--editorial-public-directory rr\/incoming\/run-tg-/);
+  await h.press(h.buttons()[0].callback_data,'cb-ok');
+  assert.match(h.sent.at(-1).text,/хеши четырёх файлов, плана монтажа и его PNG/);
+  assert.deepEqual(JSON.parse(readFileSync(path.join(jobDir,'confirmed.json'),'utf8')).editorialPlan,report.editorialPlan);
+  await h.text('/intake_local');await h.press(offerFor(h,'without-plan'),'cb-b');  // without a plan: exactly as before
+  const other=h.intake.db.prepare('SELECT * FROM intake_jobs WHERE id!=?').get(job.id),otherDir=path.join(h.root,other.id);
+  assert.ok(!existsSync(path.join(otherDir,'editorial')));
+  const plain=JSON.parse(readFileSync(path.join(otherDir,'plan-v1.json'),'utf8'));
+  assert.ok(!('editorialPlan' in plain)&&!plain.steps.at(-1).command.includes('--editorial-plan'));
+  await h.press(h.buttons()[0].callback_data,'cb-ok2');
+  assert.ok(!('editorialPlan' in JSON.parse(readFileSync(path.join(otherDir,'confirmed.json'),'utf8'))));
+  assert.ok(!h.sent.at(-1).text.includes('плана монтажа'));
+});
+
+test('editorial plan: unsafe names, links outside the kit, wrong sources or PNG hashes are rejected in the listing',async t=>{
+  const h=setup(t);
+  writeFileSync(path.join(h.dir,'outside.png'),pngBytes);
+  for(const [name,bad] of [['png-dotdot','../outside.png'],['png-absolute',path.join(h.dir,'outside.png')],['png-nested','sub/insert-a.png'],['png-type','insert-a.txt']])
+    editorialKit(h,name,{plan:p=>({...p,files:{[bad]:p.files['insert-a.png']}})});
+  editorialKit(h,'plan-dotdot',{planName:'../editorial-plan.json'});
+  editorialKit(h,'plan-kit',{planName:'kit.json'});
+  editorialKit(h,'other-source',{plan:p=>({...p,parts:{...p.parts,h2:'0'.repeat(64)}})});
+  editorialKit(h,'png-hash',{plan:p=>({...p,files:{'insert-a.png':'1'.repeat(64)}})});
+  editorialKit(h,'other-topic',{plan:p=>({...p,topicId:'roman-seo-99'})});
+  const linkedKit=editorialKit(h,'png-link');let linked=true;
+  rmSync(path.join(linkedKit,'insert-a.png'));
+  try{symlinkSync(path.join(h.dir,'outside.png'),path.join(linkedKit,'insert-a.png'),'file');}catch{linked=false;}
+  await h.text('/intake_local');
+  const text=h.sent.at(-1).text;
+  for(const name of ['png-dotdot','png-absolute','png-nested','png-type','plan-dotdot','plan-kit'])
+    assert.match(text,new RegExp(`✗ ${name}: план монтажа: недопустимое имя файла`));
+  assert.match(text,/✗ other-source: план монтажа: относится к другим исходникам/);
+  assert.match(text,/✗ png-hash: план монтажа: insert-a\.png не совпал по SHA-256/);
+  assert.match(text,/✗ other-topic: план монтажа: другая тема/);
+  if(linked)assert.match(text,/✗ png-link: план монтажа: insert-a\.png: файл вне папки комплекта/);
+  else{assert.match(text,/✗ png-link: план монтажа: нет файла insert-a\.png/);t.diagnostic('file symlinks are not permitted for this user');}
+  assert.equal(h.sent.at(-1).reply_markup,undefined);
+  assert.equal(h.intake.db.prepare('SELECT count(*) n FROM intake_jobs').get().n,0);
+  const c=setup(t);  // a second inbox: one page holds ten folders
+  editorialKit(c,'png-case',{plan:p=>({...p,files:{...p.files,'INSERT-A.png':p.files['insert-a.png']}})});
+  await c.text('/intake_local');
+  assert.match(c.sent.at(-1).text,/✗ png-case: план монтажа: имена PNG различаются только регистром/);
+});
+
+test('editorial PNG changed after the listing or before confirmation: nothing copied or confirmed',async t=>{
+  const h=setup(t),folder=editorialKit(h,'kit-png');
+  await h.text('/intake_local');const offer=offerFor(h,'kit-png');
+  appendFileSync(path.join(folder,'insert-a.png'),Buffer.from([0]));
+  assert.equal((await h.press(offer)).stale,true);
+  assert.match(h.sent.at(-1).text,/изменился после показа списка.*Ничего не скопировано/s);
+  assert.deepEqual(existsSync(h.root)?readdirSync(h.root):[],[]);
+  writeFileSync(path.join(folder,'insert-a.png'),pngBytes);
+  await h.text('/intake_local');await h.press(offerFor(h,'kit-png'),'cb-2');
+  const job=h.intake.db.prepare('SELECT * FROM intake_jobs').get();
+  writeFileSync(path.join(h.root,job.id,'editorial','insert-a.png'),'tampered');
+  assert.equal((await h.press(h.buttons()[0].callback_data,'cb-ok')).stale,true);
+  assert.match(h.sent.at(-1).text,/План монтажа или его PNG изменились после проверки/);
+  assert.equal(h.intake.db.prepare('SELECT state FROM intake_jobs').get().state,'collecting');
+  assert.ok(!existsSync(path.join(h.root,job.id,'confirmed.json')));
 });
