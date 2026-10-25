@@ -292,3 +292,25 @@ test('editorial PNG changed after the listing or before confirmation: nothing co
   assert.equal(h.intake.db.prepare('SELECT state FROM intake_jobs').get().state,'collecting');
   assert.ok(!existsSync(path.join(h.root,job.id,'confirmed.json')));
 });
+
+test('kit prepared by the local window (local_kit.py) is listed, planned and confirmed; its temporary folder is never offered',async t=>{
+  const h=setup(t);
+  mkdirSync(path.join(h.inbox,'.preparing-busy-1234'));  // another window still copying: invisible to the bot
+  const script=path.join(path.dirname(fileURLToPath(import.meta.url)),'local_kit.py');
+  const made=JSON.parse(execFileSync(python,['-I','-X','utf8','-c',
+    'import json,sys;sys.path.insert(0,sys.argv[1]);import local_kit;'+
+    'print(json.dumps(local_kit.prepare(sys.argv[2],dict(zip(["body","h1","h2","h3"],sys.argv[4:8])),sys.argv[3])))',
+    path.dirname(script),'roman-seo-02',h.inbox,sources.body,sources.h1,sources.h2,sources.h3]).toString());
+  assert.equal(path.dirname(made.path),realpathSync.native(h.inbox));
+  await h.text('/intake_local');
+  assert.ok(!h.sent.at(-1).text.includes('.preparing'),'temporary folder neither offered nor rejected');
+  const offer=offerFor(h,made.kit);assert.ok(offer,'the prepared kit is offered');
+  await h.press(offer,'cb-offer');
+  assert.match(h.sent.at(-1).text,/режиме плана/);
+  const [confirm]=h.buttons().map(b=>b.callback_data);
+  assert.equal((await h.press(confirm,'cb-ok')).confirmed,true);
+  const job=h.intake.db.prepare('SELECT * FROM intake_jobs').get();
+  const plan=JSON.parse(readFileSync(path.join(h.root,job.id,'plan-v1.json'),'utf8'));
+  for(const part of ['body','h1','h2','h3'])assert.equal(plan.inputs[part].sha256,made.parts[part].sha256);
+  assert.equal(sha256(sources.body),made.parts.body.sha256,'source untouched');
+});
