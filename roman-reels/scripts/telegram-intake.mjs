@@ -29,13 +29,19 @@ export function sha256(file){
   }catch{return null;}
 }
 const outside=(child,parent)=>{const r=path.relative(parent,child);return !!r&&(r.startsWith('..')||path.isAbsolute(r));};
-// Local kits: <inbox>/<kit>/kit.json = {"topicId":"…","parts":{"body":"…mp4","h1":…,"h2":…,"h3":…}}.
+// Local kits: <inbox>/<kit>/kit.json = {"topicId":"…","parts":{"body":"…mp4","h1":…,"h2":…,"h3":…}}, optionally with
+// "editorialPlan":"<name>.json" — a reviewed plan whose PNG files lie next to it in the same kit folder. The plan and
+// its PNG files are copied into the job and frozen by SHA-256 like the parts; the launcher checks its content.
 // Names come only from the inbox listing and the manifest, never from Telegram text or callbacks.
 const KIT=/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 const KIT_FILE=/^[\p{L}\p{N}][\p{L}\p{N} ._()-]{0,119}\.mp4$/iu;  // any alphabet; no separators, ':' or control characters
 const LOCAL_MAX_BYTES=4*1024**3;
 const MAX_KITS=10;
 const OFFER_TTL_MS=900000;
+const EDITORIAL_FILE=/^[A-Za-z0-9][A-Za-z0-9._-]{0,119}\.json$/i;
+const EDITORIAL_PNG=/^[A-Za-z0-9][A-Za-z0-9._-]{0,119}\.png$/i;
+const EDITORIAL_MAX_BYTES=4*1024**2,EDITORIAL_PNG_MAX_BYTES=20*1024**2,EDITORIAL_MAX_FILES=32;
+export const EDITORIAL_DIR='editorial',EDITORIAL_NAME='editorial-plan.json';
 
 export class FourPartIntake {
   // db: the existing ProductionQueue SQLite handle; one database and one polling lock for the bot.
@@ -88,6 +94,8 @@ function writeAtomic(file,text){
 function summary(job,report){
   const lines=PARTS.map(p=>{const i=report.inputs[p],m=i.metadata;
     return `${ROLES[p]}: ${mb(i.bytes)} МБ · ${m.duration.toFixed(2)} с · ${m.width}×${m.height} · SHA ${i.sha256.slice(0,8)}`;});
+  const edit=report.editorialPlan;
+  if(edit)lines.push(`План монтажа: SHA ${edit.sha256.slice(0,8)} · PNG ${Object.keys(edit.files).length} — субтитры, вставки и план из комплекта`);
   return `Комплект ${job.id} · тема ${job.topic_id}\n${lines.join('\n')}\n\n`+
     'Запускатель проверил комплект в режиме плана: файлы читаются и декодируются, все четыре разные. '+
     'ASR и рендер не запускались. Подтверждение фиксирует этот комплект один раз.';
@@ -97,7 +105,9 @@ async function runPlan(intake,job,api,actor){
   const {assigned}=intake.status(job);
   const parts=Object.fromEntries(PARTS.map(p=>[p,assigned.get(p).local_path]));
   let result;
-  try{result=await intake.plan({parts,topicId:job.topic_id,out:path.join(intake.jobDir(job.id),`run-${job.id}`)});}
+  const editorialPlan=path.join(intake.jobDir(job.id),EDITORIAL_DIR,EDITORIAL_NAME);
+  try{result=await intake.plan({parts,topicId:job.topic_id,out:path.join(intake.jobDir(job.id),`run-${job.id}`),
+    ...(existsSync(editorialPlan)?{editorialPlan}:{})});}
   catch{result={ok:false,error:'запускатель недоступен'};}
   if(!result?.ok){
     await api.send(actor,`Комплект не прошёл проверку запускателем: ${String(result?.error??'неизвестная ошибка').slice(0,300)}\n`+
@@ -197,12 +207,16 @@ async function confirm(intake,data,actor,api){
     intake.db.prepare(`UPDATE intake_jobs SET state='collecting',plan=NULL,plan_version=plan_version+1 WHERE id=? AND state='plan_ready'`).run(job.id);
     await api.send(actor,`${ROLES[changedPart]}: файл изменился после проверки. Назначь роль заново.`);return {stale:true};
   }
+  if(!editorialIntact(report.editorialPlan)){
+    intake.db.prepare(`UPDATE intake_jobs SET state='collecting',plan=NULL,plan_version=plan_version+1 WHERE id=? AND state='plan_ready'`).run(job.id);
+    await api.send(actor,'План монтажа или его PNG изменились после проверки. Отмени комплект (/intake_cancel) и выбери его заново.');return {stale:true};
+  }
   const at=intake.now().toISOString();
   const changed=intake.db.prepare(`UPDATE intake_jobs SET state='confirmed',confirmed_at=? WHERE id=? AND state='plan_ready' AND plan_version=?`)
     .run(at,job.id,job.plan_version).changes;
   if(Number(changed)!==1){await api.send(actor,'Кнопка устарела. Открой /intake.');return {stale:true};}
   ensureConfirmation(intake,{...job,state:'confirmed',confirmed_at:at});
-  await api.send(actor,`Комплект ${job.id} подтверждён и зафиксирован (хеши четырёх файлов).\n`+
+  await api.send(actor,`Комплект ${job.id} подтверждён и зафиксирован (хеши четырёх файлов${report.editorialPlan?', плана монтажа и его PNG':''}).\n`+
     (intake.startExecutor?'Монтаж (ASR и три рилса) запускается отдельной кнопкой «Запустить монтаж».':
       'Исполнение — ASR, монтаж трёх рилсов и их отправка — на этом координаторе не подключено и не запущено.'),montageButton(intake,job.id));
   return {confirmed:true,executeStarted:false};
@@ -284,11 +298,57 @@ function ensureConfirmation(intake,job){
   const expected={schemaVersion:'1.0.0',jobId:job.id,topicId:job.topic_id,confirmedAt:job.confirmed_at,
     confirmedBy:job.actor_id,planVersion:job.plan_version,launcher:'run-local-four-part.py',out:report.output,
     parts:Object.fromEntries(PARTS.map(p=>[p,{path:report.inputs[p].path,sha256:report.inputs[p].sha256,bytes:report.inputs[p].bytes}])),
+    ...(report.editorialPlan?{editorialPlan:report.editorialPlan}:{}),
     executeStarted:false,productionReady:false,approvalStatus:'pending_approval'};
   try{if(isDeepStrictEqual(JSON.parse(readFileSync(file,'utf8')),expected))return false;}catch{}
   writeAtomic(file,JSON.stringify(expected,null,2)+'\n');
   return true;
 }
+
+// Plan and PNG files of a job copy are unchanged since the launcher checked them (no plan: nothing to check).
+export function editorialIntact(edit){
+  if(!edit)return true;
+  return sha256(edit.path)===edit.sha256&&Object.entries(edit.files).every(([name,f])=>sha256(path.join(path.dirname(edit.path),name))===f.sha256);
+}
+
+// A plain regular file directly in the kit folder: no separators, '..', symlinks or anything resolving elsewhere.
+function kitFile(dir,name,pattern,limit){
+  if(typeof name!=='string'||!pattern.test(name)||path.basename(name)!==name||name.includes('..'))return {reason:'недопустимое имя файла'};
+  const file=path.join(dir,name),stat=lstatSync(file,{throwIfNoEntry:false});
+  if(!stat)return {reason:`нет файла ${name}`};
+  if(!stat.isFile()||stat.isSymbolicLink()||path.dirname(realpathSync(file))!==realpathSync(dir))return {reason:`${name}: файл вне папки комплекта`};
+  if(stat.size<1||stat.size>limit)return {reason:`${name}: размер вне допустимого`};
+  return {file,bytes:stat.size};
+}
+
+// Optional editorial plan of a kit: the file, its PNG list and hashes, and its binding to the kit's four originals.
+function readEditorial(dir,name,topicId,parts){
+  const fail=reason=>({ok:false,reason:`план монтажа: ${reason}`});
+  if(name===undefined)return {ok:true};
+  if(name==='kit.json')return fail('недопустимое имя файла');
+  const plan=kitFile(dir,name,EDITORIAL_FILE,EDITORIAL_MAX_BYTES);
+  if(plan.reason)return fail(plan.reason);
+  let content;
+  try{content=JSON.parse(readFileSync(plan.file,'utf8'));}catch{return fail('не читается');}
+  if(content?.topicId!==topicId)return fail('другая тема');
+  if(!content.parts||PARTS.some(p=>content.parts[p]!==parts[p].sha256))return fail('относится к другим исходникам (SHA-256)');
+  const list=content.files;
+  if(!list||typeof list!=='object'||Array.isArray(list)||!Object.keys(list).length||Object.keys(list).length>EDITORIAL_MAX_FILES)
+    return fail('нужен список PNG');
+  if(new Set(Object.keys(list).map(n=>n.toLowerCase())).size!==Object.keys(list).length)return fail('имена PNG различаются только регистром');
+  const files={};
+  for(const [png,expected] of Object.entries(list)){
+    const found=kitFile(dir,png,EDITORIAL_PNG,EDITORIAL_PNG_MAX_BYTES);
+    if(found.reason)return fail(found.reason);
+    const digest=sha256(found.file);
+    if(digest!==expected)return fail(`${png} не совпал по SHA-256`);
+    files[png]={bytes:found.bytes,sha256:digest,source:found.file};
+  }
+  return {ok:true,editorial:{name,bytes:plan.bytes,sha256:sha256(plan.file),source:plan.file,files}};
+}
+// The offered and compared form: no local source paths.
+const offeredEditorial=e=>e&&{name:e.name,bytes:e.bytes,sha256:e.sha256,
+  files:Object.fromEntries(Object.entries(e.files).map(([n,f])=>[n,{bytes:f.bytes,sha256:f.sha256}]))};
 
 // One kit folder directly inside the inbox; symlinks and anything resolving elsewhere are refused.
 function readKit(inbox,kit){
@@ -300,7 +360,7 @@ function readKit(inbox,kit){
   if(!manifestInfo?.isFile()||manifestInfo.size>65536)return {ok:false,reason:'нет kit.json'};
   let manifest;
   try{manifest=JSON.parse(readFileSync(manifestFile,'utf8'));}catch{return {ok:false,reason:'kit.json не читается'};}
-  if(!manifest||typeof manifest!=='object'||Object.keys(manifest).some(k=>!['topicId','parts'].includes(k))||
+  if(!manifest||typeof manifest!=='object'||Object.keys(manifest).some(k=>!['topicId','parts','editorialPlan'].includes(k))||
     typeof manifest.topicId!=='string'||!TOPIC.test(manifest.topicId)||!manifest.parts||typeof manifest.parts!=='object'||Array.isArray(manifest.parts))
     return {ok:false,reason:'kit.json: нужны topicId латиницей и parts'};
   const extra=Object.keys(manifest.parts).filter(k=>!PARTS.includes(k));
@@ -321,7 +381,9 @@ function readKit(inbox,kit){
     if(stat.size<1||stat.size>LOCAL_MAX_BYTES)return {ok:false,reason:`${ROLES[p]}: размер вне допустимого`};
     parts[p]={name,bytes:stat.size,sha256:sha256(file),source:file};
   }
-  return {ok:true,topicId:manifest.topicId,parts};
+  const edit=readEditorial(dir,manifest.editorialPlan,manifest.topicId,parts);
+  if(!edit.ok)return edit;
+  return {ok:true,topicId:manifest.topicId,parts,...(edit.editorial?{editorial:edit.editorial}:{})};
 }
 
 // Pages over every kit folder, valid or not, so old or broken folders never hide later kits.
@@ -340,9 +402,10 @@ async function listLocal(intake,actor,api,page=0){
     try{result=readKit(intake.inbox,kit);}catch{result={ok:false,reason:'не читается'};}
     if(!result.ok){rejected.push(`✗ ${kit}: ${result.reason}`);continue;}
     const id=randomUUID(),parts=Object.fromEntries(PARTS.map(p=>[p,{name:result.parts[p].name,bytes:result.parts[p].bytes,sha256:result.parts[p].sha256}]));
+    if(result.editorial)parts.editorial=offeredEditorial(result.editorial);
     intake.db.prepare('INSERT INTO intake_offers VALUES (?,?,?,?,?,?,NULL)').run(id,String(actor),kit,result.topicId,JSON.stringify(parts),now+OFFER_TTL_MS);
     const total=PARTS.reduce((n,p)=>n+parts[p].bytes,0);
-    buttons.push([{text:`${kit} · ${result.topicId} · ${mb(total)} МБ`,callback_data:`il:${id}`}]);
+    buttons.push([{text:`${kit} · ${result.topicId} · ${mb(total)} МБ${result.editorial?' · план монтажа':''}`,callback_data:`il:${id}`}]);
   }
   const nav=[...(page>0?[{text:'Назад',callback_data:`ilp:${page-1}`}]:[]),...(page+1<pages?[{text:'Далее',callback_data:`ilp:${page+1}`}]:[])];
   if(nav.length)buttons.push(nav);
@@ -370,9 +433,10 @@ async function selectLocal(intake,data,actor,api){
     WHERE o.kit=? AND o.parts=? AND j.state!='cancelled'`).get(offer.kit,offer.parts);
   if(taken){await api.send(actor,`Этот комплект уже взят в задание ${taken.job_id}. Повторно не копирую.`);return {duplicate:true};}
   const current=readKit(intake.inbox,offer.kit);
-  const changed=current.ok?PARTS.find(p=>['name','bytes','sha256'].some(k=>current.parts[p][k]!==offered[p][k])):null;
+  const changed=current.ok?PARTS.find(p=>['name','bytes','sha256'].some(k=>current.parts[p][k]!==offered[p][k]))??
+    (isDeepStrictEqual(offeredEditorial(current.editorial),offered.editorial)?null:'editorial'):null;
   if(!current.ok||changed||current.topicId!==offer.topic_id){
-    await api.send(actor,`Комплект ${offer.kit} изменился после показа списка${changed?`: ${ROLES[changed]}`:current.ok?'':` (${current.reason})`}. `+
+    await api.send(actor,`Комплект ${offer.kit} изменился после показа списка${changed?`: ${ROLES[changed]??'план монтажа'}`:current.ok?'':` (${current.reason})`}. `+
       'Открой /intake_local заново. Ничего не скопировано.');
     return {stale:true,changed:changed??true};
   }
@@ -389,6 +453,22 @@ async function selectLocal(intake,data,actor,api){
       return {stale:true,changed:p};
     }
     copies[p]=target;
+  }
+  if(current.editorial){
+    const dir=path.join(intake.jobDir(id),EDITORIAL_DIR);
+    mkdirSync(dir);
+    const items=[[current.editorial.source,EDITORIAL_NAME,offered.editorial.sha256],
+      ...Object.entries(current.editorial.files).map(([name,f])=>[f.source,name,offered.editorial.files[name].sha256])];
+    for(const [source,name,expected] of items){
+      const target=path.join(dir,name);
+      let copied=true;
+      try{copyFileSync(source,target,constants.COPYFILE_EXCL);}catch{copied=false;}
+      if(!copied||sha256(target)!==expected){
+        rmSync(intake.jobDir(id),{recursive:true,force:true});  // only the folder created just now for this job
+        await api.send(actor,`План монтажа: копия ${name} не совпала по SHA-256 с исходником. Открой /intake_local заново.`);
+        return {stale:true,changed:'editorial'};
+      }
+    }
   }
   const db=intake.db;
   db.exec('BEGIN IMMEDIATE');
@@ -479,15 +559,16 @@ function launcherError(message,parts){
 const LAUNCHER=path.join(path.dirname(fileURLToPath(import.meta.url)),'run-local-four-part.py');
 // Plan mode only: no --execute and no model/browser arguments, so the launcher cannot start ASR or rendering.
 export function launcherPlanner({python='python',launcher=LAUNCHER,timeoutMs=600000}={}){
-  return ({parts,topicId,out})=>new Promise(resolve=>{
-    const args=[launcher,...PARTS.flatMap(p=>[`--${p}`,parts[p]]),'--topic-id',topicId,'--out',out];
+  return ({parts,topicId,out,editorialPlan})=>new Promise(resolve=>{
+    const args=[launcher,...PARTS.flatMap(p=>[`--${p}`,parts[p]]),'--topic-id',topicId,'--out',out,
+      ...(editorialPlan===undefined?[]:['--editorial-plan',editorialPlan])];
     if(args.includes('--execute'))throw Error('Plan mode only');
     execFile(python,args,{cwd:path.dirname(launcher),timeout:timeoutMs,maxBuffer:4194304,windowsHide:true,encoding:'utf8',
       env:{...process.env,PYTHONIOENCODING:'utf-8'}},(error,stdout,stderr)=>{
       if(error){resolve({ok:false,error:launcherError(/Not started: (.*)/.exec(stderr)?.[1],parts)});return;}
       try{
         const report=JSON.parse(stdout);
-        if(report.execute!==false||report.steps?.some(s=>s.status!=='planned'))throw Error();
+        if(report.execute!==false||report.steps?.some(s=>s.status!=='planned')||!report.editorialPlan!==(editorialPlan===undefined))throw Error();
         resolve({ok:true,report});
       }catch{resolve({ok:false,error:'неожиданный ответ запускателя'});}
     });

@@ -8,6 +8,8 @@
 // The executor never ends montage processes or anyone else's: after a timeout it stops waiting and fails the run.
 // After a timeout, a crash or any unconfirmed state the queue gets a standing hold that only the operator's explicit
 // confirmation of a manual check lifts; processes disappearing do not lift it, and nothing is retried.
+// A kit with a confirmed editorial plan passes it on as --editorial-plan after its hashes are rechecked; without one
+// the launcher command is exactly as before.
 // Known limit of the first version: a detached descendant whose intermediate parent lived and exited between two
 // snapshots (3 s), without the job ID in its command line, cannot be linked to the job and may be missed.
 import path from 'node:path';
@@ -15,9 +17,10 @@ import {execFile,spawn} from 'node:child_process';
 import {randomBytes,randomUUID} from 'node:crypto';
 import {closeSync,existsSync,mkdirSync,openSync,readFileSync,renameSync,rmSync,statSync,writeFileSync} from 'node:fs';
 import {setTimeout as delay} from 'node:timers/promises';
+import {isDeepStrictEqual} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {TELEGRAM_CLOUD_UPLOAD_LIMIT} from './telegram-bot-api.mjs';
-import {PARTS,ROLES,sha256} from './telegram-intake.mjs';
+import {PARTS,ROLES,editorialIntact,sha256} from './telegram-intake.mjs';
 
 export const RUN_LABELS={waiting:'ожидает',running:'обрабатывается',done:'готово',failed:'ошибка'};
 export const RENDER_CONCURRENCY=1;
@@ -333,10 +336,14 @@ async function executeRun(o,run){
       if(confirmed.parts?.[p]?.sha256!==plan.inputs[p].sha256)throw Error(`${ROLES[p]}: confirmed.json не совпадает с подтверждённым планом`);
       if(sha256(plan.inputs[p].path)!==plan.inputs[p].sha256)throw Error(`${ROLES[p]}: SHA-256 копии изменился после подтверждения`);
     }
+    const edit=plan.editorialPlan;
+    if(!isDeepStrictEqual(confirmed.editorialPlan,edit))throw Error('план монтажа: confirmed.json не совпадает с подтверждённым планом');
+    if(!editorialIntact(edit))throw Error('план монтажа или его PNG изменились после подтверждения');
     await notify(o,run.requested_by,`Монтаж ${job.id} (${job.topic_id}): обрабатывается — ASR и три рендера по очереди. Бот остаётся доступен.`);
     step('launcher');
     const args=[LAUNCHER,...PARTS.flatMap(p=>[`--${p}`,plan.inputs[p].path]),'--topic-id',job.topic_id,'--out',plan.output,
-      '--model-path',o.modelPath,'--model-revision',o.modelRevision,'--browser-executable',o.browser,'--execute'];
+      '--model-path',o.modelPath,'--model-revision',o.modelRevision,'--browser-executable',o.browser,
+      ...(edit?['--editorial-plan',edit.path,'--editorial-plan-sha256',edit.sha256]:[]),'--execute'];
     let code;
     try{code=await o.execute({args,stdout:path.join(exec,'launcher.stdout.log'),stderr:path.join(exec,'launcher.stderr.log'),onSpawn:track.onSpawn,timeoutMs:o.timeoutMs});}
     finally{track.stop();}
@@ -347,6 +354,7 @@ async function executeRun(o,run){
     const report=JSON.parse(readFileSync(path.join(plan.output,'launch-report.json'),'utf8'));
     if(report.complete!==true||report.renderConcurrency!==RENDER_CONCURRENCY||report.offthreadVideoCacheSizeInBytes!==VIDEO_CACHE_BYTES)
       throw Error('отчёт запускателя неполный или с другими настройками рендера');
+    if(report.editorialPlan?.sha256!==edit?.sha256)throw Error('отчёт запускателя: другой план монтажа');
     const results=HOOKS.map(n=>{
       const render=report.renders?.find(r=>r.hookNumber===n),file=path.join(plan.output,'montage',`h${n}`,'development.mp4');
       if(!render||!existsSync(file))throw Error(`нет рендера хука ${n}`);

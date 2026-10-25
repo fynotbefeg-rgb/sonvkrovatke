@@ -594,3 +594,51 @@ test('hold without waiting jobs, stale confirmation, and a montage request while
   assert.equal(h.buttons()[0].callback_data,`iu:${h.hold().token}`);
   assert.equal(h.holdNotices().length,2,'/montage shows the hold (the executor does not send it again)');
 });
+
+// A confirmed editorial plan as the intake freezes it: plan + PNG in <job>/editorial, the same record in plan and confirmed.json.
+function withEditorial(h,id,{confirmed=true}={}){
+  const jobDir=path.join(h.root,id),dir=path.join(jobDir,'editorial');mkdirSync(dir);
+  const planFile=path.join(dir,'editorial-plan.json'),png=Buffer.from('png-bytes'),text=Buffer.from('{"editorialPlanVersion":"1.0.0"}');
+  writeFileSync(planFile,text);writeFileSync(path.join(dir,'a.png'),png);
+  const edit={path:planFile,sha256:digest(text),files:{'a.png':{sha256:digest(png),bytes:png.length}}};
+  const row=h.queue.db.prepare('SELECT plan FROM intake_jobs WHERE id=?').get(id),plan={...JSON.parse(row.plan),editorialPlan:edit};
+  h.queue.db.prepare('UPDATE intake_jobs SET plan=? WHERE id=?').run(JSON.stringify(plan),id);
+  const file=path.join(jobDir,'confirmed.json'),saved=JSON.parse(readFileSync(file,'utf8'));
+  writeFileSync(file,JSON.stringify(confirmed?{...saved,editorialPlan:edit}:saved));
+  return {dir,edit};
+}
+// The stub launcher reports the editorial plan it was given, like run-local-four-part.py does.
+const reportingEditorial=(h,sha)=>async o=>{
+  const code=await h.execute()(o);
+  const out=o.args[o.args.indexOf('--out')+1],file=path.join(out,'launch-report.json');
+  const at=o.args.indexOf('--editorial-plan');
+  if(at>=0)writeFileSync(file,JSON.stringify({...JSON.parse(readFileSync(file,'utf8')),editorialPlan:{sha256:sha??digest(readFileSync(o.args[at+1]))}}));
+  return code;
+};
+
+test('confirmed editorial plan: hashes rechecked and passed as --editorial-plan; a job without one runs exactly as before',async t=>{
+  const h=setup(t);h.job('tg-20261024-0000000e');const {edit}=withEditorial(h,'tg-20261024-0000000e');h.job('tg-20261024-0000000f');
+  await h.press('ix:tg-20261024-0000000e','cb-1');await h.press('ix:tg-20261024-0000000f','cb-2');
+  await h.executor({execute:reportingEditorial(h)});
+  assert.equal(h.run('tg-20261024-0000000e').state,'done');assert.equal(h.run('tg-20261024-0000000f').state,'done');
+  const [edited,plain]=h.runs;
+  assert.deepEqual(edited.slice(-5),['--editorial-plan',edit.path,'--editorial-plan-sha256',edit.sha256,'--execute']);
+  assert.ok(!plain.includes('--editorial-plan'));assert.equal(plain.at(-1),'--execute');
+  const same=(args,id)=>args.filter(a=>!['--editorial-plan',edit.path,'--editorial-plan-sha256',edit.sha256].includes(a)).map(a=>a.replaceAll(id,'<job>'));
+  assert.deepEqual(same(edited,'0000000e'),same(plain,'0000000f'),'all other arguments unchanged');
+});
+
+test('editorial plan: changed PNG, unconfirmed plan or another plan in the report fail without delivery or retry',async t=>{
+  const h=setup(t);
+  h.job('tg-20261024-00000001');const a=withEditorial(h,'tg-20261024-00000001');writeFileSync(path.join(a.dir,'a.png'),'tampered');
+  h.job('tg-20261024-00000002');withEditorial(h,'tg-20261024-00000002',{confirmed:false});
+  h.job('tg-20261024-00000003');withEditorial(h,'tg-20261024-00000003');
+  for(const id of ['00000001','00000002','00000003'])await h.press(`ix:tg-20261024-${id}`,`cb-${id}`);
+  await h.executor({execute:reportingEditorial(h,'0'.repeat(64))});
+  assert.match(h.run('tg-20261024-00000001').error,/PNG изменились после подтверждения/);
+  assert.match(h.run('tg-20261024-00000002').error,/confirmed\.json не совпадает/);
+  assert.match(h.run('tg-20261024-00000003').error,/другой план монтажа/);
+  assert.equal(h.runs.length,1,'the launcher started only for the job whose hashes matched');
+  assert.equal(h.documents.length,0);
+  for(const id of ['00000001','00000002','00000003'])assert.equal(h.run(`tg-20261024-${id}`).state,'failed');
+});
