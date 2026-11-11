@@ -1,0 +1,44 @@
+{
+  "schema": "windows-mcp-seo-observations-v1",
+  "observedAt": "2026-10-11T18:50Z..18:52Z",
+  "host": "Windows 10 Pro 22H2 19045.6456",
+  "repo": {"branch": "feature/codex-pipeline", "head": "db1adac", "behindOrigin": 0, "aheadOrigin": 0},
+  "node": {"path": "%LOCALAPPDATA%\\Programs\\nodejs\\node.exe", "version": "v24.21.0", "npm": "11.19.0", "installedThisStage": false},
+  "browser": "Microsoft Edge 155.0.4283.45 headless via Playwright MCP (existing session config, unchanged)",
+  "mcpToolsCalled": ["browser_resize", "browser_navigate", "browser_evaluate", "browser_network_requests", "browser_network_request", "browser_take_screenshot"],
+  "httpStatusMethod": "performance.getEntriesByType('navigation')[0].responseStatus; redirects via browser_network_requests + browser_network_request(response-headers)",
+  "synthetic": true,
+  "remoteModelCalls": 0,
+  "states": {
+    "broken": {
+      "origin": "http://127.0.0.1:50492",
+      "pid": 15720,
+      "pages": {
+        "/":         {"http": 200, "title": "Учебная мастерская", "description": "Учебная мастерская: вымышленная учебная страница, не предложение услуг.", "robots": "noindex", "canonical": "http://127.0.0.1:50492/", "h1Count": 2},
+        "/services": {"http": 200, "title": "Учебная мастерская", "description": null, "robots": "index,follow", "canonical": "http://127.0.0.1:50492/", "h1Count": 1},
+        "/pricing":  {"http": 200, "title": "Учебные цены", "description": "Учебные цены: вымышленная учебная страница, не предложение услуг.", "robots": "index,follow", "canonical": "http://127.0.0.1:50492/pricing", "h1Count": 1},
+        "/contact":  {"http": 200, "title": "Контакты", "description": "Контакты: вымышленная учебная страница, не предложение услуг.", "robots": "index,follow", "canonical": "http://127.0.0.1:50492/contact", "h1Count": 1}
+      },
+      "robotsTxt": {"http": 200, "contentType": "text/plain", "body": "User-agent: *\nDisallow: /services\nSitemap: http://127.0.0.1:50492/sitemap.xml\n"},
+      "sitemapXml": {"http": 200, "contentType": "application/xml", "locs": ["/", "/pricing", "/contact", "/gone"]},
+      "oldServices": {"initialHttp": 302, "location": "/", "finalUrl": "http://127.0.0.1:50492/", "finalHttp": 200},
+      "missingTestPage": {"http": 200, "title": "Не найдено", "h1": "Страница не найдена"}
+    },
+    "fixed": {
+      "origin": "http://127.0.0.1:50645",
+      "pid": 1832,
+      "pages": {
+        "/":         {"http": 200, "title": "Учебная мастерская", "description": "Учебная мастерская: вымышленная учебная страница, не предложение услуг.", "robots": "index,follow", "canonical": "http://127.0.0.1:50645/", "h1Count": 1},
+        "/services": {"http": 200, "title": "Услуги автоматизации", "description": "Услуги автоматизации: вымышленная учебная страница, не предложение услуг.", "robots": "index,follow", "canonical": "http://127.0.0.1:50645/services", "h1Count": 1},
+        "/pricing":  {"http": 200, "title": "Учебные цены", "description": "Учебные цены: вымышленная учебная страница, не предложение услуг.", "robots": "index,follow", "canonical": "http://127.0.0.1:50645/pricing", "h1Count": 1},
+        "/contact":  {"http": 200, "title": "Контакты", "description": "Контакты: вымышленная учебная страница, не предложение услуг.", "robots": "index,follow", "canonical": "http://127.0.0.1:50645/contact", "h1Count": 1}
+      },
+      "robotsTxt": {"http": 200, "contentType": "text/plain", "body": "User-agent: *\nDisallow: \nSitemap: http://127.0.0.1:50645/sitemap.xml\n"},
+      "sitemapXml": {"http": 200, "contentType": "application/xml", "locs": ["/", "/services", "/pricing", "/contact"]},
+      "oldServices": {"initialHttp": 301, "location": "/services", "finalUrl": "http://127.0.0.1:50645/services", "finalHttp": 200},
+      "missingTestPage": {"http": 404, "title": "Не найдено", "h1": "Страница не найдена"}
+    }
+  },
+  "notMeasured": ["/gone status (listed in broken sitemap) — not requested", "favicon 404 console error on fixture home — fixture has no favicon, not part of the checks"],
+  "limits": "Two pre-built fixture states on own loopback server; not autonomous repair by Claude, not a real site, not Google indexing, Search Console, speed, security or a free viewer workflow. index,follow removes the specific directive only; it does not guarantee indexing."
+}
