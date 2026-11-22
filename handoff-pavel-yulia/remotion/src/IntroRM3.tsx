@@ -73,8 +73,9 @@ const Title: React.FC<{ lines: string[]; size: number; start: number; color?: st
     <div style={{ fontFamily: "Rosmol Sans", fontWeight: 700, fontSize: size, lineHeight: 1.04, color, textTransform: "uppercase", textAlign: align }}>
       {lines.map((l, i) => {
         const p = spring({ frame: f - start - i * 3, fps, config: { damping: 200, mass: 0.7 } });
-        return <div key={i} style={{ overflow: "hidden", paddingBottom: "0.1em", marginBottom: "-0.1em" }}>
-          <div style={{ transform: `translateY(${(1 - p) * 105}%)` }}>{l}</div></div>;
+        return <div key={i} style={{ overflow: "hidden", paddingTop: "0.3em", marginTop: "-0.3em", paddingBottom: "0.1em", marginBottom: "-0.1em" }}>
+          {/* маска захватывает место над строкой, чтобы бреве «Й» не торчало до выезда строки */}
+          <div style={{ transform: `translateY(${(1 - p) * 160}%)` }}>{l}</div></div>;
       })}
     </div>
   );
@@ -153,10 +154,9 @@ const LessonV1: React.FC<{ l: L }> = ({ l }) => {
   const f = useCurrentFrame(); const { fps, durationInFrames: D } = useVideoConfig();
   const ph = PHOTOS[l.idx % PHOTOS.length];
   const pale = spring({ frame: f, fps, config: { damping: 20 } }), photo = spring({ frame: f - 5, fps, config: { damping: 18, mass: 0.8 } });
-  const out = interpolate(f, [D - 10, D], [0, 1], { ...clamp, easing: Easing.in(Easing.cubic) });
   const size = titleSize(l.title);
   return (
-    <AbsoluteFill style={{ background: C.white, overflow: "hidden", opacity: 1 - out }}>
+    <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Shape p={STEP_RIGHT} x={1100} y={-60} w={860} h={520} fill={C.pale} style={{ transform: `translateX(${(1 - pale) * 600}px)` }} />
       <Shape p={STEP_TOP} x={1000} y={130} w={820} h={820} img={ph.img} imgPos={ph.pos} imgScale={1.1 - 0.06 * (f / D)} gray={ph.img === "f020.jpg"}
         style={{ transform: `translateX(${(1 - photo) * 800}px) rotate(${(1 - photo) * 8 - 2}deg)` }} />
@@ -172,13 +172,12 @@ const LessonV1: React.FC<{ l: L }> = ({ l }) => {
 
 // V2 — бирюзовая, номер урока внутри бледной фигуры с запасом, индикатор уроков справа вверху, всё по левой оси
 const LessonV2: React.FC<{ l: L }> = ({ l }) => {
-  const f = useCurrentFrame(); const { fps, durationInFrames: D } = useVideoConfig();
+  const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const sh = spring({ frame: f - 2, fps, config: { damping: 18 } }), nm = spring({ frame: f - 12, fps, config: { damping: 16 } });
-  const out = interpolate(f, [D - 10, D], [0, 1], { ...clamp, easing: Easing.in(Easing.cubic) });
   const size = titleSize(l.title);
   const num = l.n ? String(l.n).padStart(2, "0") : "+";
   return (
-    <AbsoluteFill style={{ background: C.cyan, overflow: "hidden", opacity: 1 - out }}>
+    <AbsoluteFill style={{ background: C.cyan, overflow: "hidden" }}>
       {/* фигура с номером: бледная, плоская, номер вписан с полями */}
       <div style={{ position: "absolute", left: 1190, top: 250, width: 600, height: 560, transform: `translateX(${(1 - sh) * 700}px) rotate(${(1 - sh) * 10 - 3}deg)` }}>
         <Shape p={STEP_LEFT} x={0} y={0} w={600} h={560} fill={C.pale} />
