@@ -160,7 +160,7 @@ const LessonV1: React.FC<{ l: L }> = ({ l }) => {
       <Shape p={STEP_RIGHT} x={1100} y={-60} w={860} h={520} fill={C.pale} style={{ transform: `translateX(${(1 - pale) * 600}px)` }} />
       <Shape p={STEP_TOP} x={1000} y={130} w={820} h={820} img={ph.img} imgPos={ph.pos} imgScale={1.1 - 0.06 * (f / D)} gray={ph.img === "f020.jpg"}
         style={{ transform: `translateX(${(1 - photo) * 800}px) rotate(${(1 - photo) * 8 - 2}deg)` }} />
-      <div style={{ position: "absolute", left: 140, top: 0, bottom: 0, width: 800, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div style={{ position: "absolute", left: 140, top: 330, width: 800 }}>{/* плашка урока на одной высоте во всех заставках */}
         <div><Chip text={lessonLabel(l.n)} bg={C.pale} color={C.ink} size={34} t={spring({ frame: f - 10, fps, config: { damping: 14, mass: 0.6 } })} /></div>
         <div style={{ height: 30 }} />
         <Title lines={wrap(l.title, Math.round(1400 / size))} size={size} start={14} />
