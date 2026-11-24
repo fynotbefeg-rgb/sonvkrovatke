@@ -147,12 +147,18 @@ const PHOTOS = [
   { img: "f018.jpg", pos: "50% 40%" }, { img: "f012.jpg", pos: "55% 35%" }, { img: "f010.jpg", pos: "50% 30%" },
   { img: "f016.jpg", pos: "50% 60%" }, { img: "f006.jpg", pos: "75% 40%" }, { img: "f004.jpg", pos: "50% 55%" }, { img: "f020.jpg", pos: "45% 40%" },
 ];
+// 24.11: заказчик прислал фото в высоком разрешении (pavel-rosmolodezh/brand/hires) — по урокам
+const BY_LESSON: Record<number, { img: string; pos: string }> = {
+  2: { img: "h-para.jpg", pos: "60% 35%" }, 13: { img: "h-para.jpg", pos: "60% 35%" },
+  3: { img: "h-devushka.jpg", pos: "48% 40%" }, 0: { img: "h-devushka.jpg", pos: "48% 40%" },
+  4: { img: "h-amur.jpg", pos: "55% 45%" }, 7: { img: "h-flag.jpg", pos: "50% 55%" }, 12: { img: "h-tancy.jpg", pos: "50% 50%" },
+};
 const titleSize = (t: string) => (t.length > 60 ? 56 : t.length > 36 ? 68 : 80);
 
 // V1 — белая, фото в фигуре справа (как слайд 1 презентации)
 const LessonV1: React.FC<{ l: L }> = ({ l }) => {
   const f = useCurrentFrame(); const { fps, durationInFrames: D } = useVideoConfig();
-  const ph = PHOTOS[l.idx % PHOTOS.length];
+  const ph = BY_LESSON[l.n] ?? PHOTOS[l.idx % PHOTOS.length];
   const pale = spring({ frame: f, fps, config: { damping: 20 } }), photo = spring({ frame: f - 5, fps, config: { damping: 18, mass: 0.8 } });
   const size = titleSize(l.title);
   return (
